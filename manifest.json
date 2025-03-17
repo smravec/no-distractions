@@ -5,6 +5,14 @@
     "manifest_version": 3,
     "action": {
       "default_popup": "hello.html",
-      "default_icon": "hello_extensions.png"
+      "default_icon": "default_icon.png"
+    },
+    
+    "content_scripts": [
+        {
+        "js": ["/content.js"],
+        "matches": ["https://*.reddit.com/*"],
+        "run_at": "document_start"
     }
+    ]
   }
