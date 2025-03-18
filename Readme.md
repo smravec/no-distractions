@@ -1,12 +1,12 @@
 # No Distractions
 
 ## TODO
-Reddit - mvp done
-Instagram
-Quora
-Facebook
-Youtube
-Tiktok
+Reddit - mvp done <br/>
+Instagram <br/>
+Quora <br/>
+Facebook <br/>
+Youtube <br/>
+Tiktok <br/>
 
 Ability to turn off for each site
 
