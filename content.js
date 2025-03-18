@@ -1,11 +1,8 @@
 //TODO 
-//fix bug when clicking away from home and then back under 3s everything breaks
-//add spinner for the subreddits to load while under the 3 seconds (while it is waiting) 
+//make it remove the css just in time when the page loads (the next page) and not on timeout of fixed 1.5s
 
-// Global variable to keep track of whether CSS is injected
 let cssInjected = false;
 
-// Function to inject CSS
 function injectCSS() {
   // Prevent multiple injections
   if (cssInjected) return;
@@ -22,30 +19,33 @@ function injectCSS() {
   (document.head || document.documentElement).appendChild(style);
   cssInjected = true;
   console.log('CSS injected for homepage');
+  
 }
 
 // Function to remove CSS
 function removeCSS() {
   const style = document.getElementById('reddit-no-recommendations-style');
-  if (style) {
+  if (style && !cleanCurrentUrl()) {
     style.remove();
     cssInjected = false;
     console.log('CSS removed');
   }
 }
 
-// Detect current page
-function isHome() {
+// Decide if current page is one among those that should be cleaned
+function cleanCurrentUrl() {
   const path = window.location.pathname;
   return path === "/" || path === "/r/all/" || path === "/r/popular/";
 }
 
 // Function to update CSS based on current URL
 function updateCSS() {
-  if (isHome()) {
+  if (cleanCurrentUrl()) {
     injectCSS();
-  } else {
-    setTimeout(removeCSS, 3000)
+  } else if (cssInjected) {
+    setTimeout(() => {
+      removeCSS();
+    }, 1500);
   }
 }
 
@@ -88,3 +88,5 @@ document.addEventListener('click', function(e) {
   }
 });
   
+
+

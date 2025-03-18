@@ -1,6 +1,6 @@
 {
     "name": "No Distractions",
-    "description": "Block reddit recomendation feed",
+    "description": "Block reddit recommendation feed",
     "version": "1.0",
     "manifest_version": 3,
     "action": {
