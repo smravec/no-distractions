@@ -4,7 +4,6 @@
 let cssInjected = false;
 
 function injectCSS() {
-  // Prevent multiple injections
   if (cssInjected) return;
   
   const style = document.createElement('style');
@@ -19,10 +18,8 @@ function injectCSS() {
   (document.head || document.documentElement).appendChild(style);
   cssInjected = true;
   console.log('CSS injected for homepage');
-  
 }
 
-// Function to remove CSS
 function removeCSS() {
   const style = document.getElementById('reddit-no-recommendations-style');
   if (style && !cleanCurrentUrl()) {
@@ -32,13 +29,11 @@ function removeCSS() {
   }
 }
 
-// Decide if current page is one among those that should be cleaned
 function cleanCurrentUrl() {
   const path = window.location.pathname;
   return path === "/" || path === "/r/all/" || path === "/r/popular/";
 }
 
-// Function to update CSS based on current URL
 function updateCSS() {
   if (cleanCurrentUrl()) {
     injectCSS();
@@ -49,28 +44,24 @@ function updateCSS() {
   }
 }
 
-// Initial check and setup
 updateCSS();
 
-// Handle navigation in single-page apps
 let lastUrl = location.href;
 const urlObserver = new MutationObserver(() => {
-  const url = location.href;
-  if (url !== lastUrl) {
+const url = location.href;
+if (url !== lastUrl) {
     lastUrl = url;
     console.log('URL changed to:', url);
-    // Wait a moment for the page to update
     setTimeout(updateCSS, 50);
   }
 });
 
-// Start observing with a more comprehensive configuration
 urlObserver.observe(document, {
   subtree: true,
   childList: true,
   attributes: true,
   characterData: true
-});
+});      
 
 // Also watch for popstate events (browser back/forward buttons)
 window.addEventListener('popstate', function() {

@@ -1,0 +1,196 @@
+/*
+#masthead-ad.ytd-rich-grid-renderer.style-scope,
+div#home-page-skeleton,
+html[hide_annotations="true"] .annOption,
+html[hide_autoplay="true"] .autonav-endscreen,
+html[hide_autoplay="true"]
+  button[data-tooltip-target-id="ytp-autonav-toggle-button"],
+html[hide_autoplay="true"]
+  ytd-watch-flexy:not([playlist])
+  .ytp-chrome-controls
+  .ytp-next-button,
+html[hide_bar="true"] #actions.ytd-watch-metadata,
+html[hide_bar="true"] #info > #menu-container,
+html[hide_cards="true"] .ytp-ce-element,
+html[hide_channel="true"] #owner.ytd-watch-metadata,
+html[hide_channel="true"] #top-row.ytd-video-secondary-info-renderer,
+html[hide_channel="true"][hide_desc="true"] #primary-inner > #meta,
+html[hide_chat="true"] ytd-live-chat-frame#chat,
+html[hide_comments="true"] #comment-teaser,
+html[hide_comments="true"] #comments,
+html[hide_desc="true"] #description.ytd-watch-metadata,
+html[hide_desc="true"] ytd-expander.ytd-video-secondary-info-renderer,
+html[hide_donate="true"] #donation-shelf,
+html[hide_endscreen="true"] .html5-endscreen:not(.mweb-endscreen),
+html[hide_feed="true"]
+html[hide_feed="true"]
+  ytd-browse[role="main"]:not([page-subtype]):not(
+    :has(#header #page-header-container)
+  ):has(ytd-feed-filter-chip-bar-renderer)
+  .ytd-rich-grid-renderer,
+html[hide_header="true"] #guide-spacer,
+html[hide_header="true"] #masthead-container,
+html[hide_merch="true"] #clarify-box,
+html[hide_merch="true"] #offer-module,
+html[hide_merch="true"] #ticket-shelf,
+html[hide_merch="true"] .ytp-drawer,
+html[hide_merch="true"] yt-alert-with-actions-renderer,
+html[hide_merch="true"] ytd-merch-shelf-renderer,
+html[hide_merch="true"] ytd-metadata-row-container-renderer > #always-shown,
+html[hide_meta="true"] #primary-inner > #info,
+html[hide_meta="true"] ytd-watch-metadata,
+html[hide_mix="true"] .ytp-videowall-still[data-is-mix="true"],
+html[hide_mix="true"] a[href*="start_radio=1"],
+html[hide_mix="true"]
+  ytd-browse[page-subtype="home"]
+  ytd-video-meta-block[radio-meta],
+html[hide_mix="true"] ytd-compact-radio-renderer,
+html[hide_mix="true"] ytd-radio-renderer,
+html[hide_mix="true"] ytd-rich-item-renderer:has(a[href*="start_radio=1"]),
+html[hide_moreyt="true"]
+  #sections
+  > ytd-guide-section-renderer:nth-last-child(2),
+html[hide_notifs="true"]
+  #buttons.ytd-masthead
+  > ytd-notification-topbar-button-renderer.ytd-masthead,
+html[hide_notifs="true"] ytd-notification-topbar-button-shape-renderer,
+html[hide_playlists="true"] #playlist,
+html[hide_prof="true"] .ytd-comment-renderer yt-img-shadow,
+
+html[hide_redirect_home="true"][hide_feed="true"][hide_subs="false"]
+  .yt-simple-endpoint[href="/"],
+html[hide_redirect_home="true"][hide_feed="true"][hide_subs="false"]
+  .yt-simple-endpoint[href^="/index"],
+html[hide_search="true"]
+  #primary
+  > .ytd-two-column-search-results-renderer
+  ytd-horizontal-card-list-renderer,
+html[hide_search="true"]
+  #primary
+  > .ytd-two-column-search-results-renderer
+  ytd-shelf-renderer,
+html[hide_sidebar="true"] #secondary.ytd-watch-flexy,
+html[hide_subs="true"] .yt-simple-endpoint[href^="/feed/subscriptions"],
+html[hide_subs="true"]:not([yt-signed-out])
+  #sections
+  > ytd-guide-section-renderer:nth-child(2),
+html[hide_subs="true"] ytd-browse[page-subtype="subscriptions"],
+
+paper-dialog > ytd-single-option-survey-renderer[dialog][dialog][dialog],
+ytd-mealbar-promo-renderer[dialog],
+ytd-primetime-promo-renderer {
+  display: none !important;
+}
+html[hide_header="true"] #header.ytd-c4-tabbed-header-renderer,
+html[hide_header="true"] #page-manager.ytd-app {
+  margin-top: 0 !important;
+}
+html[hide_header="true"] ytd-mini-guide-renderer.ytd-app {
+  top: 0 !important;
+}
+html[hide_channel="true"][hide_desc="false"] ytd-video-primary-info-renderer {
+  border: 0 !important;
+}
+html[hide_sidebar="true"]
+  ytd-watch-flexy[flexy][is-two-columns_]:not([fullscreen]):not([theater]) {
+  --ytd-watch-flexy-max-player-width: calc(
+    var(--ytd-watch-flexy-chat-max-height) * var(--ytd-watch-flexy-width-ratio) /
+      var(--ytd-watch-flexy-height-ratio)
+  ) !important;
+}
+#content > #page-manager.ytd-app {
+  overflow-y: hidden !important;
+}
+#surveys,
+.mealbar-promo-renderer,
+html[hide_autoplay="true"]
+  .player-controls-middle
+  > button:not(.player-control-play-pause-icon),
+html[hide_autoplay="true"] .ytm-autonav-bar,
+html[hide_autoplay="true"] .ytm-autonav-toggle-button-container,
+html[hide_bar="true"] .slim-video-metadata-actions,
+html[hide_channel="true"] ytm-slim-owner-renderer,
+html[hide_comments="true"] ytm-comment-section-renderer,
+html[hide_comments="true"] ytm-comments-entry-point-header-renderer,
+html[hide_comments="true"] ytm-engagement-panel,
+html[hide_desc="true"] .slim-video-metadata-header-content > c3-icon,
+html[hide_desc="true"] .slim-video-metadata-info,
+html[hide_donate="true"] ytm-donation-shelf-renderer-outer,
+html[hide_endscreen="true"] .ytp-mweb-endscreen-play-next,
+html[hide_endscreen="true"] .ytp-mweb-endscreen-play-previous,
+html[hide_feed="true"] div[tab-identifier="FEwhat_to_watch"],
+html[hide_header="true"] .mobile-topbar-header,
+html[hide_merch="true"] ytm-compact-offer-module-renderer,
+html[hide_meta="true"]
+  ytm-item-section-renderer[section-identifier="slim-video-metadata"],
+html[hide_mix="true"] ytm-compact-radio-renderer,
+html[hide_mix="true"] ytm-radio-renderer,
+html[hide_playlists="true"] ytm-playlist,
+html[hide_prof="true"] .comment-icon-container,
+html[hide_recommended="true"]
+  
+
+html[hide_subs="true"] div[tab-identifier="FEsubscriptions"],
+html[hide_subs="true"]
+  ytm-pivot-bar-renderer
+  > ytm-pivot-bar-item-renderer:has(.pivot-subs),
+
+html[hide_header="true"] #player-container-id,
+html[hide_header="true"]
+  ytm-item-section-renderer[section-identifier="related-items"] {
+  top: 0 !important;
+}
+html[hide_header="true"] ytm-app.sticky-player {
+  padding-top: 0 !important;
+} */
+
+/* Shorts */
+ytm-pivot-bar-renderer > ytm-pivot-bar-item-renderer:has(.pivot-shorts),
+.yt-simple-endpoint[title="Shorts"],
+#player-shorts-container,
+.ytd-shorts,
+yt-chip-cloud-chip-renderer:has(yt-formatted-string[title="Shorts"]),
+yt-tab-shape[tab-title="Shorts"],
+ytd-compact-video-renderer:has(a[href*="/shorts/"]),
+ytd-notification-renderer:has(> a[href^="/shorts/"]),
+ytd-reel-shelf-renderer,
+ytd-rich-grid-renderer[is-shorts-grid],
+ytd-rich-item-renderer:has(a[href*="/shorts/"]),
+ytm-reel-shelf-renderer,
+ytd-rich-shelf-renderer[is-shorts],
+ytd-video-renderer:has(a[href*="/shorts/"]),
+ytm-rich-grid-renderer.is_shorts,
+ytm-video-with-context-renderer:has(a[href*="/shorts/"]) {
+  display: none !important;
+}
+
+/* Trending */
+.yt-simple-endpoint[href^="/feed/explore"],
+.yt-simple-endpoint[href^="/feed/trending"],
+:not([yt-signed-out]) #sections > ytd-guide-section-renderer:nth-child(3),
+[yt-signed-out] #sections > ytd-guide-section-renderer:nth-child(4),
+ytd-browse[page-subtype="trending"],
+div[tab-identifier="FEexplore"],
+div[tab-identifier="FEtrending"],
+ytm-pivot-bar-renderer > ytm-pivot-bar-item-renderer:has(.pivot-trending) {
+  display: none !important;
+}
+
+/* Recommendations (next to video) */
+ytm-item-section-renderer[section-identifier="related-items"],
+#items.ytd-watch-next-secondary-results-renderer,
+.ytd-watch-grid > #contents,
+.ytp-pause-overlay {
+  display: none !important;
+}
+#secondary.ytd-watch-grid {
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 300px;
+}
+
+/* Recommendations (home feed) */
+ytm-pivot-bar-renderer > ytm-pivot-bar-item-renderer:has(.pivot-w2w),
+ytd-browse[page-subtype="home"] .ytd-rich-grid-renderer {
+  display: none !important;
+}
