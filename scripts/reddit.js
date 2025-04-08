@@ -1,3 +1,4 @@
+/* TODO (past mvp) fix on mobile does not apply on page reload*/
 //Clean sidebar from /r popular and /r all
 function injectCSSIntoShadow(interval) {
   const host = document.querySelector("left-nav-top-section");

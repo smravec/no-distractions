@@ -5,6 +5,11 @@ recent-posts {
   display: none !important;
 }
 
+/* Recommendation (below post on mobile) */
+#right-sidebar-contents {
+  display: none !important;
+}
+
 /* r/all page */
 shreddit-feed[reload-url*="all-feed"] {
   display: none !important;
@@ -15,22 +20,3 @@ search-dynamic-id-cache-controller[search-telemetry-source="popular_carousel"],
 shreddit-feed[reload-url*="popular-feed"] {
   display: none !important;
 }
-
-/* trending page */
-
-/* sidebar */
-/* left-nav-top-section {
-  display: none !important;
-} */
-/* faceplate-tracker {
-  display: none !important;
-} */
-/* faceplate-tracker.visible:nth-child(3) {
-  display: none !important;
-} */
-/* faceplate-tracker.visible {
-  display: none !important;
-} */
-/* faceplate-tracker.visible {
-  border: 2px solid red;
-} */
