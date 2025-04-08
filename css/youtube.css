@@ -1,3 +1,5 @@
+/* TODO find usefull selectors and remove rest */
+
 /*
 #masthead-ad.ytd-rich-grid-renderer.style-scope,
 div#home-page-skeleton,
@@ -155,8 +157,7 @@ ytm-video-with-context-renderer:has(a[href*="/shorts/"]) {
 [yt-signed-out] #sections > ytd-guide-section-renderer:nth-child(4),
 ytd-browse[page-subtype="trending"],
 div[tab-identifier="FEexplore"],
-div[tab-identifier="FEtrending"],
-ytm-pivot-bar-renderer > ytm-pivot-bar-item-renderer:has(.pivot-trending) {
+div[tab-identifier="FEtrending"] {
   display: none !important;
 }
 
@@ -174,7 +175,14 @@ ytm-item-section-renderer[section-identifier="related-items"],
 }
 
 /* Recommendations (home feed) */
-ytm-pivot-bar-renderer > ytm-pivot-bar-item-renderer:has(.pivot-w2w),
-ytd-browse[page-subtype="home"] .ytd-rich-grid-renderer {
+div[tab-identifier="FEwhat_to_watch"],
+ytd-browse[page-subtype="home"] .ytd-rich-grid-renderer,
+ytd-browse[role="main"]:not([page-subtype]):not(
+    :has(#header #page-header-container)
+  ):has(ytd-feed-filter-chip-bar-renderer).ytd-rich-grid-renderer,
+ytm-pivot-bar-renderer > ytm-pivot-bar-item-renderer:has(.pivot-trending),
+ytm-pivot-bar-renderer > ytm-pivot-bar-item-renderer:has(.pivot-w2w) {
   display: none !important;
 }
+
+/* TODO Recommendations (after video ends) */
