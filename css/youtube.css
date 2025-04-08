@@ -23,7 +23,6 @@ html[hide_desc="true"] ytd-expander.ytd-video-secondary-info-renderer,
 html[hide_donate="true"] #donation-shelf,
 html[hide_endscreen="true"] .html5-endscreen:not(.mweb-endscreen),
 html[hide_feed="true"]
-html[hide_feed="true"]
   ytd-browse[role="main"]:not([page-subtype]):not(
     :has(#header #page-header-container)
   ):has(ytd-feed-filter-chip-bar-renderer)
@@ -127,22 +126,7 @@ html[hide_mix="true"] ytm-compact-radio-renderer,
 html[hide_mix="true"] ytm-radio-renderer,
 html[hide_playlists="true"] ytm-playlist,
 html[hide_prof="true"] .comment-icon-container,
-html[hide_recommended="true"]
-  
 
-html[hide_subs="true"] div[tab-identifier="FEsubscriptions"],
-html[hide_subs="true"]
-  ytm-pivot-bar-renderer
-  > ytm-pivot-bar-item-renderer:has(.pivot-subs),
-
-html[hide_header="true"] #player-container-id,
-html[hide_header="true"]
-  ytm-item-section-renderer[section-identifier="related-items"] {
-  top: 0 !important;
-}
-html[hide_header="true"] ytm-app.sticky-player {
-  padding-top: 0 !important;
-} */
 
 /* Shorts */
 ytm-pivot-bar-renderer > ytm-pivot-bar-item-renderer:has(.pivot-shorts),

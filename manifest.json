@@ -1,6 +1,6 @@
 {
   "name": "No Distractions",
-  "description": "Block reddit recommendation feed",
+  "description": "Block addictive recommendation feeds",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
@@ -12,6 +12,7 @@
     {
       "matches": ["https://*.reddit.com/*"],
       "css": ["/css/reddit.css"],
+      "js": ["/scripts/reddit.js"],
       "all_frames": true,
       "run_at": "document_start"
     },
