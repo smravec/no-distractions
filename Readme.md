@@ -1,12 +1,15 @@
 # No Distractions
 
-## TODO
+## TODO MVP
 
-Reddit - part of mvp <br/>
+Reddit - DONE <br/>
 Instagram - part of mvp <br/>
-Facebook - par of mvp <br/>
-Youtube - mvp done <br/>
-Tiktok - beyond mvp <br/>
-Quora - beyond mvp <br/>
+Facebook - WORKING <br/>
+Youtube - DONE <br/>
 
-Ability to turn off for each site - part of mvp
+Ability to turn off for each site - part of mvp <br/>
+
+## TODO beyond mvp
+
+Tiktok <br/>
+Quora <br/>
