@@ -1,11 +1,13 @@
 /* Init styles till the js script gets loaded*/
 /* Hides the main feed */
-div[role="main"] {
+/* div[role="main"] {
   display: none;
-}
+} */
 
 /* Pernament styles */
 /* Cleans /watch page */
 #watch_feed {
   display: none !important;
 }
+
+/**/
