@@ -1,13 +1,28 @@
 /* Init styles till the js script gets loaded*/
 /* Hides the main feed */
-/* div[role="main"] {
+div[role="main"] {
   display: none;
-} */
+}
 
 /* Pernament styles */
+
 /* Cleans /watch page */
 #watch_feed {
   display: none !important;
 }
 
-/**/
+/* Mobile styles */
+
+/* Hides main feed */
+/* #screen-root > div > div:nth-child(1) > div:nth-child(5) ~ * {
+  display: none;
+} */
+
+/* Hides open app button */
+#screen-root > div > div.m.fixed-container.bottom {
+  display: none;
+}
+
+#screen-root > div > div:nth-child(3) > div:nth-child(6) ~ * {
+  display: none;
+}
