@@ -42,10 +42,27 @@ main_feed_mobile.textContent = `
     `;
 
 const watch_feed_mobile = document.createElement("style");
-watch_feed_mobile_feed_mobile.textContent = `
+watch_feed_mobile.textContent = `
     #screen-root > div > div:nth-child(3) > div:nth-child(6) ~ * {
       display: none;
     }
+    #screen-root > div:nth-child(1)::before {
+      background-color: white !important;
+    }  
+`;
+
+const reels_mobile = document.createElement("style");
+reels_mobile.textContent = `
+    video{
+      display: none;
+    }  
+`;
+
+const live_feed_mobile = document.createElement("style");
+live_feed_mobile.textContent = `
+    #screen-root > div > div:nth-child(3) > div.m.bg-s2.displayed ~ * {
+      display: none;
+    } 
 `;
 
 function CleanEntirePageMobile(entering_or_leaving_bool, url) {
@@ -57,9 +74,21 @@ function CleanEntirePageMobile(entering_or_leaving_bool, url) {
     }
   } else if (url == "watch") {
     if (entering_or_leaving_bool === true) {
-      document.head.appendChild(main_feed_mobile);
+      document.head.appendChild(watch_feed_mobile);
     } else {
-      document.head.removeChild(main_feed_mobile);
+      document.head.removeChild(watch_feed_mobile);
+    }
+  } else if (url == "reels") {
+    if (entering_or_leaving_bool === true) {
+      document.head.appendChild(reels_mobile);
+    } else {
+      document.head.removeChild(reels_mobile);
+    }
+  } else if (url == "live") {
+    if (entering_or_leaving_bool === true) {
+      document.head.appendChild(live_feed_mobile);
+    } else {
+      document.head.removeChild(live_feed_mobile);
     }
   }
 }
@@ -78,6 +107,12 @@ const init_path = window.location.pathname;
 if (mobile_mode === true) {
   if (init_path === "/" || init_path === "") {
     CleanEntirePageMobile(true, "/");
+  } else if (init_path == "/watch/") {
+    CleanEntirePageMobile(true, "watch");
+  } else if (init_path.includes("reel")) {
+    CleanEntirePageMobile(true, "reels");
+  } else if (init_path == "/watch/live/") {
+    CleanEntirePageMobile(true, "live");
   }
 } else {
   if (
@@ -121,13 +156,39 @@ function setupObserver() {
 
         if (mobile_mode === true) {
           console.log("mobile mode");
+          // Main page
+          if (lastPathname == "/" || lastPathname == "") {
+            CleanEntirePageMobile(false, "/");
+          }
           if (
             window.location.pathname == "/" ||
             window.location.pathname == ""
           ) {
             CleanEntirePageMobile(true, "/");
-          } else if (lastPathname == "/" || lastPathname == "") {
-            CleanEntirePageMobile(false, "/");
+          }
+
+          // Watch page
+          if (lastPathname == "/watch/") {
+            CleanEntirePageMobile(false, "watch");
+          }
+          if (window.location.pathname == "/watch/") {
+            CleanEntirePageMobile(true, "watch");
+          }
+
+          // Reels page
+          if (lastPathname.includes("reel")) {
+            CleanEntirePageMobile(false, "reels");
+          }
+          if (window.location.pathname.includes("reel")) {
+            CleanEntirePageMobile(true, "reels");
+          }
+
+          // Live page
+          if (lastPathname == "/watch/live/") {
+            CleanEntirePageMobile(false, "live");
+          }
+          if (window.location.pathname == "/watch/live/") {
+            CleanEntirePageMobile(true, "live");
           }
         } else {
           if (

@@ -13,16 +13,7 @@ div[role="main"] {
 
 /* Mobile styles */
 
-/* Hides main feed */
-/* #screen-root > div > div:nth-child(1) > div:nth-child(5) ~ * {
-  display: none;
-} */
-
 /* Hides open app button */
 #screen-root > div > div.m.fixed-container.bottom {
-  display: none;
-}
-
-#screen-root > div > div:nth-child(3) > div:nth-child(6) ~ * {
   display: none;
 }
