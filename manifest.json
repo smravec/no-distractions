@@ -34,6 +34,18 @@
       "js": ["scripts/facebook.js"],
       "all_frames": true,
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.instagram.com/*"],
+      "css": ["css/instagram.css"],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.instagram.com/*"],
+      "js": ["scripts/instagram.js"],
+      "all_frames": true,
+      "run_at": "document_idle"
     }
   ],
 
