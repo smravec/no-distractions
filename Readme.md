@@ -1,9 +1,9 @@
 # No Distractions
 
-3 settings for each site
-Recommendation feeds completely off - green
-Only friends and followed in recommendation feeds - yellow
-No filtering recommendation feeds as they are - red
+3 settings for each site <br/>
+Recommendation feeds completely off - green <br/>
+Only friends and followed in recommendation feeds - yellow <br/>
+No filtering recommendation feeds as they are - red <br/>
 
 ## TODO MVP
 
