@@ -11,5 +11,3 @@ div[role="progressbar"] {
 div[data-visualcompletion="ignore"] {
   display: none !important;
 }
-
-/* TODO fix styles on main page flickering articles */

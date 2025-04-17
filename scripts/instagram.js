@@ -1,124 +1,5 @@
-// TODO mvp block /reels and remove all article tags from / and clean /explore page
-
-// // mobile = true, desktop = false
-// let mobile_mode = null;
-// if (window.screen.width <= 500) {
-//   mobile_mode = true;
-// } else {
-//   mobile_mode = false;
-// }
-
-// const dont_display_style = "display: none !important;";
-
-// // Universal style to clean the main content element
-// const main_feed = document.createElement("style");
-// main_feed.textContent = `
-//     div[role="main"]{
-//         ${dont_display_style}
-//     }
-// `;
-
-// function CleanEntirePage(entering_or_leaving_bool) {
-//   if (entering_or_leaving_bool === true) {
-//     document.head.appendChild(main_feed);
-//   } else {
-//     document.head.removeChild(main_feed);
-//   }
-// }
-// // Styles for mobile
-// const main_feed_mobile = document.createElement("style");
-// main_feed_mobile.textContent = `
-//     #screen-root > div > div:nth-child(1) > div:nth-child(5) ~ * {
-//       display: none !important;
-//     }
-//     #screen-root > div:nth-child(1)::before {
-//       background-color: white !important;
-//     }
-//     `;
-
-// const watch_feed_mobile = document.createElement("style");
-// watch_feed_mobile.textContent = `
-//     #screen-root > div > div:nth-child(3) > div:nth-child(6) ~ * {
-//       display: none;
-//     }
-//     #screen-root > div:nth-child(1)::before {
-//       background-color: white !important;
-//     }
-// `;
-
-// const reels_mobile = document.createElement("style");
-// reels_mobile.textContent = `
-//     video{
-//       display: none;
-//     }
-// `;
-
-// const live_feed_mobile = document.createElement("style");
-// live_feed_mobile.textContent = `
-//     #screen-root > div > div:nth-child(3) > div.m.bg-s2.displayed ~ * {
-//       display: none;
-//     }
-// `;
-
-// function CleanEntirePageMobile(entering_or_leaving_bool, url) {
-//   if (url == "/") {
-//     if (entering_or_leaving_bool === true) {
-//       document.head.appendChild(main_feed_mobile);
-//     } else {
-//       document.head.removeChild(main_feed_mobile);
-//     }
-//   } else if (url == "watch") {
-//     if (entering_or_leaving_bool === true) {
-//       document.head.appendChild(watch_feed_mobile);
-//     } else {
-//       document.head.removeChild(watch_feed_mobile);
-//     }
-//   } else if (url == "reels") {
-//     if (entering_or_leaving_bool === true) {
-//       document.head.appendChild(reels_mobile);
-//     } else {
-//       document.head.removeChild(reels_mobile);
-//     }
-//   } else if (url == "live") {
-//     if (entering_or_leaving_bool === true) {
-//       document.head.appendChild(live_feed_mobile);
-//     } else {
-//       document.head.removeChild(live_feed_mobile);
-//     }
-//   }
-// }
-
-// //Init override stylesheet styles
-// const main_feed_override = document.createElement("style");
-// main_feed_override.textContent = `
-//     div[role="main"]{
-//         display: block !important;
-//     }
-// `;
-// document.head.appendChild(main_feed_override);
-
-// //Init clean
-// const init_path = window.location.pathname;
-// if (mobile_mode === true) {
-//   if (init_path === "/" || init_path === "") {
-//     CleanEntirePageMobile(true, "/");
-//   } else if (init_path == "/watch/") {
-//     CleanEntirePageMobile(true, "watch");
-//   } else if (init_path.includes("reel")) {
-//     CleanEntirePageMobile(true, "reels");
-//   } else if (init_path == "/watch/live/") {
-//     CleanEntirePageMobile(true, "live");
-//   }
-// } else {
-//   if (
-//     init_path === "/" ||
-//     init_path === "" ||
-//     init_path === "/reel/" ||
-//     init_path.includes("watch")
-//   ) {
-//     CleanEntirePage(true);
-//   }
-// }
+// TODO fix styles flickering on the main feed
+// (there is display none on article should just find suggested posts headline and remove everything below )
 
 // Universal style to clean the main content element
 const main_feed = document.createElement("style");
@@ -126,7 +7,6 @@ main_feed.textContent = `
     article {
         display: none !important;
     }   
-
     div[role="progressbar"] {
         display: none !important;
     }
@@ -136,6 +16,13 @@ const explore_page = document.createElement("style");
 explore_page.textContent = `
     main[role="main"] > *{
     display: none !important
+    }
+`;
+
+const explore_page_mobile = document.createElement("style");
+explore_page_mobile.textContent = `
+    main[role="main"] > *:not(nav){
+    display: none !important;
     }
 `;
 
@@ -163,6 +50,14 @@ function CleanEntirePage(entering_or_leaving_bool, url) {
     }
   }
 
+  if (url == "/explore-mobile/") {
+    if (entering_or_leaving_bool === true) {
+      document.head.appendChild(explore_page_mobile);
+    } else {
+      document.head.removeChild(explore_page_mobile);
+    }
+  }
+
   if (url == "/reels/") {
     if (entering_or_leaving_bool === true) {
       document.head.appendChild(reels_page);
@@ -177,9 +72,20 @@ const init_path = window.location.pathname;
 if (init_path === "/" || init_path === "") {
   CleanEntirePage(true, "/");
 }
-if (init_path === "/explore/" || init_path === "/explore") {
+if (
+  (init_path === "/explore/" || init_path === "/explore") &&
+  window.screen.width <= 500
+) {
+  CleanEntirePage(true, "/explore-mobile/");
+}
+
+if (
+  (init_path === "/explore/" || init_path === "/explore") &&
+  window.screen.width > 500
+) {
   CleanEntirePage(true, "/explore/");
 }
+
 if (init_path.includes("/reels/")) {
   CleanEntirePage(true, "/reels/");
 }
@@ -217,24 +123,39 @@ function setupObserver() {
         }
 
         // Explore page
-        if (lastPathname == "/explore/" || lastPathname == "/explore") {
-          console.log("removed ");
-
-          CleanEntirePage(false, "/explore/");
+        // Diferent version for mobile & desktop
+        // Mobile
+        if (window.screen.width <= 500) {
+          if (lastPathname == "/explore/" || lastPathname == "/explore") {
+            console.log("removed");
+            CleanEntirePage(false, "/explore-mobile/");
+          }
+          if (window.location.pathname == "/explore/") {
+            console.log("added");
+            CleanEntirePage(true, "/explore-mobile/");
+          }
         }
-        if (window.location.pathname == "/explore/") {
-          console.log("added ");
-          CleanEntirePage(true, "/explore/");
+        // Desktop
+        else {
+          if (lastPathname == "/explore/" || lastPathname == "/explore") {
+            console.log("removed ");
+
+            CleanEntirePage(false, "/explore/");
+          }
+          if (window.location.pathname == "/explore/") {
+            console.log("added ");
+            CleanEntirePage(true, "/explore/");
+          }
         }
 
         // Reels page
         if (lastPathname.includes("/reels")) {
-          console.log("removed ");
+          console.log("removed");
 
           CleanEntirePage(false, "/reels/");
         }
         if (window.location.pathname.includes("/reels/")) {
-          console.log("added ");
+          console.log("added");
           CleanEntirePage(true, "/reels/");
         }
 
