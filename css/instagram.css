@@ -1,0 +1,15 @@
+/* TODO maybe add init temp styles */
+
+/* article {
+  display: none !important;
+}
+
+div[role="progressbar"] {
+  display: none !important;
+} */
+
+div[data-visualcompletion="ignore"] {
+  display: none !important;
+}
+
+/* TODO fix styles on main page flickering articles */

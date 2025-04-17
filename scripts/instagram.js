@@ -120,6 +120,70 @@
 //   }
 // }
 
+// Universal style to clean the main content element
+const main_feed = document.createElement("style");
+main_feed.textContent = `
+    article {
+        display: none !important;
+    }   
+
+    div[role="progressbar"] {
+        display: none !important;
+    }
+`;
+
+const explore_page = document.createElement("style");
+explore_page.textContent = `
+    main[role="main"] > *{
+    display: none !important
+    }
+`;
+
+const reels_page = document.createElement("style");
+reels_page.textContent = `
+    main[role="main"] > *{
+    display: none !important
+    }
+`;
+
+function CleanEntirePage(entering_or_leaving_bool, url) {
+  if (url == "/") {
+    if (entering_or_leaving_bool === true) {
+      document.head.appendChild(main_feed);
+    } else {
+      document.head.removeChild(main_feed);
+    }
+  }
+
+  if (url == "/explore/") {
+    if (entering_or_leaving_bool === true) {
+      document.head.appendChild(explore_page);
+    } else {
+      document.head.removeChild(explore_page);
+    }
+  }
+
+  if (url == "/reels/") {
+    if (entering_or_leaving_bool === true) {
+      document.head.appendChild(reels_page);
+    } else {
+      document.head.removeChild(reels_page);
+    }
+  }
+}
+
+//Init clean
+const init_path = window.location.pathname;
+if (init_path === "/" || init_path === "") {
+  CleanEntirePage(true, "/");
+}
+if (init_path === "/explore/" || init_path === "/explore") {
+  CleanEntirePage(true, "/explore/");
+}
+if (init_path.includes("/reels/")) {
+  CleanEntirePage(true, "/reels/");
+}
+
 let bodyObserver = null;
 
 // Function to set up the observer
@@ -140,6 +204,39 @@ function setupObserver() {
     bodyObserver = new MutationObserver(() => {
       if (lastPathname !== window.location.pathname) {
         console.log("Path changed (body observer):", window.location.pathname);
+
+        // Home page
+        if (lastPathname == "/" || lastPathname == "") {
+          console.log("removed ");
+
+          CleanEntirePage(false, "/");
+        }
+        if (window.location.pathname == "/") {
+          console.log("added ");
+          CleanEntirePage(true, "/");
+        }
+
+        // Explore page
+        if (lastPathname == "/explore/" || lastPathname == "/explore") {
+          console.log("removed ");
+
+          CleanEntirePage(false, "/explore/");
+        }
+        if (window.location.pathname == "/explore/") {
+          console.log("added ");
+          CleanEntirePage(true, "/explore/");
+        }
+
+        // Reels page
+        if (lastPathname.includes("/reels")) {
+          console.log("removed ");
+
+          CleanEntirePage(false, "/reels/");
+        }
+        if (window.location.pathname.includes("/reels/")) {
+          console.log("added ");
+          CleanEntirePage(true, "/reels/");
+        }
 
         lastPathname = window.location.pathname;
       }
