@@ -8,6 +8,6 @@ div[role="progressbar"] {
   display: none !important;
 } */
 
-div[data-visualcompletion="ignore"] {
+/* div[data-visualcompletion="ignore"] {
   display: none !important;
-}
+} */
