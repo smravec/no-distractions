@@ -1,13 +1,36 @@
 /* TODO maybe add init temp styles */
 
-/* article {
+/* Main feed (home) */
+.ig-main-feed article {
+  display: none !important;
+}
+.ig-main-feed div[role="progressbar"] {
   display: none !important;
 }
 
-div[role="progressbar"] {
+/* Explore page (desktop) */
+.ig-explore-page main[role="main"] > * {
   display: none !important;
-} */
+}
 
-/* div[data-visualcompletion="ignore"] {
+/* Explore page (mobile) */
+.ig-explore-mobile main[role="main"] > *:not(nav) {
+  display: none !important;
+}
+
+/* Reels page */
+.ig-reels-page main[role="main"] > * {
+  display: none !important;
+}
+
+/* Existing global toggle for future use */
+.no-distractions-css article {
+  display: none !important;
+}
+.no-distractions-css div[role="progressbar"] {
+  display: none !important;
+}
+
+/* .no-distractions-css div[data-visualcompletion="ignore"] {
   display: none !important;
 } */

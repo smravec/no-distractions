@@ -9,12 +9,12 @@ browser.storage.sync.get(["yt"], (result) => {
   const html = document.documentElement;
 
   if (!ENABLE_YOUTUBE_CSS) {
-    html.classList.remove('no-distractions-youtube-css');
+    html.classList.remove('no-distractions-css');
     console.log('YouTube CSS injection is disabled by toggle.');
     return;
   }
 
-  html.classList.add('no-distractions-youtube-css');
+  html.classList.add('no-distractions-css');
 
   const extensionApi = (typeof browser !== 'undefined') ? browser : (typeof chrome !== 'undefined' ? chrome : null);
 

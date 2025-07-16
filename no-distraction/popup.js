@@ -8,7 +8,7 @@ if (typeof browser === "undefined") {
 
 // Call this function when needed, e.g., on button click or page load
 
-let yt = true;
+
 // chrome.storage.sync.get("yt_hidden", (result) => {
 //   if (result.yt_hidden == undefined) {
 //     yt = true;
@@ -17,6 +17,9 @@ let yt = true;
 //   }
 // });
 
+let general_switch = true;
+
+let yt = true;
 let fb = true;
 let ig = true;
 let rd = true;
@@ -52,56 +55,102 @@ yt_btn.addEventListener("click", () => {
 //Facebook button
 const fb_btn = document.getElementById("facebook");
 
-// Sets the initial style
-if (fb) {
-  fb_btn.style.borderColor = "greenyellow";
-} else {
-  fb_btn.style.borderColor = "red";
-}
+// Load saved value on popup open
+browser.storage.sync.get(["fb"], (result) => {
+  fb = result.fb !== undefined ? result.fb : true;
 
-fb_btn.addEventListener("click", () => {
-  fb = !fb;
-  if (fb) {
-    fb_btn.style.borderColor = "greenyellow";
-  } else {
-    fb_btn.style.borderColor = "red";
-  }
+  // Update button style
+  fb_btn.style.borderColor = fb ? "greenyellow" : "red";
 });
 
-//Instragram button
+// Add click listener
+fb_btn.addEventListener("click", () => {
+  fb = !fb; // toggle
+  fb_btn.style.borderColor = fb ? "greenyellow" : "red";
+
+  // Save to storage
+  browser.storage.sync.set({ fb });
+
+  // Check if active tab is facebook.com → reload it
+  browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const activeTab = tabs[0];
+    if (activeTab && activeTab.url && activeTab.url.includes("facebook.com")) {
+      browser.tabs.reload(activeTab.id);
+    }
+  });
+});
+
+//Instagram button
 const ig_btn = document.getElementById("instagram");
 
-// Sets the initial style
-if (ig) {
-  ig_btn.style.borderColor = "greenyellow";
-} else {
-  ig_btn.style.borderColor = "red";
-}
+// Load saved value on popup open
+browser.storage.sync.get(["ig"], (result) => {
+  ig = result.ig !== undefined ? result.ig : true;
 
-ig_btn.addEventListener("click", () => {
-  ig = !ig;
-  if (ig) {
-    ig_btn.style.borderColor = "greenyellow";
-  } else {
-    ig_btn.style.borderColor = "red";
-  }
+  // Update button style
+  ig_btn.style.borderColor = ig ? "greenyellow" : "red";
 });
 
-//Reddit button
+// Add click listener
+ig_btn.addEventListener("click", () => {
+  ig = !ig; // toggle
+  ig_btn.style.borderColor = ig ? "greenyellow" : "red";
+
+  // Save to storage
+  browser.storage.sync.set({ ig });
+
+  // Check if active tab is instagram.com → reload it
+  browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const activeTab = tabs[0];
+    if (activeTab && activeTab.url && activeTab.url.includes("instagram.com")) {
+      browser.tabs.reload(activeTab.id);
+    }
+  });
+});
+
+  //Reddit button
 const rd_btn = document.getElementById("reddit");
 
-// Sets the initial style
-if (rd) {
-  rd_btn.style.borderColor = "greenyellow";
-} else {
-  rd_btn.style.borderColor = "red";
-}
+// Load saved value on popup open
+browser.storage.sync.get(["rd"], (result) => {
+  rd = result.rd !== undefined ? result.rd : true;
 
-rd_btn.addEventListener("click", () => {
-  rd = !rd;
-  if (rd) {
-    rd_btn.style.borderColor = "greenyellow";
-  } else {
-    rd_btn.style.borderColor = "red";
-  }
+  // Update button style
+  rd_btn.style.borderColor = rd ? "greenyellow" : "red";
 });
+
+// Add click listener
+rd_btn.addEventListener("click", () => {
+  rd = !rd; // toggle
+  rd_btn.style.borderColor = rd ? "greenyellow" : "red";
+
+  // Save to storage
+  browser.storage.sync.set({ rd });
+
+      // Check if active tab is reddit.com → reload it
+  browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const activeTab = tabs[0];
+    if (activeTab && activeTab.url && activeTab.url.includes("reddit.com")) {
+      browser.tabs.reload(activeTab.id);
+    }
+  });
+});
+
+// //General switch button
+// const general_switch_btn = document.getElementById("general_switch");
+
+// // Sets the initial style
+// if (fb) {
+//   general_switch_btn.style.borderColor = "greenyellow";
+// } else {
+//   general_switch_btn.style.borderColor = "red";
+// }
+
+// general_switch_btn.addEventListener("click", () => {
+//   general_switch = !general_switch;
+//   if (general_switch) {
+//     general_switch_btn.style.borderColor = "greenyellow";
+//   } else {
+//     general_switch_btn.style.borderColor = "red";
+//   }
+// });
