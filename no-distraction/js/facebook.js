@@ -2,12 +2,19 @@ if (typeof browser === "undefined") {
   var browser = chrome;
 }
 
-browser.storage.sync.get(["fb"], (result) => {
-  const ENABLE_FB = result.fb !== undefined ? result.fb : true;
+browser.storage.sync.get(["fb", "general_switch"], (result) => {
+  const GENERAL_SWITCH = result.general_switch !== undefined ? result.general_switch : true;
+  const FACEBOOK_TOGGLE = result.fb !== undefined ? result.fb : true;
+  const ENABLE_FB = GENERAL_SWITCH && FACEBOOK_TOGGLE;
+  
+  console.log("GENERAL_SWITCH", GENERAL_SWITCH);
+  console.log("FACEBOOK_TOGGLE", FACEBOOK_TOGGLE);
+  console.log("ENABLE_FB", ENABLE_FB);
+
   const html = document.documentElement;
   if (!ENABLE_FB) {
     html.classList.remove('no-distractions-css');
-    console.log('Facebook blocking is disabled by toggle.');
+    console.log('Facebook blocking is disabled by toggle or general switch.');
     return;
   }
   html.classList.add('no-distractions-css');
@@ -17,22 +24,32 @@ browser.storage.sync.get(["fb"], (result) => {
   let currentDomain = window.location.hostname;
 
   try {
+    // Try to access top frame location
     if (window.top.location.hostname === window.location.hostname) {
       isTopFrame = true;
     }
   } catch (e) {
+    // Security error means we're in a cross-origin iframe
     console.log("Cross-origin frame detected, running in an iframe");
     isTopFrame = false;
   }
 
   if (isTopFrame && currentDomain.includes("facebook")) {
-    let mobile_mode = window.screen.width <= 500;
+    // mobile = true, desktop = false
+    let mobile_mode = null;
+    if (window.screen.width <= 500) {
+      mobile_mode = true;
+    } else {
+      mobile_mode = false;
+    }
+
+    const dont_display_style = "display: none !important;";
 
     // Universal style to clean the main content element
     const main_feed = document.createElement("style");
     main_feed.textContent = `
       div[role="main"]{
-          display: none !important;
+          ${dont_display_style}
       }
     `;
 
@@ -43,7 +60,6 @@ browser.storage.sync.get(["fb"], (result) => {
         document.head.removeChild(main_feed);
       }
     }
-
     // Styles for mobile
     const main_feed_mobile = document.createElement("style");
     main_feed_mobile.textContent = `
@@ -53,7 +69,7 @@ browser.storage.sync.get(["fb"], (result) => {
       #screen-root > div:nth-child(1)::before {
         background-color: white !important;
       }  
-      `;
+    `;
 
     const watch_feed_mobile = document.createElement("style");
     watch_feed_mobile.textContent = `
@@ -141,24 +157,39 @@ browser.storage.sync.get(["fb"], (result) => {
 
     let bodyObserver = null;
 
+    // Function to set up the observer
     function setupObserver() {
-      let targetElementSelector = null;
+      targetElementSelector = null;
+      // Based on mode pick target element
       if (mobile_mode === true) {
         targetElementSelector = `#screen-root`;
       } else {
         targetElementSelector = 'div[role="main"]';
       }
 
+      // Try to find the target element
       const targetElement = document.querySelector(targetElementSelector);
       let lastPathname = window.location.pathname;
 
       if (targetElement) {
+        console.log("Facebook main content element found!");
+
+        // Prevent spawning multiple observers
         if (bodyObserver !== null) {
           return;
         }
+
+        // Observe url changes
         bodyObserver = new MutationObserver(() => {
           if (lastPathname !== window.location.pathname) {
+            console.log(
+              "Path changed (body observer):",
+              window.location.pathname
+            );
+
             if (mobile_mode === true) {
+              console.log("mobile mode");
+              // Main page
               if (lastPathname == "/" || lastPathname == "") {
                 CleanEntirePageMobile(false, "/");
               }
@@ -168,18 +199,24 @@ browser.storage.sync.get(["fb"], (result) => {
               ) {
                 CleanEntirePageMobile(true, "/");
               }
+
+              // Watch page
               if (lastPathname == "/watch/") {
                 CleanEntirePageMobile(false, "watch");
               }
               if (window.location.pathname == "/watch/") {
                 CleanEntirePageMobile(true, "watch");
               }
+
+              // Reels page
               if (lastPathname.includes("reel")) {
                 CleanEntirePageMobile(false, "reels");
               }
               if (window.location.pathname.includes("reel")) {
                 CleanEntirePageMobile(true, "reels");
               }
+
+              // Live page
               if (lastPathname == "/watch/live/") {
                 CleanEntirePageMobile(false, "live");
               }
@@ -208,16 +245,33 @@ browser.storage.sync.get(["fb"], (result) => {
             lastPathname = window.location.pathname;
           }
         });
+
         bodyObserver.observe(document.body, { childList: true, subtree: true });
+
         return bodyObserver;
       } else {
+        console.log("Main content element not found yet, will retry...");
+        // Retry
         setTimeout(setupObserver, 1000);
         return null;
       }
     }
 
+    // Whichever is soonest creates the observer (other chunks wont spawn another)
+
+    // Run the setup with a slight delay to ensure Facebook's UI is loaded
     setTimeout(setupObserver, 500);
-    window.addEventListener("load", setupObserver);
-    window.addEventListener("popstate", setupObserver);
+
+    // Also set up on page load events
+    window.addEventListener("load", () => {
+      console.log("Window loaded, setting up observer...");
+      setupObserver();
+    });
+
+    // Listen for Facebook's navigation events
+    window.addEventListener("popstate", () => {
+      console.log("Navigation detected via popstate");
+      setupObserver();
+    });
   }
 });

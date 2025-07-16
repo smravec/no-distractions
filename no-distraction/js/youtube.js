@@ -2,15 +2,20 @@ if (typeof browser === "undefined") {
     var browser = chrome;
   }
 
-browser.storage.sync.get(["yt"], (result) => {
-  const ENABLE_YOUTUBE_CSS = result.yt !== undefined ? result.yt : true;
+browser.storage.sync.get(["yt", "general_switch"], (result) => {
+  const GENERAL_SWITCH = result.general_switch !== undefined ? result.general_switch : true;
+  const YOUTUBE_TOGGLE = result.yt !== undefined ? result.yt : true;
+  const ENABLE_YOUTUBE_CSS = GENERAL_SWITCH && YOUTUBE_TOGGLE;
+  
+  console.log("GENERAL_SWITCH", GENERAL_SWITCH);
+  console.log("YOUTUBE_TOGGLE", YOUTUBE_TOGGLE);
   console.log("ENABLE_YOUTUBE_CSS", ENABLE_YOUTUBE_CSS);
 
   const html = document.documentElement;
 
   if (!ENABLE_YOUTUBE_CSS) {
     html.classList.remove('no-distractions-css');
-    console.log('YouTube CSS injection is disabled by toggle.');
+    console.log('YouTube CSS injection is disabled by toggle or general switch.');
     return;
   }
 

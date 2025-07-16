@@ -2,13 +2,20 @@ if (typeof browser === "undefined") {
   var browser = chrome;
 }
 
-browser.storage.sync.get(["ig"], (result) => {
-  const ENABLE_IG = result.ig !== undefined ? result.ig : true;
+browser.storage.sync.get(["ig", "general_switch"], (result) => {
+  const GENERAL_SWITCH = result.general_switch !== undefined ? result.general_switch : true;
+  const INSTAGRAM_TOGGLE = result.ig !== undefined ? result.ig : true;
+  const ENABLE_IG = GENERAL_SWITCH && INSTAGRAM_TOGGLE;
+  
+  console.log("GENERAL_SWITCH", GENERAL_SWITCH);
+  console.log("INSTAGRAM_TOGGLE", INSTAGRAM_TOGGLE);
+  console.log("ENABLE_IG", ENABLE_IG);
+
   const html = document.documentElement;
   if (!ENABLE_IG) {
     html.classList.remove('no-distractions-css');
     html.classList.remove('ig-main-feed', 'ig-explore-page', 'ig-explore-mobile', 'ig-reels-page');
-    console.log('Instagram blocking is disabled by toggle.');
+    console.log('Instagram blocking is disabled by toggle or general switch.');
     return;
   }
   html.classList.add('no-distractions-css');

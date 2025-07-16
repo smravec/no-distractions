@@ -2,12 +2,19 @@ if (typeof browser === "undefined") {
   var browser = chrome;
 }
 
-browser.storage.sync.get(["rd"], (result) => {
-  const ENABLE_RD = result.rd !== undefined ? result.rd : true;
+browser.storage.sync.get(["rd", "general_switch"], (result) => {
+  const GENERAL_SWITCH = result.general_switch !== undefined ? result.general_switch : true;
+  const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
+  const ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
+  
+  console.log("GENERAL_SWITCH", GENERAL_SWITCH);
+  console.log("REDDIT_TOGGLE", REDDIT_TOGGLE);
+  console.log("ENABLE_RD", ENABLE_RD);
+
   const html = document.documentElement;
   if (!ENABLE_RD) {
     html.classList.remove('no-distractions-css');
-    console.log('Reddit blocking is disabled by toggle.');
+    console.log('Reddit blocking is disabled by toggle or general switch.');
     return;
   }
   html.classList.add('no-distractions-css');

@@ -43,12 +43,13 @@ yt_btn.addEventListener("click", () => {
   // Save to storage
   browser.storage.sync.set({ yt });
 
-  // Check if active tab is youtube.com → reload it
-  browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const activeTab = tabs[0];
-    if (activeTab && activeTab.url && activeTab.url.includes("youtube.com")) {
-      browser.tabs.reload(activeTab.id);
-    }
+  // Refresh all YouTube tabs
+  browser.tabs.query({}, (tabs) => {
+    tabs.forEach(tab => {
+      if (tab.url && tab.url.includes("youtube.com")) {
+        browser.tabs.reload(tab.id);
+      }
+    });
   });
 });
 
@@ -71,12 +72,13 @@ fb_btn.addEventListener("click", () => {
   // Save to storage
   browser.storage.sync.set({ fb });
 
-  // Check if active tab is facebook.com → reload it
-  browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const activeTab = tabs[0];
-    if (activeTab && activeTab.url && activeTab.url.includes("facebook.com")) {
-      browser.tabs.reload(activeTab.id);
-    }
+  // Refresh all Facebook tabs
+  browser.tabs.query({}, (tabs) => {
+    tabs.forEach(tab => {
+      if (tab.url && tab.url.includes("facebook.com")) {
+        browser.tabs.reload(tab.id);
+      }
+    });
   });
 });
 
@@ -99,12 +101,13 @@ ig_btn.addEventListener("click", () => {
   // Save to storage
   browser.storage.sync.set({ ig });
 
-  // Check if active tab is instagram.com → reload it
-  browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const activeTab = tabs[0];
-    if (activeTab && activeTab.url && activeTab.url.includes("instagram.com")) {
-      browser.tabs.reload(activeTab.id);
-    }
+  // Refresh all Instagram tabs
+  browser.tabs.query({}, (tabs) => {
+    tabs.forEach(tab => {
+      if (tab.url && tab.url.includes("instagram.com")) {
+        browser.tabs.reload(tab.id);
+      }
+    });
   });
 });
 
@@ -127,30 +130,41 @@ rd_btn.addEventListener("click", () => {
   // Save to storage
   browser.storage.sync.set({ rd });
 
-      // Check if active tab is reddit.com → reload it
-  browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const activeTab = tabs[0];
-    if (activeTab && activeTab.url && activeTab.url.includes("reddit.com")) {
-      browser.tabs.reload(activeTab.id);
-    }
+  // Refresh all Reddit tabs
+  browser.tabs.query({}, (tabs) => {
+    tabs.forEach(tab => {
+      if (tab.url && tab.url.includes("reddit.com")) {
+        browser.tabs.reload(tab.id);
+      }
+    });
   });
 });
 
-// //General switch button
-// const general_switch_btn = document.getElementById("general_switch");
+//General switch button
+const general_switch_btn = document.getElementById("general_switch");
 
-// // Sets the initial style
-// if (fb) {
-//   general_switch_btn.style.borderColor = "greenyellow";
-// } else {
-//   general_switch_btn.style.borderColor = "red";
-// }
+// Load saved value on popup open
+browser.storage.sync.get(["general_switch"], (result) => {
+  general_switch = result.general_switch !== undefined ? result.general_switch : true;
 
-// general_switch_btn.addEventListener("click", () => {
-//   general_switch = !general_switch;
-//   if (general_switch) {
-//     general_switch_btn.style.borderColor = "greenyellow";
-//   } else {
-//     general_switch_btn.style.borderColor = "red";
-//   }
-// });
+  // Update button style
+  general_switch_btn.style.borderColor = general_switch ? "greenyellow" : "red";
+});
+
+// Add click listener
+general_switch_btn.addEventListener("click", () => {
+  general_switch = !general_switch; // toggle
+  general_switch_btn.style.borderColor = general_switch ? "greenyellow" : "red";
+
+  // Save to storage
+  browser.storage.sync.set({ general_switch });
+
+  // Refresh all tabs with supported sites
+  browser.tabs.query({}, (tabs) => {
+    tabs.forEach(tab => {
+      if (tab.url && (tab.url.includes("facebook.com") || tab.url.includes("instagram.com") || tab.url.includes("reddit.com") || tab.url.includes("youtube.com"))) {
+        browser.tabs.reload(tab.id);
+      }
+    });
+  });
+});
