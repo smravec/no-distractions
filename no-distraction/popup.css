@@ -1,0 +1,25 @@
+* {
+  background-color: black;
+  color: white;
+}
+
+body {
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.setting {
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.setting > button {
+  border: 1px solid transparent;
+}
+.setting > button:hover {
+  cursor: pointer;
+}

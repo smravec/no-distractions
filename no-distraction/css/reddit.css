@@ -1,0 +1,22 @@
+/* TODO (past mvp) add message on how to browse on the empty feed page */
+/* Recommendation (home feed) */
+shreddit-feed[reload-url*="home-feed"],
+recent-posts {
+  display: none !important;
+}
+
+/* Recommendation (below post on mobile) */
+#right-sidebar-contents {
+  display: none !important;
+}
+
+/* r/all page */
+shreddit-feed[reload-url*="all-feed"] {
+  display: none !important;
+}
+
+/* r/popular page */
+search-dynamic-id-cache-controller[search-telemetry-source="popular_carousel"],
+shreddit-feed[reload-url*="popular-feed"] {
+  display: none !important;
+}
