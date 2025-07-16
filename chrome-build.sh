@@ -5,7 +5,7 @@ rm -rf no-distraction
 mkdir -p no-distraction
 
 # Copy all files except manifest.json to temp directory
-cp default_icon.png popup.js popup.html popup.css manifest.json no-distraction/
+cp default_icon.png popup.js popup.html popup.css manifest.json background.js no-distraction/
 cp -r js css no-distraction/
 
 

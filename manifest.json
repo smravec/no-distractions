@@ -3,7 +3,11 @@
   "name": "No Distractions",
   "description": "Blocks addictive recommendation feeds",
   "version": "1.0",
-  "permissions": ["storage", "scripting", "tabs"],
+  "permissions": ["storage", "scripting", "tabs", "alarms"],
+
+  "background": {
+    "service_worker": "background.js"
+  },
 
   "action": {
     "default_popup": "popup.html",

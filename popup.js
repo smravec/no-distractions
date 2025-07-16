@@ -143,21 +143,66 @@ rd_btn.addEventListener("click", () => {
 //General switch button
 const general_switch_btn = document.getElementById("general_switch");
 
-// Load saved value on popup open
-browser.storage.sync.get(["general_switch"], (result) => {
-  general_switch = result.general_switch !== undefined ? result.general_switch : true;
+// Function to update countdown display
+function updateCountdownDisplay() {
+  browser.storage.sync.get(["general_switch", "general_switch_timer"], (result) => {
+    general_switch = result.general_switch !== undefined ? result.general_switch : true;
+    
+    // Update button style
+    general_switch_btn.style.borderColor = general_switch ? "greenyellow" : "red";
+    
+    // Reset button text
+    general_switch_btn.textContent = "on/off";
+    
+    // Check if timer is active
+    if (!general_switch && result.general_switch_timer) {
+      const timeRemaining = result.general_switch_timer.expiryTime - Date.now();
+      if (timeRemaining > 0) {
+        const minutes = Math.floor(timeRemaining / (1000 * 60));
+        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+        general_switch_btn.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      }
+    }
+  });
+}
 
-  // Update button style
-  general_switch_btn.style.borderColor = general_switch ? "greenyellow" : "red";
-});
+// Load saved value on popup open
+updateCountdownDisplay();
+
+// Set up countdown interval that updates every second
+let countdownInterval = setInterval(() => {
+  updateCountdownDisplay();
+}, 1000);
 
 // Add click listener
 general_switch_btn.addEventListener("click", () => {
   general_switch = !general_switch; // toggle
-  general_switch_btn.style.borderColor = general_switch ? "greenyellow" : "red";
 
-  // Save to storage
-  browser.storage.sync.set({ general_switch });
+  if (!general_switch) {
+    // General switch turned OFF - start 2-hour timer
+    const TWO_HOURS_MS = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+    const expiryTime = Date.now() + TWO_HOURS_MS;
+    
+    // Store timer data
+    browser.storage.sync.set({ 
+      general_switch: false,
+      general_switch_timer: {
+        expiryTime: expiryTime,
+        duration: TWO_HOURS_MS
+      }
+    });
+    
+    // Create alarm for 2 hours
+    browser.alarms.create("general_switch_timer", { delayInMinutes: 120 });
+    
+    console.log("2-hour timer started for general switch");
+  } else {
+    // General switch turned ON - clear any existing timer
+    browser.alarms.clear("general_switch_timer");
+    browser.storage.sync.set({ general_switch: true });
+    browser.storage.sync.remove(["general_switch_timer"]);
+    console.log("Timer cleared - general switch turned ON");
+  }
 
   // Refresh all tabs with supported sites
   browser.tabs.query({}, (tabs) => {

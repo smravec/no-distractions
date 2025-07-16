@@ -3,7 +3,11 @@
   "name": "No Distractions",
   "description": "Blocks addictive recommendation feeds",
   "version": "1.0",
-  "permissions": ["storage", "scripting"],
+  "permissions": ["storage", "scripting", "alarms", "tabs"],
+
+  "background": {
+    "scripts": ["background.js"]
+  },
 
   "browser_action": {
     "default_popup": "popup.html",
@@ -12,15 +16,26 @@
 
   "content_scripts": [
     {
-      "matches": ["https://*.reddit.com/*"],
-      "css": ["css/reddit.css"],
-      "js": ["scripts/reddit.js"],
+      "matches": ["https://www.youtube.com/*", "https://m.youtube.com/*"],
+      "js": ["js/init-class.js"],
       "all_frames": true,
       "run_at": "document_start"
     },
     {
       "matches": ["https://www.youtube.com/*", "https://m.youtube.com/*"],
       "css": ["css/youtube.css"],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.youtube.com/*", "https://m.youtube.com/*"],
+      "js": ["js/youtube.js"],
+      "all_frames": true,
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.facebook.com/*", "https://m.facebook.com/*"],
+      "js": ["js/init-class.js"],
       "all_frames": true,
       "run_at": "document_start"
     },
@@ -32,9 +47,15 @@
     },
     {
       "matches": ["https://www.facebook.com/*", "https://m.facebook.com/*"],
-      "js": ["scripts/facebook.js"],
+      "js": ["js/facebook.js"],
       "all_frames": true,
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.instagram.com/*"],
+      "js": ["js/init-class.js"],
+      "all_frames": true,
+      "run_at": "document_start"
     },
     {
       "matches": ["https://www.instagram.com/*"],
@@ -44,7 +65,25 @@
     },
     {
       "matches": ["https://www.instagram.com/*"],
-      "js": ["scripts/instagram.js"],
+      "js": ["js/instagram.js"],
+      "all_frames": true,
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://*.reddit.com/*"],
+      "js": ["js/init-class.js"],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://*.reddit.com/*"],
+      "css": ["css/reddit.css"],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://*.reddit.com/*"],
+      "js": ["js/reddit.js"],
       "all_frames": true,
       "run_at": "document_idle"
     }
