@@ -11,7 +11,7 @@
 
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "default_icon.png"
+    "default_icon": "no_distractions_logo.png"
   },
 
   "content_scripts": [

@@ -1,12 +1,12 @@
 # Clean up
-rm -rf no-distraction
+rm -rf no-distractions
 
 # Create temporary directory
-mkdir -p no-distraction
+mkdir -p no-distractions
 
 # Copy all files except manifest.json to temp directory
-cp default_icon.png popup.js popup.html popup.css manifest.json background.js no-distraction/
-cp -r js css no-distraction/
+cp no_distractions_logo.png popup.js popup.html popup.css manifest.json background.js no-distractions/
+cp -r js css no-distractions/
 
 
 

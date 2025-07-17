@@ -1,23 +1,25 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap');
+
 * {
   background-color: black;
   color: white;
   margin: 0;
   padding: 0;
-  
 }
 
 body {
   width: 200px;
+  height: 230px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid transparent;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
 }
 
 #title{
   margin-bottom: 10px;
   margin-top: 10px;
-  
+  font-size: 22px;
 }
 
 #main_menu{
@@ -62,7 +64,6 @@ body {
 
   background-color: transparent;
   margin-bottom: 10px;
-  
 }
 
 .main_menu_loading::after {
@@ -71,13 +72,19 @@ body {
 }
 
 @keyframes ellipsis {
-  0% { content: ''; }
-  25% { content: '.'; }
-  75% { content: '..'; }
-  100% { content: ''; }
+  0% { content: '.'; }
+  25% { content: '..'; }
+  75% { content: '...'; }
+  100% { content: '.'; }
+}
+
+.paused-dots::after {
+  content: '...';
+  animation: none !important;
 }
 
 .btn{
+  font-size: 14px;
   border: 1px solid transparent;
   padding-left: 10px;
   padding-right: 10px;
@@ -89,7 +96,7 @@ body {
   cursor: pointer;
 }
 
-#settings{
+#toggle_settings, #toggle_main_menu{
   display: flex;
   border: 1px solid rgb(97, 96, 96);
   background-color: transparent;
@@ -102,28 +109,57 @@ body {
   margin-bottom: 10px;
 }
 
-#settings:hover{
+#toggle_settings:hover, #toggle_main_menu:hover{
   cursor: pointer;
+}
+
+#settings_menu{
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-top: 1px solid rgb(97, 96, 96);
+}
+
+.settings_menu_container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(24, 24, 24);
+  border-bottom: 1px solid rgb(97, 96, 96);
+
 }
 
 .setting {
   width: 80%;
   display: flex;
-  justify-content: space-between;
   margin-bottom: 5px;
+  background-color: transparent;
+}
+
+.setting > span{
+  font-size: 14px;
+  width: 100%;
+  border-bottom: 1px solid rgb(97, 96, 96);
+  background-color: transparent;
 }
 
 .setting > button {
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
   border: 1px solid transparent;
+  background-color: black;
 }
+
 .setting > button:hover {
   cursor: pointer;
 }
 
 
-
-
-
-#settings_menu{
-  display: none;
-}

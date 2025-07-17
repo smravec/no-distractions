@@ -2,8 +2,10 @@
 mkdir -p temp_dir
 
 # Copy all files except manifest.json to temp directory
-cp default_icon.png popup.js popup.html popup.css temp_dir/
-cp -r scripts css temp_dir/
+cp no_distractions_logo.png popup.js popup.html background.js temp_dir/
+cp -r js css temp_dir/
+
+cp popup-firefox.css temp_dir/popup.css
 
 # Copy manifest-firefox.json as manifest.json to temp directory
 cp manifest-firefox.json temp_dir/manifest.json

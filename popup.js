@@ -24,26 +24,52 @@ let fb = true;
 let ig = true;
 let rd = true;
 
+// Helper to update main menu title
+function updateMainMenuTitle(paused) {
+  const mainMenuTitle = document.querySelector('.main_menu_title');
+  if (mainMenuTitle) {
+    mainMenuTitle.textContent = paused ? "Don't Waste It" : "Saving You Time";
+  }
+}
+
+// Helper to update main menu loading animation
+function updateMainMenuLoading(paused) {
+  const loadingElem = document.querySelector('.main_menu_loading');
+  if (!loadingElem) return;
+  if (paused) {
+    loadingElem.classList.add('paused-dots');
+  } else {
+    loadingElem.classList.remove('paused-dots');
+  }
+}
+
+// Update both title and dots when paused/unpaused
+function setPausedState(paused) {
+  updateMainMenuTitle(paused);
+  updateMainMenuLoading(paused);
+}
+
+// Helper to update settings button text
+function updateSettingsButtonText(btn, isOn) {
+  btn.textContent = isOn ? 'On' : 'Off';
+}
+
 //Youtube button
 const yt_btn = document.getElementById("youtube");
 
 // Load saved value on popup open
 browser.storage.sync.get(["yt"], (result) => {
   yt = result.yt !== undefined ? result.yt : true;
-
-  // Update button style
   yt_btn.style.borderColor = yt ? "greenyellow" : "red";
+  updateSettingsButtonText(yt_btn, yt);
 });
 
 // Add click listener
 yt_btn.addEventListener("click", () => {
   yt = !yt; // toggle
   yt_btn.style.borderColor = yt ? "greenyellow" : "red";
-
-  // Save to storage
+  updateSettingsButtonText(yt_btn, yt);
   browser.storage.sync.set({ yt });
-
-  // Refresh all YouTube tabs
   browser.tabs.query({}, (tabs) => {
     tabs.forEach(tab => {
       if (tab.url && tab.url.includes("youtube.com")) {
@@ -59,20 +85,16 @@ const fb_btn = document.getElementById("facebook");
 // Load saved value on popup open
 browser.storage.sync.get(["fb"], (result) => {
   fb = result.fb !== undefined ? result.fb : true;
-
-  // Update button style
   fb_btn.style.borderColor = fb ? "greenyellow" : "red";
+  updateSettingsButtonText(fb_btn, fb);
 });
 
 // Add click listener
 fb_btn.addEventListener("click", () => {
   fb = !fb; // toggle
   fb_btn.style.borderColor = fb ? "greenyellow" : "red";
-
-  // Save to storage
+  updateSettingsButtonText(fb_btn, fb);
   browser.storage.sync.set({ fb });
-
-  // Refresh all Facebook tabs
   browser.tabs.query({}, (tabs) => {
     tabs.forEach(tab => {
       if (tab.url && tab.url.includes("facebook.com")) {
@@ -88,20 +110,16 @@ const ig_btn = document.getElementById("instagram");
 // Load saved value on popup open
 browser.storage.sync.get(["ig"], (result) => {
   ig = result.ig !== undefined ? result.ig : true;
-
-  // Update button style
   ig_btn.style.borderColor = ig ? "greenyellow" : "red";
+  updateSettingsButtonText(ig_btn, ig);
 });
 
 // Add click listener
 ig_btn.addEventListener("click", () => {
   ig = !ig; // toggle
   ig_btn.style.borderColor = ig ? "greenyellow" : "red";
-
-  // Save to storage
+  updateSettingsButtonText(ig_btn, ig);
   browser.storage.sync.set({ ig });
-
-  // Refresh all Instagram tabs
   browser.tabs.query({}, (tabs) => {
     tabs.forEach(tab => {
       if (tab.url && tab.url.includes("instagram.com")) {
@@ -117,20 +135,16 @@ const rd_btn = document.getElementById("reddit");
 // Load saved value on popup open
 browser.storage.sync.get(["rd"], (result) => {
   rd = result.rd !== undefined ? result.rd : true;
-
-  // Update button style
   rd_btn.style.borderColor = rd ? "greenyellow" : "red";
+  updateSettingsButtonText(rd_btn, rd);
 });
 
 // Add click listener
 rd_btn.addEventListener("click", () => {
   rd = !rd; // toggle
   rd_btn.style.borderColor = rd ? "greenyellow" : "red";
-
-  // Save to storage
+  updateSettingsButtonText(rd_btn, rd);
   browser.storage.sync.set({ rd });
-
-  // Refresh all Reddit tabs
   browser.tabs.query({}, (tabs) => {
     tabs.forEach(tab => {
       if (tab.url && tab.url.includes("reddit.com")) {
@@ -163,6 +177,7 @@ function updateCountdownDisplay() {
         general_switch_btn.textContent = `Reverts back in: ${minutes}:${seconds.toString().padStart(2, '0')}`;
       }
     }
+    setPausedState(!general_switch);
   });
 }
 
@@ -195,13 +210,13 @@ general_switch_btn.addEventListener("click", () => {
     // Create alarm for 2 hours
     browser.alarms.create("general_switch_timer", { delayInMinutes: 120 });
     
-    console.log("2-hour timer started for general switch");
+    setPausedState(true);
   } else {
     // General switch turned ON - clear any existing timer
     browser.alarms.clear("general_switch_timer");
     browser.storage.sync.set({ general_switch: true });
     browser.storage.sync.remove(["general_switch_timer"]);
-    console.log("Timer cleared - general switch turned ON");
+    setPausedState(false);
   }
 
   // Refresh all tabs with supported sites
@@ -212,4 +227,22 @@ general_switch_btn.addEventListener("click", () => {
       }
     });
   });
+});
+
+// Settings menu toggle logic
+const settingsBtn = document.getElementById("toggle_settings");
+const mainMenu = document.getElementById("main_menu");
+const settingsMenu = document.getElementById("settings_menu");
+
+settingsBtn.addEventListener("click", () => {
+  mainMenu.style.display = "none";
+  settingsMenu.style.display = "flex";
+});
+
+// Back to main menu logic
+const backBtn = document.getElementById("toggle_main_menu");
+
+backBtn.addEventListener("click", () => {
+  mainMenu.style.display = "flex";
+  settingsMenu.style.display = "none";
 });
