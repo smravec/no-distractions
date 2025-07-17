@@ -6,7 +6,6 @@
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Install-blue?logo=googlechrome)](https://chrome.google.com/webstore)
 [![Firefox Add-ons](https://img.shields.io/badge/Firefox%20Add--ons-Install-orange?logo=firefox)](https://addons.mozilla.org/firefox/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > Block algorithmic feeds. Keep intentional browsing.
 
@@ -73,9 +72,6 @@ If a site isn't working as expected:
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
-
-MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Updates
 
