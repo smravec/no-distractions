@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="no_distractions_logo.svg" alt="No Distractions" width="240" >
+</div>
+
 # No Distractions
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Install-blue?logo=googlechrome)](https://chrome.google.com/webstore)
