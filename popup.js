@@ -152,7 +152,7 @@ function updateCountdownDisplay() {
     general_switch_btn.style.borderColor = general_switch ? "greenyellow" : "red";
     
     // Reset button text
-    general_switch_btn.textContent = "on/off";
+    general_switch_btn.textContent = "Turn off blocking";
     
     // Check if timer is active
     if (!general_switch && result.general_switch_timer) {
@@ -160,7 +160,7 @@ function updateCountdownDisplay() {
       if (timeRemaining > 0) {
         const minutes = Math.floor(timeRemaining / (1000 * 60));
         const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-        general_switch_btn.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        general_switch_btn.textContent = `Reverts back in: ${minutes}:${seconds.toString().padStart(2, '0')}`;
       }
     }
   });

@@ -152,7 +152,7 @@ function updateCountdownDisplay() {
     general_switch_btn.style.borderColor = general_switch ? "greenyellow" : "red";
     
     // Reset button text
-    general_switch_btn.textContent = "on/off";
+    general_switch_btn.textContent = "Turn off blocking";
     
     // Check if timer is active
     if (!general_switch && result.general_switch_timer) {
@@ -160,7 +160,7 @@ function updateCountdownDisplay() {
       if (timeRemaining > 0) {
         const minutes = Math.floor(timeRemaining / (1000 * 60));
         const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-        general_switch_btn.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        general_switch_btn.textContent = `Reverts back in: ${minutes}:${seconds.toString().padStart(2, '0')}`;
       }
     }
   });
@@ -179,23 +179,23 @@ general_switch_btn.addEventListener("click", () => {
   general_switch = !general_switch; // toggle
 
   if (!general_switch) {
-    // General switch turned OFF - start 10-second timer (for debugging)
-    const TEN_SECONDS_MS = 10 * 1000; // 10 seconds in milliseconds
-    const expiryTime = Date.now() + TEN_SECONDS_MS;
+    // General switch turned OFF - start 2-hour timer
+    const TWO_HOURS_MS = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+    const expiryTime = Date.now() + TWO_HOURS_MS;
     
     // Store timer data
     browser.storage.sync.set({ 
       general_switch: false,
       general_switch_timer: {
         expiryTime: expiryTime,
-        duration: TEN_SECONDS_MS
+        duration: TWO_HOURS_MS
       }
     });
     
-    // Create alarm for 10 seconds
-    browser.alarms.create("general_switch_timer", { delayInMinutes: 10/60 }); // 10 seconds = 10/60 minutes
+    // Create alarm for 2 hours
+    browser.alarms.create("general_switch_timer", { delayInMinutes: 120 });
     
-    console.log("10-second timer started for general switch");
+    console.log("2-hour timer started for general switch");
   } else {
     // General switch turned ON - clear any existing timer
     browser.alarms.clear("general_switch_timer");

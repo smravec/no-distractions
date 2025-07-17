@@ -1,32 +1,45 @@
-
 <!DOCTYPE html>
 <html>
-  <head>
-    <link rel="stylesheet" href="popup.css">
-  </head>
+
+<head>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+
   <body>
-  <body>
-    <h1>Settings</h1>
-    <div class="setting">
-      <span>Youtube</span>
-      <button id="youtube">on/off</button>
-     </div>
-     <div class="setting">
-      <span>Facebook</span>
-      <button id="facebook">on/off</button>
-     </div>
-     <div class="setting">
-      <span>Instagram</span>
-      <button id="instagram">on/off</button>
-     </div>
-     <div class="setting">
-      <span>Reddit</span>
-      <button id="reddit">on/off</button>
-     </div>
-     <div class="setting">
-      <span>General</span>
-      <button id="general_switch">on/off</button>
-     </div>
+    <h1 id="title">No Distractions</h1>
+
+    <div id="main_menu">
+      <div class="main_menu_container">
+        <div class="main_menu_title">Removing Distractions</div>
+        <div class="main_menu_loading">.</div>
+        <button id="general_switch" class="btn">Turn off blocking</button>
+      </div>
+      <button id="settings">Other settings</button>
+    </div>
+
+    <div id="settings_menu">
+      <h1 id="settings_title">Turn off for each site</h1>
+      <div class="setting">
+        <span>Youtube</span>
+        <button id="youtube">on/off</button>
+      </div>
+      <div class="setting">
+        <span>Facebook</span>
+        <button id="facebook">on/off</button>
+      </div>
+      <div class="setting">
+        <span>Instagram</span>
+        <button id="instagram">on/off</button>
+      </div>
+      <div class="setting">
+        <span>Reddit</span>
+        <button id="reddit">on/off</button>
+      </div>
+    </div>
+
     <script src="popup.js"></script>
   </body>
+
 </html>
