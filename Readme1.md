@@ -11,10 +11,10 @@
 No Distractions removes recommendation feeds from social media while keeping the sites functional. Instead of endless scrolling, you see only content you consciously choose to follow.
 
 **Supported platforms:**
-- <img src="https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=white" alt="YouTube" height="20"> → Subscriptions only, no homepage feed or Shorts
-- <img src="https://img.shields.io/badge/Instagram-E4405F?logo=instagram&logoColor=white" alt="Instagram" height="20"> → Main feed and Reels removed, profile/direct access remains
-- <img src="https://img.shields.io/badge/Facebook-1877F2?logo=facebook&logoColor=white" alt="Facebook" height="20"> → Main feed and Reels removed, profile/direct access remains
-- <img src="https://img.shields.io/badge/Reddit-FF4500?logo=reddit&logoColor=white" alt="Reddit" height="20"> → Your subscribed subreddits only
+- YouTube → Subscriptions only, no homepage feed or Shorts
+- Instagram → Main feed and Reels removed, profile/direct access remains
+- Facebook → Main feed and Reels removed, profile/direct access remains
+- Reddit → Your subscribed subreddits only
 
 Works on desktop and mobile browsers.
 
@@ -46,10 +46,10 @@ In the extension popup, toggle individual sites on/off permanently.
 **Before:** Endless feeds, recommendations, "For You" content, Shorts, Reels
 **After:** Only subscriptions and content you chose
 
-- <img src="https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=white" alt="YouTube" height="20"> **YouTube:** Subscriptions tab only, no homepage feed or Shorts
-- <img src="https://img.shields.io/badge/Instagram-E4405F?logo=instagram&logoColor=white" alt="Instagram" height="20"> **Instagram:** Main feed and Reels removed, profile/direct access remains
-- <img src="https://img.shields.io/badge/Facebook-1877F2?logo=facebook&logoColor=white" alt="Facebook" height="20"> **Facebook:** Main feed and Reels removed, profile/direct access remains
-- <img src="https://img.shields.io/badge/Reddit-FF4500?logo=reddit&logoColor=white" alt="Reddit" height="20"> **Reddit:** Your subscribed subreddits only
+- **YouTube:** Subscriptions tab only, no homepage feed or Shorts
+- **Instagram:** Main feed and Reels removed, profile/direct access remains
+- **Facebook:** Main feed and Reels removed, profile/direct access remains
+- **Reddit:** Your subscribed subreddits only
 
 ## Why This Helps
 
