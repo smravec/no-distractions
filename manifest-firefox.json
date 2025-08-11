@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "No Distractions",
   "description": "Blocks addictive recommendation feeds",
-  "version": "1.0",
+  "version": "1.0.0",
   "permissions": ["storage", "scripting", "alarms", "tabs"],
 
   "background": {

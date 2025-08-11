@@ -12,7 +12,7 @@ cp manifest-firefox.json temp_dir/manifest.json
 
 # Create zip from temp directory
 cd temp_dir
-zip -r ../no-distractions.xpi *
+zip -r ../builds/no-distractions-firefox.xpi *
 cd ..
 
 # Clean up

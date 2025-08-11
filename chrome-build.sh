@@ -1,12 +1,12 @@
 # Clean up
-rm -rf no-distractions
+rm -rf ./builds/no-distractions-chrome
 
 # Create temporary directory
-mkdir -p no-distractions
+mkdir -p ./builds/no-distractions-chrome
 
 # Copy all files except manifest.json to temp directory
-cp no_distractions_logo.png popup.js popup.html popup.css manifest.json background.js no-distractions/
-cp -r js css no-distractions/
+cp no_distractions_logo.png manifest.json popup.js popup.html popup.css background.js ./builds/no-distractions-chrome/
+cp -r js css ./builds/no-distractions-chrome/
 
 
 
