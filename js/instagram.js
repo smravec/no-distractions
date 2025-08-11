@@ -3,21 +3,31 @@ if (typeof browser === "undefined") {
 }
 
 // Redirect to following feed if on main Instagram page
-function redirectToFollowingFeed() {
+let enforceFollowingRAF = null;
+function enforceFollowingRedirectLoop() {
   const currentUrl = window.location.href;
   const currentPath = window.location.pathname;
-  
-  // Check if we're on the main Instagram page (not inbox or other pages)
-  // Also redirect if we're on the home variant back to following
-  if ((currentPath === "/" || currentPath === "") && 
-      (!currentUrl.includes("variant=following") || currentUrl.includes("variant=home"))) {
-    console.log('Redirecting to following feed from:', currentUrl);
-    window.location.href = "https://www.instagram.com/?variant=following";
-    return;
+  const urlObj = new URL(currentUrl);
+  const variant = urlObj.searchParams.get('variant');
+  if ((currentPath === "/" || currentPath === "") && variant !== "following") {
+    if (variant !== "following") {
+      // Use replace to avoid polluting history
+      window.location.replace("https://www.instagram.com/?variant=following");
+      return;
+    }
   }
+  enforceFollowingRAF = requestAnimationFrame(enforceFollowingRedirectLoop);
 }
 
-// Monitor URL changes more comprehensively
+function redirectToFollowingFeed() {
+  if (enforceFollowingRAF) {
+    cancelAnimationFrame(enforceFollowingRAF);
+    enforceFollowingRAF = null;
+  }
+  enforceFollowingRedirectLoop();
+}
+
+// Monitor URL changes more comprehensively, including SPA navigation
 let lastUrl = window.location.href;
 function checkUrlChange() {
   const currentUrl = window.location.href;
@@ -27,6 +37,19 @@ function checkUrlChange() {
     redirectToFollowingFeed();
     blockHorizontalScroll(); // Update horizontal scroll blocking on URL change
   }
+}
+
+// Patch history.pushState and replaceState to catch SPA navigation
+if (!window._noDistractionsHistoryPatched) {
+  ["pushState", "replaceState"].forEach(fn => {
+    const orig = history[fn];
+    history[fn] = function() {
+      const ret = orig.apply(this, arguments);
+      setTimeout(checkUrlChange, 0);
+      return ret;
+    };
+  });
+  window._noDistractionsHistoryPatched = true;
 }
 
 // Run redirect check immediately
