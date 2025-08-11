@@ -20,12 +20,10 @@ function enforceFollowingRedirectLoop() {
     }
   }
   // Redirect to following feed if on main page
-  if ((currentPath === "/" || currentPath === "") && variant !== "following") {
-    if (variant !== "following") {
+    if ((currentPath === "/" || currentPath === "") && variant !== "following") {
       window.location.replace("https://www.instagram.com/?variant=following");
       return;
     }
-  }
   enforceFollowingRAF = requestAnimationFrame(enforceFollowingRedirectLoop);
 }
 
@@ -174,59 +172,9 @@ browser.storage.sync.get(["ig", "general_switch"], (result) => {
     console.log('Instagram blocking is disabled by toggle or general switch.');
     return;
   }
-  // html.classList.add('no-distractions-css'); // Temporarily disabled: CSS-based feed removal
 
-  function setPageClass(path) {
-    html.classList.remove('ig-main-feed', 'ig-explore-page', 'ig-explore-mobile', 'ig-reels-page');
-    if (path === "/" || path === "") {
-      //html.classList.add('ig-main-feed');
-    } else if ((path === "/explore/" || path === "/explore") && window.screen.width > 500) {
-      html.classList.add('ig-explore-page');
-    } else if ((path === "/explore/" || path === "/explore") && window.screen.width <= 500) {
-      html.classList.add('ig-explore-mobile');
-    } else if (path.includes("/reels/")) {
-      html.classList.add('ig-reels-page');
-    }
-  }
-
-  // Initial class set
-  setPageClass(window.location.pathname);
-
-  let lastPathname = window.location.pathname;
-  let bodyObserver = null;
-
-
-  function setupObserver() {
-    const targetElement = document.querySelector('main[role="main"]');
-    if (!targetElement) {
-      setTimeout(setupObserver, 1000);
-      return;
-    }
-    if (bodyObserver !== null) return;
-    bodyObserver = new MutationObserver(() => {
-      // Check for both pathname and URL changes
-      checkUrlChange();
-      
-      if (lastPathname !== window.location.pathname) {
-        setPageClass(window.location.pathname);
-        lastPathname = window.location.pathname;
-        // Check if we need to redirect on navigation
-        redirectToFollowingFeed();
-        blockHorizontalScroll(); // Update horizontal scroll blocking on navigation
-      }
-    });
-    bodyObserver.observe(document.body, { childList: true, subtree: true });
-  }
-
-  setTimeout(setupObserver, 500);
-  window.addEventListener("load", setupObserver);
-  window.addEventListener("popstate", setupObserver);
-
-  // Also check for redirect on popstate events
+  // No need to set any page class or observe DOM changes, as all relevant paths are redirected.
+  // Only keep popstate and interval listeners for robust redirect and scroll blocking.
   window.addEventListener("popstate", redirectToFollowingFeed);
-
-  // Set up interval to catch URL changes that might be missed
   setInterval(checkUrlChange, 1000);
-
 });
-

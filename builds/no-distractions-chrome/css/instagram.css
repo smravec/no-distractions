@@ -1,12 +1,10 @@
-/* TODO maybe add init temp styles */
-
-/* Main feed (home) */
-.ig-main-feed article {
+/* Main feed (home) (solved in js) */
+/* .ig-main-feed article {
   display: none !important;
 }
 .ig-main-feed div[role="progressbar"] {
   display: none !important;
-}
+} */
 
 /* Explore page (desktop) */
 .ig-explore-page main[role="main"] > * {
@@ -23,14 +21,3 @@
   display: none !important;
 }
 
-/* Existing global toggle for future use */
-/* .no-distractions-css article {
-  display: none !important;
-}
-.no-distractions-css div[role="progressbar"] {
-  display: none !important;
-} */
-
-/* .no-distractions-css div[data-visualcompletion="ignore"] {
-  display: none !important;
-} */

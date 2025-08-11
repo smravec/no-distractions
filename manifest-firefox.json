@@ -53,12 +53,6 @@
     },
     {
       "matches": ["https://www.instagram.com/*"],
-      "js": ["js/init-class.js"],
-      "all_frames": true,
-      "run_at": "document_start"
-    },
-    {
-      "matches": ["https://www.instagram.com/*"],
       "css": ["css/instagram.css"],
       "all_frames": true,
       "run_at": "document_start"
@@ -67,7 +61,7 @@
       "matches": ["https://www.instagram.com/*"],
       "js": ["js/instagram.js"],
       "all_frames": true,
-      "run_at": "document_idle"
+      "run_at": "document_start"
     },
     {
       "matches": ["https://*.reddit.com/*"],

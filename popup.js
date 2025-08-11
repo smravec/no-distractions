@@ -236,9 +236,9 @@ const settingsMenu = document.getElementById("settings_menu");
 
 settingsBtn.addEventListener("click", () => {
   // when this button is clicked show an popup that says under construction
-  alert("Feature under construction.");
-  // mainMenu.style.display = "none";
-  // settingsMenu.style.display = "flex";
+  // alert("Feature under construction.");
+  mainMenu.style.display = "none";
+  settingsMenu.style.display = "flex";
 });
 
 // Back to main menu logic
