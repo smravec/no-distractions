@@ -9,9 +9,19 @@ function enforceFollowingRedirectLoop() {
   const currentPath = window.location.pathname;
   const urlObj = new URL(currentUrl);
   const variant = urlObj.searchParams.get('variant');
+  // Redirect /explore or /explore/ to /explore/search on mobile, to /?variant=following on desktop
+  if ((currentPath === "/explore" || currentPath === "/explore/") && !currentUrl.includes("/explore/search")) {
+    if (window.innerWidth > 500) {
+      window.location.replace("https://www.instagram.com/?variant=following");
+      return;
+    } else {
+      window.location.replace("https://www.instagram.com/explore/search");
+      return;
+    }
+  }
+  // Redirect to following feed if on main page
   if ((currentPath === "/" || currentPath === "") && variant !== "following") {
     if (variant !== "following") {
-      // Use replace to avoid polluting history
       window.location.replace("https://www.instagram.com/?variant=following");
       return;
     }
@@ -185,6 +195,7 @@ browser.storage.sync.get(["ig", "general_switch"], (result) => {
   let lastPathname = window.location.pathname;
   let bodyObserver = null;
 
+
   function setupObserver() {
     const targetElement = document.querySelector('main[role="main"]');
     if (!targetElement) {
@@ -199,7 +210,6 @@ browser.storage.sync.get(["ig", "general_switch"], (result) => {
       if (lastPathname !== window.location.pathname) {
         setPageClass(window.location.pathname);
         lastPathname = window.location.pathname;
-        
         // Check if we need to redirect on navigation
         redirectToFollowingFeed();
         blockHorizontalScroll(); // Update horizontal scroll blocking on navigation
