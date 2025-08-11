@@ -24,12 +24,12 @@
 }
 
 /* Existing global toggle for future use */
-.no-distractions-css article {
-  /* display: none !important; */
+/* .no-distractions-css article {
+  display: none !important;
 }
 .no-distractions-css div[role="progressbar"] {
-  /* display: none !important; */
-}
+  display: none !important;
+} */
 
 /* .no-distractions-css div[data-visualcompletion="ignore"] {
   display: none !important;
