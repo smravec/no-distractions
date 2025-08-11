@@ -73,15 +73,6 @@ function blockHorizontalScroll() {
   const currentPath = window.location.pathname;
   const currentUrl = window.location.href;
   // Only block on main page with following variant
-  // Single-call version for ResizeObserver and for RAF
-  function resetScrollLeft() {
-    const all = [document.documentElement, document.body, ...document.querySelectorAll('*')];
-    for (const el of all) {
-      if (el && el.scrollWidth > el.clientWidth && el.scrollLeft !== 0) {
-        el.scrollLeft = 0;
-      }
-    }
-  }
   if ((currentPath === "/" || currentPath === "") && currentUrl.includes("variant=following")) {
     // Stronger CSS for all relevant containers
     if (!document.getElementById('no-distractions-horizontal-scroll-block')) {
@@ -93,15 +84,11 @@ function blockHorizontalScroll() {
         const style = document.createElement('style');
         style.id = 'no-distractions-horizontal-scroll-block';
         style.textContent = `
-          html, body, main[role="main"], #react-root, section, div[role="presentation"], div[style*="display: flex"] {
+          html, body, main[role="main"], #react-root {
             overflow-x: hidden !important;
             max-width: 100vw !important;
             position: relative !important;
             left: 0 !important;
-          }
-          body {
-            position: fixed !important;
-            width: 100vw !important;
           }
         `;
         document.head.appendChild(style);
@@ -110,20 +97,21 @@ function blockHorizontalScroll() {
       injectStyle();
     }
 
-    // Forcibly reset scrollLeft on all horizontally scrollable elements every animation frame
-    function resetScrollLeftRAF() {
-      resetScrollLeft();
-      window.horizontalScrollResetRAF = requestAnimationFrame(resetScrollLeftRAF);
+    // Only block horizontal scroll events at the main containers
+    function isRootContainer(el) {
+      if (!el) return false;
+      return (
+        el === document.documentElement ||
+        el === document.body ||
+        (el.matches && (el.matches('main[role="main"]') || el.matches('#react-root')))
+      );
     }
-    if (!window.horizontalScrollResetRAF) {
-      window.horizontalScrollResetRAF = requestAnimationFrame(resetScrollLeftRAF);
-    }
-
-    // Block horizontal scroll events
     function blockHorizontalScrollEvent(e) {
       if (e.deltaX && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        e.preventDefault();
-        return false;
+        if (isRootContainer(e.target)) {
+          e.preventDefault();
+          return false;
+        }
       }
     }
     function blockHorizontalTouch(e) {
@@ -132,8 +120,10 @@ function blockHorizontalScroll() {
         if (!window.lastTouchX) window.lastTouchX = touch.clientX;
         const deltaX = touch.clientX - window.lastTouchX;
         if (Math.abs(deltaX) > 10) {
-          e.preventDefault();
-          return false;
+          if (isRootContainer(e.target)) {
+            e.preventDefault();
+            return false;
+          }
         }
         window.lastTouchX = touch.clientX;
       }
@@ -143,34 +133,11 @@ function blockHorizontalScroll() {
       window.addEventListener('touchmove', blockHorizontalTouch, { passive: false });
       window.horizontalScrollBlocked = true;
     }
-
-    // Resize observer to re-apply CSS if needed
-    if (!window.horizontalScrollResizeObserver) {
-      window.horizontalScrollResizeObserver = new ResizeObserver(() => {
-        resetScrollLeft();
-      });
-      const waitForBody = () => {
-        if (!document.body) {
-          setTimeout(waitForBody, 10);
-          return;
-        }
-        window.horizontalScrollResizeObserver.observe(document.body);
-      };
-      waitForBody();
-    }
   } else {
     // Remove horizontal scroll blocking when not on main page
     const style = document.getElementById('no-distractions-horizontal-scroll-block');
     if (style) {
       style.remove();
-    }
-    if (window.horizontalScrollResetRAF) {
-      cancelAnimationFrame(window.horizontalScrollResetRAF);
-      window.horizontalScrollResetRAF = null;
-    }
-    if (window.horizontalScrollResizeObserver) {
-      window.horizontalScrollResizeObserver.disconnect();
-      window.horizontalScrollResizeObserver = null;
     }
     window.horizontalScrollBlocked = false;
     window.lastTouchX = null;
