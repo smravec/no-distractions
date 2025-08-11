@@ -58,22 +58,19 @@ function blockHorizontalScroll() {
       console.log('Horizontal scroll blocking enabled');
     }
 
-    // Forcibly reset scrollLeft on all scrollable elements
-    function resetScrollLeft() {
-      [document.documentElement, document.body].forEach(el => {
-        if (el.scrollLeft !== 0) el.scrollLeft = 0;
-      });
-      // Try main containers
-      const main = document.querySelector('main[role="main"]');
-      if (main && main.scrollLeft !== 0) main.scrollLeft = 0;
-      // All divs with overflow-x
-      document.querySelectorAll('div').forEach(div => {
-        const style = window.getComputedStyle(div);
-        if (style.overflowX !== 'visible' && div.scrollLeft !== 0) div.scrollLeft = 0;
-      });
+    // Forcibly reset scrollLeft on all horizontally scrollable elements every animation frame
+    function resetScrollLeftRAF() {
+      // All elements that can scroll horizontally
+      const all = [document.documentElement, document.body, ...document.querySelectorAll('*')];
+      for (const el of all) {
+        if (el && el.scrollWidth > el.clientWidth && el.scrollLeft !== 0) {
+          el.scrollLeft = 0;
+        }
+      }
+      window.horizontalScrollResetRAF = requestAnimationFrame(resetScrollLeftRAF);
     }
-    if (!window.horizontalScrollResetInterval) {
-      window.horizontalScrollResetInterval = setInterval(resetScrollLeft, 100);
+    if (!window.horizontalScrollResetRAF) {
+      window.horizontalScrollResetRAF = requestAnimationFrame(resetScrollLeftRAF);
     }
 
     // Block horizontal scroll events
@@ -114,9 +111,9 @@ function blockHorizontalScroll() {
     if (style) {
       style.remove();
     }
-    if (window.horizontalScrollResetInterval) {
-      clearInterval(window.horizontalScrollResetInterval);
-      window.horizontalScrollResetInterval = null;
+    if (window.horizontalScrollResetRAF) {
+      cancelAnimationFrame(window.horizontalScrollResetRAF);
+      window.horizontalScrollResetRAF = null;
     }
     if (window.horizontalScrollResizeObserver) {
       window.horizontalScrollResizeObserver.disconnect();
