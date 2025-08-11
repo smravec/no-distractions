@@ -31,6 +31,19 @@ function redirectToFollowingFeed() {
 let lastUrl = window.location.href;
 function checkUrlChange() {
   const currentUrl = window.location.href;
+  const currentPath = window.location.pathname;
+  // If on a /reels/ page, redirect to last non-reels page
+  if (/^\/reels\//.test(currentPath)) {
+    const lastNonReels = sessionStorage.getItem('noDistractionsLastNonReelsUrl') || 'https://www.instagram.com/?variant=following';
+    if (currentUrl !== lastNonReels) {
+      console.log('Redirecting from reels to last non-reels:', lastNonReels);
+      window.location.replace(lastNonReels);
+      return;
+    }
+  } else {
+    // Store last non-reels URL if not on reels
+    sessionStorage.setItem('noDistractionsLastNonReelsUrl', currentUrl);
+  }
   if (currentUrl !== lastUrl) {
     console.log('URL changed from:', lastUrl, 'to:', currentUrl);
     lastUrl = currentUrl;
@@ -60,36 +73,46 @@ function blockHorizontalScroll() {
   const currentPath = window.location.pathname;
   const currentUrl = window.location.href;
   // Only block on main page with following variant
+  // Single-call version for ResizeObserver and for RAF
+  function resetScrollLeft() {
+    const all = [document.documentElement, document.body, ...document.querySelectorAll('*')];
+    for (const el of all) {
+      if (el && el.scrollWidth > el.clientWidth && el.scrollLeft !== 0) {
+        el.scrollLeft = 0;
+      }
+    }
+  }
   if ((currentPath === "/" || currentPath === "") && currentUrl.includes("variant=following")) {
     // Stronger CSS for all relevant containers
     if (!document.getElementById('no-distractions-horizontal-scroll-block')) {
-      const style = document.createElement('style');
-      style.id = 'no-distractions-horizontal-scroll-block';
-      style.textContent = `
-        html, body, main[role="main"], #react-root, section, div[role="presentation"], div[style*="display: flex"] {
-          overflow-x: hidden !important;
-          max-width: 100vw !important;
-          position: relative !important;
-          left: 0 !important;
+      const injectStyle = () => {
+        if (!document.head) {
+          setTimeout(injectStyle, 10);
+          return;
         }
-        body {
-          position: fixed !important;
-          width: 100vw !important;
-        }
-      `;
-      document.head.appendChild(style);
-      console.log('Horizontal scroll blocking enabled');
+        const style = document.createElement('style');
+        style.id = 'no-distractions-horizontal-scroll-block';
+        style.textContent = `
+          html, body, main[role="main"], #react-root, section, div[role="presentation"], div[style*="display: flex"] {
+            overflow-x: hidden !important;
+            max-width: 100vw !important;
+            position: relative !important;
+            left: 0 !important;
+          }
+          body {
+            position: fixed !important;
+            width: 100vw !important;
+          }
+        `;
+        document.head.appendChild(style);
+        console.log('Horizontal scroll blocking enabled');
+      };
+      injectStyle();
     }
 
     // Forcibly reset scrollLeft on all horizontally scrollable elements every animation frame
     function resetScrollLeftRAF() {
-      // All elements that can scroll horizontally
-      const all = [document.documentElement, document.body, ...document.querySelectorAll('*')];
-      for (const el of all) {
-        if (el && el.scrollWidth > el.clientWidth && el.scrollLeft !== 0) {
-          el.scrollLeft = 0;
-        }
-      }
+      resetScrollLeft();
       window.horizontalScrollResetRAF = requestAnimationFrame(resetScrollLeftRAF);
     }
     if (!window.horizontalScrollResetRAF) {
@@ -126,7 +149,14 @@ function blockHorizontalScroll() {
       window.horizontalScrollResizeObserver = new ResizeObserver(() => {
         resetScrollLeft();
       });
-      window.horizontalScrollResizeObserver.observe(document.body);
+      const waitForBody = () => {
+        if (!document.body) {
+          setTimeout(waitForBody, 10);
+          return;
+        }
+        window.horizontalScrollResizeObserver.observe(document.body);
+      };
+      waitForBody();
     }
   } else {
     // Remove horizontal scroll blocking when not on main page
