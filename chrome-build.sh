@@ -5,8 +5,8 @@ rm -rf ./builds/no-distractions-chrome
 mkdir -p ./builds/no-distractions-chrome
 
 # Copy all files except manifest.json to temp directory
-cp no_distractions_logo.png manifest.json popup.js popup.html popup.css background.js ./builds/no-distractions-chrome/
-cp -r js css ./builds/no-distractions-chrome/
+cp ./assets/* manifest.json popup.js popup.html popup.css background.js ./builds/no-distractions-chrome/
+cp -r  js css ./builds/no-distractions-chrome/
 
 
 

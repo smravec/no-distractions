@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
   "name": "No Distractions",
-  "description": "Blocks addictive recommendation feeds",
-  "version": "1.0.0",
-  "permissions": ["storage", "scripting", "alarms", "tabs"],
+  "description": "Removes algorithmic feeds, reels, and endless scrolling — see only posts from people you follow.",
+  "version": "0.0.0.1",
+  "permissions": ["storage", "alarms", "tabs"],
 
   "background": {
     "scripts": ["background.js"]
