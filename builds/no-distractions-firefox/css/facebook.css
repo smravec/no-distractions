@@ -1,0 +1,19 @@
+/* Init styles till the js script gets loaded*/
+/* Hides the main feed */
+.no-distractions-css div[role="main"] {
+  display: none;
+}
+
+/* Pernament styles */
+
+/* Cleans /watch page */
+.no-distractions-css #watch_feed {
+  display: none !important;
+}
+
+/* Mobile styles */
+
+/* Hides open app button */
+.no-distractions-css #screen-root > div > div.m.fixed-container.bottom {
+  display: none;
+}

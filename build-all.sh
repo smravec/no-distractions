@@ -1,3 +1,16 @@
+## CHROME
+# Clean up
+rm -rf ./builds/no-distractions-chrome
+
+# Create temporary directory
+mkdir -p ./builds/no-distractions-chrome
+
+# Copy all files except manifest.json to temp directory
+cp ./assets/* manifest.json popup.js popup.html popup.css background.js ./builds/no-distractions-chrome/
+cp -r  js css ./builds/no-distractions-chrome/
+
+
+## FIREFOX
 # Create temporary directory
 mkdir -p temp_dir
 
@@ -12,6 +25,8 @@ cp manifest-firefox.json temp_dir/manifest.json
 
 # Create zip from temp directory
 cd temp_dir
+mkdir -p ../builds/no-distractions-firefox
+cp -r ./* ../builds/no-distractions-firefox/.
 zip -r ../builds/no-distractions-firefox.xpi *
 cd ..
 
