@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "No Distractions",
-  "description": "Removes algorithmic feeds, reels, and endless scrolling — see only posts from people you follow.",
-  "version": "0.0.0.1",
-   "icons": {
+  "name": "No Distractions - Remove Reels, Shorts & Suggested Posts",
+  "description": "Hide reels, shorts & suggested posts across YouTube, Instagram, Facebook & Reddit. Keep posts only from people you follow.",
+  "version": "0.0.0.2",
+  "icons": {
     "16": "icon16.png",
     "32": "icon32.png",
     "48": "icon48.png",
