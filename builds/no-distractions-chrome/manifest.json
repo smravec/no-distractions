@@ -105,6 +105,10 @@
         "https://www.instagram.com/*",
         "https://*.reddit.com/*"
       ]
+    },
+    {
+      "resources": ["reddit-icon.png"],
+      "matches": ["https://*.reddit.com/*"]
     }
   ]
 }

@@ -16,7 +16,19 @@
 }
 
 /* r/popular page */
-.no-distractions-css search-dynamic-id-cache-controller[search-telemetry-source="popular_carousel"],
+.no-distractions-css
+  search-dynamic-id-cache-controller[search-telemetry-source="popular_carousel"],
 .no-distractions-css shreddit-feed[reload-url*="popular-feed"] {
+  display: none !important;
+}
+
+/*Left side bar*/
+nav:has(left-nav-top-section) details:has(summary[aria-controls="RESOURCES"]),
+nav:has(left-nav-top-section) reddit-recent-pages {
+  display: none !important;
+}
+
+/*Right side bar*/
+#right-sidebar-container {
   display: none !important;
 }
