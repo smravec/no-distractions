@@ -201,48 +201,31 @@ let countdownInterval = setInterval(() => {
 
 // Add click listener
 general_switch_btn.addEventListener("click", () => {
-  general_switch = !general_switch; // toggle
-
-  if (!general_switch) {
-    // General switch turned OFF - start 1-hour timer
-    const ONE_HOUR_MS = 1 * 60 * 60 * 1000; // 1 hour in milliseconds
-    const expiryTime = Date.now() + ONE_HOUR_MS;
-
-    // Store timer data
-    browser.storage.sync.set({
-      general_switch: false,
-      general_switch_timer: {
-        expiryTime: expiryTime,
-        duration: ONE_HOUR_MS,
-      },
-    });
-
-    // Create alarm for 1 hour
-    browser.alarms.create("general_switch_timer", { delayInMinutes: 60 });
-
-    setPausedState(true);
+  if (general_switch) {
+    // Show confirmation menu instead of directly turning off
+    showConfirmationMenu();
   } else {
     // General switch turned ON - clear any existing timer
     browser.alarms.clear("general_switch_timer");
     browser.storage.sync.set({ general_switch: true });
     browser.storage.sync.remove(["general_switch_timer"]);
     setPausedState(false);
-  }
 
-  // Refresh all tabs with supported sites
-  browser.tabs.query({}, (tabs) => {
-    tabs.forEach((tab) => {
-      if (
-        tab.url &&
-        (tab.url.includes("facebook.com") ||
-          tab.url.includes("instagram.com") ||
-          tab.url.includes("reddit.com") ||
-          tab.url.includes("youtube.com"))
-      ) {
-        browser.tabs.reload(tab.id);
-      }
+    // Refresh all tabs with supported sites
+    browser.tabs.query({}, (tabs) => {
+      tabs.forEach((tab) => {
+        if (
+          tab.url &&
+          (tab.url.includes("facebook.com") ||
+            tab.url.includes("instagram.com") ||
+            tab.url.includes("reddit.com") ||
+            tab.url.includes("youtube.com"))
+        ) {
+          browser.tabs.reload(tab.id);
+        }
+      });
     });
-  });
+  }
 });
 
 // Settings menu toggle logic
@@ -264,3 +247,133 @@ backBtn.addEventListener("click", () => {
   mainMenu.style.display = "flex";
   settingsMenu.style.display = "none";
 });
+
+// Confirmation menu logic
+function showConfirmationMenu() {
+  const mainMenu = document.getElementById("main_menu");
+  const confirmationMenu = document.getElementById("confirmation_menu");
+
+  mainMenu.style.display = "none";
+  confirmationMenu.style.display = "flex";
+
+  // Focus first input
+  document.getElementById("confirmation_input_1").focus();
+}
+
+function hideConfirmationMenu() {
+  const mainMenu = document.getElementById("main_menu");
+  const confirmationMenu = document.getElementById("confirmation_menu");
+
+  confirmationMenu.style.display = "none";
+  mainMenu.style.display = "flex";
+
+  // Clear all inputs
+  for (let i = 1; i <= 4; i++) {
+    const input = document.getElementById(`confirmation_input_${i}`);
+    input.value = "";
+    input.style.borderColor = "greenyellow";
+  }
+}
+
+function turnOffBlocking() {
+  general_switch = false;
+
+  // General switch turned OFF - start 1-hour timer
+  const ONE_HOUR_MS = 1 * 60 * 60 * 1000; // 1 hour in milliseconds
+  const expiryTime = Date.now() + ONE_HOUR_MS;
+
+  // Store timer data
+  browser.storage.sync.set({
+    general_switch: false,
+    general_switch_timer: {
+      expiryTime: expiryTime,
+      duration: ONE_HOUR_MS,
+    },
+  });
+
+  // Create alarm for 1 hour
+  browser.alarms.create("general_switch_timer", { delayInMinutes: 60 });
+
+  setPausedState(true);
+
+  // Refresh all tabs with supported sites
+  browser.tabs.query({}, (tabs) => {
+    tabs.forEach((tab) => {
+      if (
+        tab.url &&
+        (tab.url.includes("facebook.com") ||
+          tab.url.includes("instagram.com") ||
+          tab.url.includes("reddit.com") ||
+          tab.url.includes("youtube.com"))
+      ) {
+        browser.tabs.reload(tab.id);
+      }
+    });
+  });
+
+  hideConfirmationMenu();
+}
+
+// Confirmation back button
+const confirmationBackBtn = document.getElementById("confirmation_back");
+confirmationBackBtn.addEventListener("click", hideConfirmationMenu);
+
+// Handle input navigation and validation
+for (let i = 1; i <= 4; i++) {
+  const input = document.getElementById(`confirmation_input_${i}`);
+
+  input.addEventListener("input", (e) => {
+    const value = e.target.value;
+
+    // Update border color based on content
+    if (value) {
+      e.target.style.borderColor = "red";
+    } else {
+      e.target.style.borderColor = "greenyellow";
+    }
+
+    // Only allow digits
+    if (!/^\d*$/.test(value)) {
+      e.target.value = "";
+      e.target.style.borderColor = "greenyellow";
+      return;
+    }
+
+    // Move to next input if value entered
+    if (value && i < 4) {
+      document.getElementById(`confirmation_input_${i + 1}`).focus();
+    }
+
+    // Check if all inputs are filled correctly
+    checkConfirmationCode();
+  });
+  input.addEventListener("keydown", (e) => {
+    // Handle backspace to move to previous input
+    if (e.key === "Backspace" && !e.target.value && i > 1) {
+      document.getElementById(`confirmation_input_${i - 1}`).focus();
+    }
+    // Reset border color when deleting content
+    if (e.key === "Backspace") {
+      setTimeout(() => {
+        if (!e.target.value) {
+          e.target.style.borderColor = "greenyellow";
+        }
+      }, 0);
+    }
+  });
+}
+
+function checkConfirmationCode() {
+  const expectedCode = "4257";
+  let enteredCode = "";
+
+  for (let i = 1; i <= 4; i++) {
+    enteredCode += document.getElementById(`confirmation_input_${i}`).value;
+  }
+
+  if (enteredCode === expectedCode) {
+    setTimeout(() => {
+      turnOffBlocking();
+    }, 200); // Small delay for better UX
+  }
+}

@@ -178,3 +178,82 @@ body {
 .setting > button:hover {
   cursor: pointer;
 }
+
+#confirmation_menu {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-top: 1px solid rgb(97, 96, 96);
+}
+
+.confirmation_menu_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-bottom: 1px solid rgb(97, 96, 96);
+}
+
+.confirmation_title {
+  font-size: 20px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  background-color: transparent;
+  color: white;
+  text-align: center;
+}
+
+.confirmation_subtitle {
+  font-size: 10px;
+  color: white;
+  text-align: center;
+  margin-bottom: 25px;
+  margin-top: 5px;
+  background-color: transparent;
+}
+
+.confirmation_input_container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  background-color: transparent;
+}
+
+.confirmation_input {
+  width: 30px;
+  height: 30px;
+  border: 1px solid greenyellow;
+  border-radius: 5px;
+  background-color: transparent;
+  color: white;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.confirmation_input:focus {
+  outline: none;
+  border-color: greenyellow;
+}
+
+#confirmation_back {
+  display: flex;
+  border: 1px solid rgb(97, 96, 96);
+  background-color: transparent;
+  color: white;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+#confirmation_back:hover {
+  cursor: pointer;
+}
