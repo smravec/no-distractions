@@ -8,7 +8,6 @@ if (typeof browser === "undefined") {
 
 // Call this function when needed, e.g., on button click or page load
 
-
 // chrome.storage.sync.get("yt_hidden", (result) => {
 //   if (result.yt_hidden == undefined) {
 //     yt = true;
@@ -26,20 +25,22 @@ let rd = true;
 
 // Helper to update main menu title
 function updateMainMenuTitle(paused) {
-  const mainMenuTitle = document.querySelector('.main_menu_title');
+  const mainMenuTitle = document.querySelector(".main_menu_title");
   if (mainMenuTitle) {
-    mainMenuTitle.textContent = paused ? "Don't Waste It" : "Saving Your GPA";
+    mainMenuTitle.innerHTML = paused
+      ? "Temporarily <br/> turned off"
+      : "Removing <br/> distractions";
   }
 }
 
 // Helper to update main menu loading animation
 function updateMainMenuLoading(paused) {
-  const loadingElem = document.querySelector('.main_menu_loading');
+  const loadingElem = document.querySelector(".main_menu_loading");
   if (!loadingElem) return;
   if (paused) {
-    loadingElem.classList.add('paused-dots');
+    loadingElem.classList.add("paused-dots");
   } else {
-    loadingElem.classList.remove('paused-dots');
+    loadingElem.classList.remove("paused-dots");
   }
 }
 
@@ -51,7 +52,7 @@ function setPausedState(paused) {
 
 // Helper to update settings button text
 function updateSettingsButtonText(btn, isOn) {
-  btn.textContent = isOn ? 'On' : 'Off';
+  btn.textContent = isOn ? "On" : "Off";
 }
 
 //Youtube button
@@ -71,7 +72,7 @@ yt_btn.addEventListener("click", () => {
   updateSettingsButtonText(yt_btn, yt);
   browser.storage.sync.set({ yt });
   browser.tabs.query({}, (tabs) => {
-    tabs.forEach(tab => {
+    tabs.forEach((tab) => {
       if (tab.url && tab.url.includes("youtube.com")) {
         browser.tabs.reload(tab.id);
       }
@@ -96,7 +97,7 @@ fb_btn.addEventListener("click", () => {
   updateSettingsButtonText(fb_btn, fb);
   browser.storage.sync.set({ fb });
   browser.tabs.query({}, (tabs) => {
-    tabs.forEach(tab => {
+    tabs.forEach((tab) => {
       if (tab.url && tab.url.includes("facebook.com")) {
         browser.tabs.reload(tab.id);
       }
@@ -121,7 +122,7 @@ ig_btn.addEventListener("click", () => {
   updateSettingsButtonText(ig_btn, ig);
   browser.storage.sync.set({ ig });
   browser.tabs.query({}, (tabs) => {
-    tabs.forEach(tab => {
+    tabs.forEach((tab) => {
       if (tab.url && tab.url.includes("instagram.com")) {
         browser.tabs.reload(tab.id);
       }
@@ -129,7 +130,7 @@ ig_btn.addEventListener("click", () => {
   });
 });
 
-  //Reddit button
+//Reddit button
 const rd_btn = document.getElementById("reddit");
 
 // Load saved value on popup open
@@ -146,7 +147,7 @@ rd_btn.addEventListener("click", () => {
   updateSettingsButtonText(rd_btn, rd);
   browser.storage.sync.set({ rd });
   browser.tabs.query({}, (tabs) => {
-    tabs.forEach(tab => {
+    tabs.forEach((tab) => {
       if (tab.url && tab.url.includes("reddit.com")) {
         browser.tabs.reload(tab.id);
       }
@@ -159,26 +160,35 @@ const general_switch_btn = document.getElementById("general_switch");
 
 // Function to update countdown display
 function updateCountdownDisplay() {
-  browser.storage.sync.get(["general_switch", "general_switch_timer"], (result) => {
-    general_switch = result.general_switch !== undefined ? result.general_switch : true;
-    
-    // Update button style
-    general_switch_btn.style.borderColor = general_switch ? "greenyellow" : "red";
-    
-    // Reset button text
-    general_switch_btn.textContent = "Turn off blocking";
-    
-    // Check if timer is active
-    if (!general_switch && result.general_switch_timer) {
-      const timeRemaining = result.general_switch_timer.expiryTime - Date.now();
-      if (timeRemaining > 0) {
-        const minutes = Math.floor(timeRemaining / (1000 * 60));
-        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-        general_switch_btn.textContent = `Reverts back in: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+  browser.storage.sync.get(
+    ["general_switch", "general_switch_timer"],
+    (result) => {
+      general_switch =
+        result.general_switch !== undefined ? result.general_switch : true;
+
+      // Update button style
+      general_switch_btn.style.borderColor = general_switch
+        ? "greenyellow"
+        : "red";
+
+      // Reset button text
+      general_switch_btn.textContent = "Turn off blocking";
+
+      // Check if timer is active
+      if (!general_switch && result.general_switch_timer) {
+        const timeRemaining =
+          result.general_switch_timer.expiryTime - Date.now();
+        if (timeRemaining > 0) {
+          const minutes = Math.floor(timeRemaining / (1000 * 60));
+          const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+          general_switch_btn.textContent = `Reverts back in: ${minutes}:${seconds
+            .toString()
+            .padStart(2, "0")}`;
+        }
       }
+      setPausedState(!general_switch);
     }
-    setPausedState(!general_switch);
-  });
+  );
 }
 
 // Load saved value on popup open
@@ -194,22 +204,22 @@ general_switch_btn.addEventListener("click", () => {
   general_switch = !general_switch; // toggle
 
   if (!general_switch) {
-    // General switch turned OFF - start 2-hour timer
-    const TWO_HOURS_MS = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
-    const expiryTime = Date.now() + TWO_HOURS_MS;
-    
+    // General switch turned OFF - start 1-hour timer
+    const ONE_HOUR_MS = 1 * 60 * 60 * 1000; // 1 hour in milliseconds
+    const expiryTime = Date.now() + ONE_HOUR_MS;
+
     // Store timer data
-    browser.storage.sync.set({ 
+    browser.storage.sync.set({
       general_switch: false,
       general_switch_timer: {
         expiryTime: expiryTime,
-        duration: TWO_HOURS_MS
-      }
+        duration: ONE_HOUR_MS,
+      },
     });
-    
-    // Create alarm for 2 hours
-    browser.alarms.create("general_switch_timer", { delayInMinutes: 120 });
-    
+
+    // Create alarm for 1 hour
+    browser.alarms.create("general_switch_timer", { delayInMinutes: 60 });
+
     setPausedState(true);
   } else {
     // General switch turned ON - clear any existing timer
@@ -221,8 +231,14 @@ general_switch_btn.addEventListener("click", () => {
 
   // Refresh all tabs with supported sites
   browser.tabs.query({}, (tabs) => {
-    tabs.forEach(tab => {
-      if (tab.url && (tab.url.includes("facebook.com") || tab.url.includes("instagram.com") || tab.url.includes("reddit.com") || tab.url.includes("youtube.com"))) {
+    tabs.forEach((tab) => {
+      if (
+        tab.url &&
+        (tab.url.includes("facebook.com") ||
+          tab.url.includes("instagram.com") ||
+          tab.url.includes("reddit.com") ||
+          tab.url.includes("youtube.com"))
+      ) {
         browser.tabs.reload(tab.id);
       }
     });
