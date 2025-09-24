@@ -48,30 +48,56 @@ browser.storage.sync.get(["rd", "general_switch"], (result) => {
 });
 
 /* TODO (past mvp) fix on mobile does not apply on page reload*/
-//Clean sidebar from /r popular and /r all
+//Clean sidebar from /r popular and /r all - only when blocking is enabled
 function injectCSSIntoShadow(interval) {
-  const host = document.querySelector("left-nav-top-section");
-  if (!host || !host.shadowRoot) return;
+  // Check if blocking is still enabled before injecting
+  browser.storage.sync.get(["rd", "general_switch"], (result) => {
+    const GENERAL_SWITCH =
+      result.general_switch !== undefined ? result.general_switch : true;
+    const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
+    const ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
 
-  const style = document.createElement("style");
-  style.textContent = `
-    faceplate-tracker[noun="popular"],
-    faceplate-tracker[noun="all"]
-    {
-      display: none !important;
+    if (!ENABLE_RD) {
+      clearInterval(interval);
+      return;
     }
-  `;
 
-  host.shadowRoot.appendChild(style);
-  clearInterval(interval);
+    const host = document.querySelector("left-nav-top-section");
+    if (!host || !host.shadowRoot) return;
+
+    const style = document.createElement("style");
+    style.id = "no-distractions-shadow-style";
+    style.textContent = `
+      faceplate-tracker[noun="popular"],
+      faceplate-tracker[noun="all"]
+      {
+        display: none !important;
+      }
+    `;
+
+    // Only inject if not already present
+    if (!host.shadowRoot.getElementById("no-distractions-shadow-style")) {
+      host.shadowRoot.appendChild(style);
+    }
+    clearInterval(interval);
+  });
 }
 
-//Try injecting it
-let tries = 0;
-const interval = setInterval(() => {
-  injectCSSIntoShadow(interval);
-  if (++tries > 10) clearInterval(interval);
-}, 500);
+//Try injecting it - only if blocking is enabled
+browser.storage.sync.get(["rd", "general_switch"], (result) => {
+  const GENERAL_SWITCH =
+    result.general_switch !== undefined ? result.general_switch : true;
+  const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
+  const ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
+
+  if (ENABLE_RD) {
+    let tries = 0;
+    const interval = setInterval(() => {
+      injectCSSIntoShadow(interval);
+      if (++tries > 10) clearInterval(interval);
+    }, 500);
+  }
+});
 
 if (typeof browser === "undefined") {
   var browser = chrome;
@@ -154,17 +180,32 @@ function restoreFeed() {
 }
 
 function enforceRedditInjectLoop() {
-  const currentUrl = window.location.href;
-  const currentPath = window.location.pathname;
+  // Check if blocking is still enabled before doing anything
+  browser.storage.sync.get(["rd", "general_switch"], (result) => {
+    const GENERAL_SWITCH =
+      result.general_switch !== undefined ? result.general_switch : true;
+    const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
+    const ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
 
-  if (
-    currentPath === "/" ||
-    currentUrl === "https://www.reddit.com/?feed=home"
-  ) {
-    injectBannerAndHideFeed();
-  } else {
-    restoreFeed();
-  }
+    if (!ENABLE_RD) {
+      // If blocking is disabled, restore the feed and stop
+      restoreFeed();
+      return;
+    }
+
+    // Only proceed with blocking if enabled
+    const currentUrl = window.location.href;
+    const currentPath = window.location.pathname;
+
+    if (
+      currentPath === "/" ||
+      currentUrl === "https://www.reddit.com/?feed=home"
+    ) {
+      injectBannerAndHideFeed();
+    } else {
+      restoreFeed();
+    }
+  });
 
   enforceRedditRAF = requestAnimationFrame(enforceRedditInjectLoop);
 }
@@ -187,21 +228,35 @@ function checkUrlChange() {
 }
 
 function initRedditCleaner() {
-  if (!window._noDistractionsRedditPatched) {
-    ["pushState", "replaceState"].forEach((fn) => {
-      const orig = history[fn];
-      history[fn] = function () {
-        const ret = orig.apply(this, arguments);
-        setTimeout(checkUrlChange, 0);
-        return ret;
-      };
-    });
-    window._noDistractionsRedditPatched = true;
-  }
+  // Check if blocking is enabled before starting
+  browser.storage.sync.get(["rd", "general_switch"], (result) => {
+    const GENERAL_SWITCH =
+      result.general_switch !== undefined ? result.general_switch : true;
+    const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
+    const ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
 
-  // Run immediately and keep checking
-  startRedditBanner();
-  setInterval(checkUrlChange, 1000);
+    if (!ENABLE_RD) {
+      // If blocking is disabled, ensure feed is restored and don't start the loop
+      restoreFeed();
+      return;
+    }
+
+    if (!window._noDistractionsRedditPatched) {
+      ["pushState", "replaceState"].forEach((fn) => {
+        const orig = history[fn];
+        history[fn] = function () {
+          const ret = orig.apply(this, arguments);
+          setTimeout(checkUrlChange, 0);
+          return ret;
+        };
+      });
+      window._noDistractionsRedditPatched = true;
+    }
+
+    // Run immediately and keep checking
+    startRedditBanner();
+    setInterval(checkUrlChange, 1000);
+  });
 }
 
 // Wait until full load before running

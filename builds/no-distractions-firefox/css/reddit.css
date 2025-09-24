@@ -1,4 +1,6 @@
 /* TODO (past mvp) add message on how to browse on the empty feed page */
+/* Only apply these styles when the no-distractions-css class is present */
+
 /* Recommendation (home feed) */
 .no-distractions-css shreddit-feed[reload-url*="home-feed"],
 .no-distractions-css recent-posts {
@@ -22,13 +24,15 @@
   display: none !important;
 }
 
-/*Left side bar*/
-nav:has(left-nav-top-section) details:has(summary[aria-controls="RESOURCES"]),
-nav:has(left-nav-top-section) reddit-recent-pages {
+/* Left side bar - only hide when blocking is enabled */
+.no-distractions-css
+  nav:has(left-nav-top-section)
+  details:has(summary[aria-controls="RESOURCES"]),
+.no-distractions-css nav:has(left-nav-top-section) reddit-recent-pages {
   display: none !important;
 }
 
-/*Right side bar*/
-#right-sidebar-container {
+/* Right side bar - only hide when blocking is enabled */
+.no-distractions-css #right-sidebar-container {
   display: none !important;
 }
