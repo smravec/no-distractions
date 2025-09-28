@@ -2,20 +2,33 @@ if (typeof browser === "undefined") {
   var browser = chrome;
 }
 
-// Redirect to following feed if on main Instagram page
-let enforceFollowingRAF = null;
-function enforceFollowingRedirectLoop() {
-  // Check if blocking is enabled before doing redirects
-  browser.storage.sync.get(["ig", "general_switch"], (result) => {
-    const GENERAL_SWITCH =
-      result.general_switch !== undefined ? result.general_switch : true;
-    const INSTAGRAM_TOGGLE = result.ig !== undefined ? result.ig : true;
-    const ENABLE_IG = GENERAL_SWITCH && INSTAGRAM_TOGGLE;
+browser.storage.sync.get(["ig", "general_switch"], (result) => {
+  const GENERAL_SWITCH =
+    result.general_switch !== undefined ? result.general_switch : true;
+  const INSTAGRAM_TOGGLE = result.ig !== undefined ? result.ig : true;
+  const ENABLE_IG = GENERAL_SWITCH && INSTAGRAM_TOGGLE;
 
-    if (!ENABLE_IG) {
-      // If blocking is disabled, don't redirect
-      return;
-    }
+  console.log("GENERAL_SWITCH", GENERAL_SWITCH);
+  console.log("INSTAGRAM_TOGGLE", INSTAGRAM_TOGGLE);
+  console.log("ENABLE_IG", ENABLE_IG);
+
+  const html = document.documentElement;
+  if (!ENABLE_IG) {
+    html.classList.remove("no-distractions-css");
+    html.classList.remove(
+      "ig-main-feed",
+      "ig-explore-page",
+      "ig-explore-mobile",
+      "ig-reels-page"
+    );
+    console.log("Instagram blocking is disabled by toggle or general switch.");
+    return;
+  }
+
+  // --- REDIRECT LOGIC respecting switches ---
+  let enforceFollowingRAF = null;
+  function enforceFollowingRedirectLoop() {
+    if (!ENABLE_IG) return; // Respect switches
 
     const currentUrl = window.location.href;
     const currentPath = window.location.pathname;
@@ -42,33 +55,21 @@ function enforceFollowingRedirectLoop() {
       window.location.replace("https://www.instagram.com/?variant=following");
       return;
     }
-  });
-
-  enforceFollowingRAF = requestAnimationFrame(enforceFollowingRedirectLoop);
-}
-
-function redirectToFollowingFeed() {
-  if (enforceFollowingRAF) {
-    cancelAnimationFrame(enforceFollowingRAF);
-    enforceFollowingRAF = null;
+    enforceFollowingRAF = requestAnimationFrame(enforceFollowingRedirectLoop);
   }
-  enforceFollowingRedirectLoop();
-}
 
-// Monitor URL changes more comprehensively, including SPA navigation
-let lastUrl = window.location.href;
-function checkUrlChange() {
-  // Check if blocking is enabled before doing any redirects
-  browser.storage.sync.get(["ig", "general_switch"], (result) => {
-    const GENERAL_SWITCH =
-      result.general_switch !== undefined ? result.general_switch : true;
-    const INSTAGRAM_TOGGLE = result.ig !== undefined ? result.ig : true;
-    const ENABLE_IG = GENERAL_SWITCH && INSTAGRAM_TOGGLE;
-
-    if (!ENABLE_IG) {
-      // If blocking is disabled, don't do any redirects or blocking
-      return;
+  function redirectToFollowingFeed() {
+    if (enforceFollowingRAF) {
+      cancelAnimationFrame(enforceFollowingRAF);
+      enforceFollowingRAF = null;
     }
+    enforceFollowingRedirectLoop();
+  }
+
+  // Monitor URL changes more comprehensively, including SPA navigation
+  let lastUrl = window.location.href;
+  function checkUrlChange() {
+    if (!ENABLE_IG) return; // Respect switches
 
     const currentUrl = window.location.href;
     const currentPath = window.location.pathname;
@@ -92,44 +93,24 @@ function checkUrlChange() {
       redirectToFollowingFeed();
       blockHorizontalScroll(); // Update horizontal scroll blocking on URL change
     }
-  });
-}
-
-// Patch history.pushState and replaceState to catch SPA navigation
-if (!window._noDistractionsHistoryPatched) {
-  ["pushState", "replaceState"].forEach((fn) => {
-    const orig = history[fn];
-    history[fn] = function () {
-      const ret = orig.apply(this, arguments);
-      setTimeout(checkUrlChange, 0);
-      return ret;
-    };
-  });
-  window._noDistractionsHistoryPatched = true;
-}
-
-// Only run redirect and scroll blocking if extension is enabled
-browser.storage.sync.get(["ig", "general_switch"], (result) => {
-  const GENERAL_SWITCH =
-    result.general_switch !== undefined ? result.general_switch : true;
-  const INSTAGRAM_TOGGLE = result.ig !== undefined ? result.ig : true;
-  const ENABLE_IG = GENERAL_SWITCH && INSTAGRAM_TOGGLE;
-
-  if (ENABLE_IG) {
-    // Run redirect check immediately
-    redirectToFollowingFeed();
-    // Run horizontal scroll blocking immediately
-    blockHorizontalScroll();
   }
-});
-function blockHorizontalScroll() {
-  // Check if blocking is enabled before applying scroll blocking
-  browser.storage.sync.get(["ig", "general_switch"], (result) => {
-    const GENERAL_SWITCH =
-      result.general_switch !== undefined ? result.general_switch : true;
-    const INSTAGRAM_TOGGLE = result.ig !== undefined ? result.ig : true;
-    const ENABLE_IG = GENERAL_SWITCH && INSTAGRAM_TOGGLE;
 
+  // Patch history.pushState and replaceState to catch SPA navigation
+  if (!window._noDistractionsHistoryPatched) {
+    ["pushState", "replaceState"].forEach((fn) => {
+      const orig = history[fn];
+      history[fn] = function () {
+        const ret = orig.apply(this, arguments);
+        setTimeout(checkUrlChange, 0);
+        return ret;
+      };
+    });
+    window._noDistractionsHistoryPatched = true;
+  }
+
+  // Run redirect check immediately
+  redirectToFollowingFeed();
+  function blockHorizontalScroll() {
     if (!ENABLE_IG) {
       // If blocking is disabled, remove any existing scroll blocking
       const style = document.getElementById(
@@ -225,34 +206,12 @@ function blockHorizontalScroll() {
       window.horizontalScrollBlocked = false;
       window.lastTouchX = null;
     }
-  });
-}
-
-// Run horizontal scroll blocking immediately
-blockHorizontalScroll();
-
-browser.storage.sync.get(["ig", "general_switch"], (result) => {
-  const GENERAL_SWITCH =
-    result.general_switch !== undefined ? result.general_switch : true;
-  const INSTAGRAM_TOGGLE = result.ig !== undefined ? result.ig : true;
-  const ENABLE_IG = GENERAL_SWITCH && INSTAGRAM_TOGGLE;
-
-  // console.log("GENERAL_SWITCH", GENERAL_SWITCH);
-  // console.log("INSTAGRAM_TOGGLE", INSTAGRAM_TOGGLE);
-  // console.log("ENABLE_IG", ENABLE_IG);
-
-  const html = document.documentElement;
-  if (!ENABLE_IG) {
-    html.classList.remove("no-distractions-css");
-    html.classList.remove(
-      "ig-main-feed",
-      "ig-explore-page",
-      "ig-explore-mobile",
-      "ig-reels-page"
-    );
-    console.log("Instagram blocking is disabled by toggle or general switch.");
-    return;
   }
+
+  // Run horizontal scroll blocking immediately
+  blockHorizontalScroll();
+
+  html.classList.add("no-distractions-css");
 
   // Hide all <a> elements with href containing '/explore/' and '/reels/'
   function hideNavLinks() {
@@ -266,30 +225,7 @@ browser.storage.sync.get(["ig", "general_switch"], (result) => {
   const observer = new MutationObserver(hideNavLinks);
   observer.observe(document.body, { childList: true, subtree: true });
 
-  // Only keep popstate and interval listeners for robust redirect and scroll blocking if enabled
-  window.addEventListener("popstate", () => {
-    browser.storage.sync.get(["ig", "general_switch"], (result) => {
-      const GENERAL_SWITCH =
-        result.general_switch !== undefined ? result.general_switch : true;
-      const INSTAGRAM_TOGGLE = result.ig !== undefined ? result.ig : true;
-      const ENABLE_IG = GENERAL_SWITCH && INSTAGRAM_TOGGLE;
-
-      if (ENABLE_IG) {
-        redirectToFollowingFeed();
-      }
-    });
-  });
-
-  setInterval(() => {
-    browser.storage.sync.get(["ig", "general_switch"], (result) => {
-      const GENERAL_SWITCH =
-        result.general_switch !== undefined ? result.general_switch : true;
-      const INSTAGRAM_TOGGLE = result.ig !== undefined ? result.ig : true;
-      const ENABLE_IG = GENERAL_SWITCH && INSTAGRAM_TOGGLE;
-
-      if (ENABLE_IG) {
-        checkUrlChange();
-      }
-    });
-  }, 1000);
+  // Event listeners for robust redirect and scroll blocking
+  window.addEventListener("popstate", redirectToFollowingFeed);
+  setInterval(checkUrlChange, 1000);
 });
