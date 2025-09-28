@@ -3,21 +3,30 @@ if (typeof browser === "undefined") {
 }
 
 browser.storage.sync.get(["fb", "general_switch"], (result) => {
-  const GENERAL_SWITCH = result.general_switch !== undefined ? result.general_switch : true;
+  const GENERAL_SWITCH =
+    result.general_switch !== undefined ? result.general_switch : true;
   const FACEBOOK_TOGGLE = result.fb !== undefined ? result.fb : true;
   const ENABLE_FB = GENERAL_SWITCH && FACEBOOK_TOGGLE;
-  
+
   console.log("GENERAL_SWITCH", GENERAL_SWITCH);
   console.log("FACEBOOK_TOGGLE", FACEBOOK_TOGGLE);
   console.log("ENABLE_FB", ENABLE_FB);
 
   const html = document.documentElement;
-  if (!ENABLE_FB) {
-    html.classList.remove('no-distractions-css');
-    console.log('Facebook blocking is disabled by toggle or general switch.');
+
+  // Check if user is logged out (don't block on login/signup pages)
+  const isLoggedOut = document.body.classList.contains("UIPage_LoggedOut");
+
+  if (!ENABLE_FB || isLoggedOut) {
+    html.classList.remove("no-distractions-css");
+    if (isLoggedOut) {
+      console.log("Facebook blocking disabled - user is logged out.");
+    } else {
+      console.log("Facebook blocking is disabled by toggle or general switch.");
+    }
     return;
   }
-  html.classList.add('no-distractions-css');
+  html.classList.add("no-distractions-css");
 
   // Stops from running on other sites which just use facebook.com in a iframe (like instagram)
   let isTopFrame = false;
