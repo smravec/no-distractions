@@ -420,12 +420,3 @@ rateLink.addEventListener("click", () => {
 
 // Check visibility on popup open
 updateRateButtonVisibility();
-
-const rateLink1 = document.getElementById("rate_link1");
-
-rateLink1.addEventListener("click", () => {
-  // Open the review page (Chrome Web Store)
-  browser.tabs.create({
-    url: "https://chromewebstore.google.com/detail/no-distractions-remove-re/looidefpafaogockjglamdijbaocichg/reviews",
-  }); // Update with actual extension URL
-});
