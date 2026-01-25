@@ -187,7 +187,7 @@ function updateCountdownDisplay() {
         }
       }
       setPausedState(!general_switch);
-    }
+    },
   );
 }
 
@@ -377,3 +377,46 @@ function checkConfirmationCode() {
     }, 200); // Small delay for better UX
   }
 }
+
+// ===== RATE BUTTON LOGIC =====
+const ACTIVE_TIME_THRESHOLD = 30 * 60; // 30 minutes in seconds
+const rateLink = document.getElementById("rate_link");
+
+// Check if user should see rate button
+function updateRateButtonVisibility() {
+  browser.storage.sync.get(
+    ["activeTimeOnSites", "rateButtonClicked"],
+    (result) => {
+      const activeTime = result.activeTimeOnSites || 0;
+      const hasClicked = result.rateButtonClicked || false;
+
+      if (hasClicked) {
+        // User has clicked, hide button
+        rateLink.style.display = "none";
+      } else if (activeTime >= ACTIVE_TIME_THRESHOLD) {
+        // User has been active for 30+ minutes, show rate button
+        rateLink.style.display = "block";
+      } else {
+        // Not enough time yet, hide button
+        rateLink.style.display = "none";
+      }
+    },
+  );
+}
+
+// Handle rate button click
+rateLink.addEventListener("click", () => {
+  // Mark as clicked
+  browser.storage.sync.set({ rateButtonClicked: true });
+
+  // Open the review page (Chrome Web Store)
+  browser.tabs.create({
+    url: "https://chromewebstore.google.com/detail/no-distractions-remove-re/looidefpafaogockjglamdijbaocichg/reviews",
+  }); // Update with actual extension URL
+
+  // Update visibility
+  updateRateButtonVisibility();
+});
+
+// Check visibility on popup open
+updateRateButtonVisibility();

@@ -257,3 +257,18 @@ body {
 #confirmation_back:hover {
   cursor: pointer;
 }
+
+#rate_link {
+  color: greenyellow;
+  background-color: transparent;
+  border: none;
+  margin-bottom: 8px;
+  font-size: 14px;
+  margin-left: 5px;
+  margin-right: 5px;
+  text-decoration: underline;
+}
+
+#rate_link:hover {
+  cursor: pointer;
+}

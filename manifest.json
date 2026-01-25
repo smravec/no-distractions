@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "No Distractions - Remove Reels, Shorts & Suggested Posts",
-  "description": "Hide reels, shorts & suggested posts across YouTube, Instagram, Facebook & Reddit. Keep posts only from people you follow.",
+  "name": "No Distractions - Block Shorts, Reels & Feeds (YouTube, Reddit, Insta, FB)",
+  "description": "Remove Reels, Shorts & Suggested posts across YouTube, Instagram, Facebook & Reddit.",
   "version": "0.0.0.3",
   "icons": {
     "16": "icon16.png",
@@ -9,7 +9,7 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
-  "permissions": ["storage", "tabs", "alarms"],
+  "permissions": ["storage", "tabs", "alarms", "idle"],
 
   "background": {
     "service_worker": "background.js"
