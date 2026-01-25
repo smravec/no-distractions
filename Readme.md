@@ -1,6 +1,6 @@
 # No Distractions
 
-A browser extension to block social media distractions—Reels, Shorts, infinite feeds, suggested posts, and recommendations across YouTube, Instagram, Facebook, and Reddit.
+A browser extension to block social media distractions - Reels, Shorts, infinite feeds, suggested posts, and recommendations across YouTube, Instagram, Facebook, and Reddit.
 
 ## What it does
 
