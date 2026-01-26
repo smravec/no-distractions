@@ -45,19 +45,19 @@ A browser extension to block social media distractions - Reels, Shorts, infinite
 
 ## Changelog
 
-### Version 0.3 — 29.9.2025
+### Version 0.3
 
 - Major UI overhaul
 - Added 2FA-style confirmation when turning off blocking
 - Reduced auto-revert timer from 2h to 1h
 - Bug fixes
 
-### Version 0.2 — 14.9.2025
+### Version 0.2
 
 - Instead of removing feeds, now redirects to user-specific feeds (YouTube → Subscriptions, Instagram → Following, etc.)
 - Bug fixes
 
-### Version 0.1 — 13.8.2025
+### Version 0.1
 
 - Initial launch
 - Remove feeds for Instagram, Facebook, YouTube, Reddit
