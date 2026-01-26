@@ -1,13 +1,14 @@
 # No Distractions
 
+<img src=./storepage-assets/block-reels-shorts-instagram-youtube-feeds.png />
 A browser extension to block social media distractions - Reels, Shorts, infinite feeds, suggested posts, and recommendations across YouTube, Instagram, Facebook, and Reddit.
 
 ## What it does
 
-✅ Keep posts from accounts you follow  
-❌ Hide "suggested for you" algorithmic feeds  
-❌ Block endless scrolling traps and recommendations  
-❌ Remove explore pages, reels, and trending content
+- Keep posts from accounts you follow  
+- Hide "suggested for you" algorithmic feeds  
+- Block endless scrolling traps and recommendations  
+- Remove explore pages, reels, and trending content
 
 ## Supported platforms
 
@@ -65,4 +66,4 @@ A browser extension to block social media distractions - Reels, Shorts, infinite
 
 ## License
 
-MIT - Open source. Do what you want with it.
+MIT - Open source
