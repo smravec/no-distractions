@@ -1,4 +1,4 @@
-/* Init styles till the js script gets loaded*/
+/* Init styles untill the js script gets loaded*/
 /* Hides the main feed */
 .no-distractions-css div[role="main"] {
   display: none;

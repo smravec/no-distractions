@@ -1,11 +1,3 @@
-/* Main feed (home) (solved in js) */
-/* .ig-main-feed article {
-  display: none !important;
-}
-.ig-main-feed div[role="progressbar"] {
-  display: none !important;
-} */
-
 /* Explore page (desktop) */
 .ig-explore-page main[role="main"] > * {
   display: none !important;

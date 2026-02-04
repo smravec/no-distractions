@@ -1,20 +1,6 @@
 if (typeof browser === "undefined") {
-  var browser = chrome;
+  let browser = chrome;
 }
-
-// chrome.storage.sync.set({ yt: true }).then(() => {
-//   console.log("Value is set");
-// });
-
-// Call this function when needed, e.g., on button click or page load
-
-// chrome.storage.sync.get("yt_hidden", (result) => {
-//   if (result.yt_hidden == undefined) {
-//     yt = true;
-//   } else {
-//     yt = false;
-//   }
-// });
 
 let general_switch = true;
 

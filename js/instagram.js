@@ -1,5 +1,5 @@
 if (typeof browser === "undefined") {
-  var browser = chrome;
+  let browser = chrome;
 }
 
 browser.storage.sync.get(["ig", "general_switch"], (result) => {
@@ -7,10 +7,6 @@ browser.storage.sync.get(["ig", "general_switch"], (result) => {
     result.general_switch !== undefined ? result.general_switch : true;
   const INSTAGRAM_TOGGLE = result.ig !== undefined ? result.ig : true;
   const ENABLE_IG = GENERAL_SWITCH && INSTAGRAM_TOGGLE;
-
-  console.log("GENERAL_SWITCH", GENERAL_SWITCH);
-  console.log("INSTAGRAM_TOGGLE", INSTAGRAM_TOGGLE);
-  console.log("ENABLE_IG", ENABLE_IG);
 
   const html = document.documentElement;
   if (!ENABLE_IG) {
@@ -21,7 +17,6 @@ browser.storage.sync.get(["ig", "general_switch"], (result) => {
       "ig-explore-mobile",
       "ig-reels-page"
     );
-    console.log("Instagram blocking is disabled by toggle or general switch.");
     return;
   }
 
@@ -79,7 +74,6 @@ browser.storage.sync.get(["ig", "general_switch"], (result) => {
         sessionStorage.getItem("noDistractionsLastNonReelsUrl") ||
         "https://www.instagram.com/?variant=following";
       if (currentUrl !== lastNonReels) {
-        console.log("Redirecting from reels to last non-reels:", lastNonReels);
         window.location.replace(lastNonReels);
         return;
       }
@@ -88,7 +82,6 @@ browser.storage.sync.get(["ig", "general_switch"], (result) => {
       sessionStorage.setItem("noDistractionsLastNonReelsUrl", currentUrl);
     }
     if (currentUrl !== lastUrl) {
-      console.log("URL changed from:", lastUrl, "to:", currentUrl);
       lastUrl = currentUrl;
       redirectToFollowingFeed();
       blockHorizontalScroll(); // Update horizontal scroll blocking on URL change
@@ -149,7 +142,6 @@ browser.storage.sync.get(["ig", "general_switch"], (result) => {
             }
           `;
           document.head.appendChild(style);
-          console.log("Horizontal scroll blocking enabled");
         };
         injectStyle();
       }

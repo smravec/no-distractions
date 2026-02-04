@@ -9,7 +9,14 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
-  "permissions": ["storage", "tabs", "alarms", "idle"],
+  "permissions": ["storage", "alarms", "idle"],
+
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.facebook.com/*",
+    "*://*.instagram.com/*",
+    "*://*.reddit.com/*"
+  ],
 
   "background": {
     "service_worker": "background.js"

@@ -1,5 +1,5 @@
 if (typeof browser === "undefined") {
-  var browser = chrome;
+  let browser = chrome;
 }
 
 browser.storage.sync.get(["fb", "general_switch"], (result) => {
@@ -8,10 +8,6 @@ browser.storage.sync.get(["fb", "general_switch"], (result) => {
   const FACEBOOK_TOGGLE = result.fb !== undefined ? result.fb : true;
   const ENABLE_FB = GENERAL_SWITCH && FACEBOOK_TOGGLE;
 
-  console.log("GENERAL_SWITCH", GENERAL_SWITCH);
-  console.log("FACEBOOK_TOGGLE", FACEBOOK_TOGGLE);
-  console.log("ENABLE_FB", ENABLE_FB);
-
   const html = document.documentElement;
 
   // Check if user is logged out (don't block on login/signup pages)
@@ -19,11 +15,6 @@ browser.storage.sync.get(["fb", "general_switch"], (result) => {
 
   if (!ENABLE_FB || isLoggedOut) {
     html.classList.remove("no-distractions-css");
-    if (isLoggedOut) {
-      console.log("Facebook blocking disabled - user is logged out.");
-    } else {
-      console.log("Facebook blocking is disabled by toggle or general switch.");
-    }
     return;
   }
   html.classList.add("no-distractions-css");
@@ -39,7 +30,6 @@ browser.storage.sync.get(["fb", "general_switch"], (result) => {
     }
   } catch (e) {
     // Security error means we're in a cross-origin iframe
-    console.log("Cross-origin frame detected, running in an iframe");
     isTopFrame = false;
   }
 
@@ -181,8 +171,6 @@ browser.storage.sync.get(["fb", "general_switch"], (result) => {
       let lastPathname = window.location.pathname;
 
       if (targetElement) {
-        console.log("Facebook main content element found!");
-
         // Prevent spawning multiple observers
         if (bodyObserver !== null) {
           return;
@@ -191,13 +179,7 @@ browser.storage.sync.get(["fb", "general_switch"], (result) => {
         // Observe url changes
         bodyObserver = new MutationObserver(() => {
           if (lastPathname !== window.location.pathname) {
-            console.log(
-              "Path changed (body observer):",
-              window.location.pathname
-            );
-
             if (mobile_mode === true) {
-              console.log("mobile mode");
               // Main page
               if (lastPathname == "/" || lastPathname == "") {
                 CleanEntirePageMobile(false, "/");
@@ -259,7 +241,6 @@ browser.storage.sync.get(["fb", "general_switch"], (result) => {
 
         return bodyObserver;
       } else {
-        console.log("Main content element not found yet, will retry...");
         // Retry
         setTimeout(setupObserver, 1000);
         return null;
@@ -273,13 +254,11 @@ browser.storage.sync.get(["fb", "general_switch"], (result) => {
 
     // Also set up on page load events
     window.addEventListener("load", () => {
-      console.log("Window loaded, setting up observer...");
       setupObserver();
     });
 
     // Listen for Facebook's navigation events
     window.addEventListener("popstate", () => {
-      console.log("Navigation detected via popstate");
       setupObserver();
     });
   }

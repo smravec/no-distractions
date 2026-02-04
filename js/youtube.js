@@ -1,5 +1,5 @@
 if (typeof browser === "undefined") {
-  var browser = chrome;
+  let browser = chrome;
 }
 
 browser.storage.sync.get(["yt", "general_switch"], (result) => {
@@ -8,17 +8,10 @@ browser.storage.sync.get(["yt", "general_switch"], (result) => {
   const YOUTUBE_TOGGLE = result.yt !== undefined ? result.yt : true;
   const ENABLE_YOUTUBE_CSS = GENERAL_SWITCH && YOUTUBE_TOGGLE;
 
-  console.log("GENERAL_SWITCH", GENERAL_SWITCH);
-  console.log("YOUTUBE_TOGGLE", YOUTUBE_TOGGLE);
-  console.log("ENABLE_YOUTUBE_CSS", ENABLE_YOUTUBE_CSS);
-
   const html = document.documentElement;
 
   if (!ENABLE_YOUTUBE_CSS) {
     html.classList.remove("no-distractions-css");
-    console.log(
-      "YouTube CSS injection is disabled by toggle or general switch."
-    );
     return;
   }
 
@@ -109,8 +102,8 @@ browser.storage.sync.get(["yt", "general_switch"], (result) => {
     typeof browser !== "undefined"
       ? browser
       : typeof chrome !== "undefined"
-      ? chrome
-      : null;
+        ? chrome
+        : null;
 
   if (extensionApi && extensionApi.runtime && extensionApi.runtime.getURL) {
     const cssUrl = extensionApi.runtime.getURL("css/youtube.css");
@@ -123,15 +116,14 @@ browser.storage.sync.get(["yt", "general_switch"], (result) => {
           style.id = "no-distractions-youtube-css";
           style.textContent = cssText;
           document.head.appendChild(style);
-          console.log("Injected youtube.css as <style> tag");
         }
       })
       .catch((err) =>
-        console.error("Failed to fetch/inject youtube.css:", err)
+        console.error("Failed to fetch/inject youtube.css:", err),
       );
   } else {
     console.error(
-      "No extension API found. This script must be run as a browser extension content script."
+      "No extension API found. This script must be run as a browser extension content script.",
     );
   }
 });

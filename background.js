@@ -1,5 +1,5 @@
 if (typeof browser === "undefined") {
-  var browser = chrome;
+  let browser = chrome;
 }
 
 // ===== ACTIVE TIME TRACKING FOR RATE BUTTON =====
@@ -50,7 +50,6 @@ browser.alarms.onAlarm.addListener((alarm) => {
     return;
   }
   if (alarm.name === "general_switch_timer") {
-    console.log("2-hour timer expired, reverting general switch to ON");
 
     // Set general switch back to true
     browser.storage.sync.set({ general_switch: true }, () => {
@@ -90,13 +89,11 @@ function checkAndRestoreTimer() {
 
       if (timeRemaining > 0) {
         // Timer hasn't expired yet, restore it
-        console.log(`Restoring timer with ${timeRemaining}ms remaining`);
         browser.alarms.create("general_switch_timer", {
           delayInMinutes: timeRemaining / (1000 * 60),
         });
       } else {
         // Timer has expired, clean up and revert
-        console.log("Timer expired during shutdown, reverting general switch");
         browser.storage.sync.set({ general_switch: true });
         browser.storage.sync.remove(["general_switch_timer"]);
       }
