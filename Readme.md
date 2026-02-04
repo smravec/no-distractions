@@ -66,4 +66,4 @@ A browser extension to block social media distractions - Reels, Shorts, infinite
 
 ## License
 
-MIT - Open source
+MIT
