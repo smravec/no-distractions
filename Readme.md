@@ -1,6 +1,6 @@
 # No Distractions
 
-<img src=./storepage-assets/block-reels-shorts-instagram-youtube-feeds.png />
+<img src=./storepage-assets/screenshot1.png />
 A browser extension to block social media distractions - Reels, Shorts, infinite feeds, suggested posts, and recommendations across YouTube, Instagram, Facebook, and Reddit.
 
 ## What it does
