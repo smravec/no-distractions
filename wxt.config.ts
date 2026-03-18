@@ -7,7 +7,8 @@ export default defineConfig({
     version: "0.0.0.4",
     permissions: ["storage", "alarms", "idle"],
     host_permissions: [
-      "*://*.youtube.com/*",
+      "https://www.youtube.com/*", 
+      "https://m.youtube.com/*",
       "*://*.facebook.com/*",
       "*://*.instagram.com/*",
       "*://*.reddit.com/*"
