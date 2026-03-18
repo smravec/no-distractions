@@ -1,5 +1,5 @@
 export default defineContentScript({
-  matches: ["*://*.youtube.com/*"],
+  matches: ["https://www.youtube.com/*", "https://m.youtube.com/*"],
   runAt: "document_idle",
   main() {
     const extensionApi =
