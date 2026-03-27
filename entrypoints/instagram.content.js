@@ -238,8 +238,38 @@ export default defineContentScript({
         });
       }
 
+      function removeForYouTabContainer() {
+        const body = document.body;
+        if (!body) {
+          return;
+        }
+
+        const spans = body.querySelectorAll("span[dir='auto']");
+        spans.forEach((span) => {
+          const text = span.textContent?.trim().toLowerCase();
+          if (text !== "for you") {
+            return;
+          }
+
+          const tab = span.closest("div[role='tab']");
+          if (!tab) {
+            return;
+          }
+
+          // Remove the exact tab wrapper structure shown in Instagram's feed tabs.
+          const tabContainer = tab.parentElement;
+          if (tabContainer) {
+            tabContainer.remove();
+            return;
+          }
+
+          tab.remove();
+        });
+      }
+
       function onMutation() {
         hideNavLinks();
+        removeForYouTabContainer();
       }
 
       onMutation();
