@@ -225,15 +225,27 @@ export default defineContentScript({
 
       // Hide all <a> elements with href containing '/explore/' and '/reels/'
       function hideNavLinks() {
+        const body = document.body;
+        if (!body) {
+          return;
+        }
+
         ["a[href*='/explore/']", "a[href*='/reels/']"].forEach((selector) => {
-          const elements = document.querySelectorAll(selector);
-          elements.forEach((el) => (el.style.display = "none"));
+          const elements = body.querySelectorAll(selector);
+          elements.forEach((el) =>
+            el.style.setProperty("display", "none", "important"),
+          );
         });
       }
-      hideNavLinks();
+
+      function onMutation() {
+        hideNavLinks();
+      }
+
+      onMutation();
       // Also observe DOM changes to hide new links
-      const observer = new MutationObserver(hideNavLinks);
-      observer.observe(document.body, { childList: true, subtree: true });
+      const observer = new MutationObserver(onMutation);
+      observer.observe(document, { childList: true, subtree: true });
 
       // Event listeners for robust redirect and scroll blocking
       window.addEventListener("popstate", redirectToFollowingFeed);
