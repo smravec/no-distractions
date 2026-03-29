@@ -43,11 +43,6 @@
   display: none !important;
 }
 
-/* DONATE */
-.no-distractions-css #donation-shelf,
-.no-distractions-css ytm-donation-shelf-renderer-outer {
-  display: none !important;
-}
 
 /* ENDSCREEN */
 .no-distractions-css .html5-endscreen:not(.mweb-endscreen),
@@ -65,24 +60,8 @@
   display: none !important;
 }
 
-/* MERCH */
-.no-distractions-css #clarify-box,
-.no-distractions-css #offer-module,
-.no-distractions-css #ticket-shelf,
-.no-distractions-css .ytp-drawer,
-.no-distractions-css yt-alert-with-actions-renderer,
-.no-distractions-css ytd-merch-shelf-renderer,
-.no-distractions-css ytd-metadata-row-container-renderer > #always-shown,
-.no-distractions-css ytm-compact-offer-module-renderer {
-  display: none !important;
-}
 
-/* META */
-.no-distractions-css #primary-inner > #info,
-.no-distractions-css ytd-watch-metadata,
-.no-distractions-css ytm-item-section-renderer[section-identifier="slim-video-metadata"] {
-  display: none !important;
-}
+
 
 /* MIX */
 .no-distractions-css .ytp-videowall-still[data-is-mix="true"],
