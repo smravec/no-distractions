@@ -4,7 +4,7 @@ export default defineConfig({
   manifest: {
     name: "No Distractions - Block Shorts, Reels & Feeds (YouTube, Reddit, Insta, FB)",
     description: "Remove Reels, Shorts & Suggested posts across YouTube, Instagram, Facebook & Reddit.",
-    version: "0.0.0.4",
+    version: "0.0.0.5",
     permissions: ["storage", "alarms", "idle"],
     host_permissions: [
       "https://www.youtube.com/*", 
