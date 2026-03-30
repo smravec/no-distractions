@@ -1,8 +1,7 @@
-import "../assets/css/reddit.css";
-
 export default defineContentScript({
-  matches: ["*://*.reddit.com/*"],
-  runAt: "document_start",
+  matches: ["https://*.reddit.com/*"],
+  runAt: "document_idle",
+  allFrames: true,
   main() {
     let ENABLE_RD = true as any;
 

@@ -1,6 +1,7 @@
 export default defineContentScript({
-  matches: ["*://*.facebook.com/*"],
+  matches: ["https://www.facebook.com/*", "https://m.facebook.com/*"],
   runAt: "document_idle",
+  allFrames: true,
   main() {
     const extensionApi =
       typeof browser !== "undefined"

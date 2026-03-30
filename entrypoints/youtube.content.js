@@ -1,6 +1,7 @@
 export default defineContentScript({
   matches: ["https://www.youtube.com/*", "https://m.youtube.com/*"],
   runAt: "document_idle",
+  allFrames: true,
   main() {
     const extensionApi =
       typeof browser !== "undefined"

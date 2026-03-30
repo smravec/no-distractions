@@ -1,5 +1,5 @@
 export default defineContentScript({
-  matches: ["https://*.instagram.com/*", "https://instagram.com/*"],
+  matches: ["https://www.instagram.com/*"],
   runAt: "document_start",
   allFrames: true,
   main() {

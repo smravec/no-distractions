@@ -1,7 +1,7 @@
 import "../assets/css/instagram.css";
 
 export default defineContentScript({
-  matches: ["*://*.instagram.com/*"],
+  matches: ["https://www.instagram.com/*"],
   runAt: "document_start",
   allFrames: true,
   main() {
