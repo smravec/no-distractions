@@ -3,195 +3,157 @@ export default defineContentScript({
   runAt: "document_idle",
   allFrames: true,
   main() {
-    let ENABLE_RD = true as any;
+    const DOC_STYLE_ID = "no-distractions-doc-popular-style";
+    const SHADOW_STYLE_ID = "no-distractions-shadow-popular-style";
+    const READY_CLASS = "nd-reddit-sidebar-ready";
+    const SIDEBAR_SELECTOR = "reddit-sidebar-nav#left-sidebar";
+    const DEFER_UNTIL_READY_SELECTOR = [
+      "li.left-nav-create-community-button",
+      "li.left-nav-manage-communities-link",
+    ].join(", ");
+    const HIDE_SELECTOR = [
+      "faceplate-tracker[noun='popular']",
+      "li#popular-posts",
+      "a[href='/r/popular/']",
+      "faceplate-tracker[noun='explore']",
+      "li#explore-communities",
+      "a[href='/explore/']",
+      "faceplate-tracker[noun='news']",
+      "li#news-posts",
+      "a[href='/news/']",
+      "faceplate-tracker[noun='games_drawer']",
+      "games-section-badge-controller",
+      "[aria-controls='games_section']",
+      "#games_section",
+      "faceplate-tracker[noun='games_drawer_featured_game']",
+      "faceplate-tracker[noun='games_drawer_discover']",
+      "a[href='/r/GamesOnReddit']",
+      "reddit-sidebar-nav#left-sidebar > nav > hr.w-100.my-sm.border-neutral-border-weak:first-of-type",
+    ].join(", ");
+    const SHADOW_HOST_TAG = "left-nav-top-section";
+    const observedShadowRoots = new WeakSet<ShadowRoot>();
 
-    // 1. Initial State Fetch
-    browser.storage.sync.get(["rd", "general_switch"]).then((result) => {
-      const GENERAL_SWITCH = result.general_switch !== undefined ? result.general_switch : true;
-      const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
-      ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
-      updateRedditClasses();
-    });
-
-    // 2. Listen for switch changes instead of polling the database 60 times a second
-    browser.storage.onChanged.addListener((changes, area) => {
-      if (area === "sync" && (changes.rd || changes.general_switch)) {
-        browser.storage.sync.get(["rd", "general_switch"]).then((result) => {
-          const GENERAL_SWITCH = result.general_switch !== undefined ? result.general_switch : true;
-          const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
-          ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
-          updateRedditClasses();
-        });
-      }
-    });
-
-    function updateRedditClasses() {
-      const html = document.documentElement;
-      if (!ENABLE_RD) {
-        html.classList.remove("no-distractions-css");
-      } else {
-        html.classList.add("no-distractions-css");
-      }
+    function hideTargetsInRoot(root: ParentNode) {
+      root.querySelectorAll(HIDE_SELECTOR).forEach((el) => {
+        (el as HTMLElement).style.display = "none";
+      });
     }
 
-    // --- Sidebar Shadow DOM Cleaner ---
-    function injectCSSIntoShadow(interval: NodeJS.Timeout) {
-      if (!ENABLE_RD) {
-        clearInterval(interval);
-        return;
-      }
+    function uncloakSidebar() {
+      document.documentElement.classList.add(READY_CLASS);
+      document.querySelectorAll(SIDEBAR_SELECTOR).forEach((el) => {
+        (el as HTMLElement).style.visibility = "";
+      });
+      document.querySelectorAll(DEFER_UNTIL_READY_SELECTOR).forEach((el) => {
+        (el as HTMLElement).style.visibility = "";
+      });
+    }
 
-      const host = document.querySelector("left-nav-top-section");
-      if (!host || !host.shadowRoot) return;
+    function cloakSidebar() {
+      document.documentElement.classList.remove(READY_CLASS);
+      document.querySelectorAll(SIDEBAR_SELECTOR).forEach((el) => {
+        (el as HTMLElement).style.visibility = "hidden";
+      });
+      document.querySelectorAll(DEFER_UNTIL_READY_SELECTOR).forEach((el) => {
+        (el as HTMLElement).style.visibility = "hidden";
+      });
+    }
 
-      if (!host.shadowRoot.getElementById("no-distractions-shadow-style")) {
+    function injectDocumentCss() {
+      if (document.getElementById(DOC_STYLE_ID)) return;
+      const style = document.createElement("style");
+      style.id = DOC_STYLE_ID;
+      style.textContent = `
+        ${SIDEBAR_SELECTOR} {
+          visibility: hidden !important;
+        }
+
+        html.${READY_CLASS} ${SIDEBAR_SELECTOR} {
+          visibility: visible !important;
+        }
+
+        ${DEFER_UNTIL_READY_SELECTOR} {
+          visibility: hidden !important;
+        }
+
+        html.${READY_CLASS} ${DEFER_UNTIL_READY_SELECTOR} {
+          visibility: visible !important;
+        }
+
+        ${HIDE_SELECTOR} {
+          display: none !important;
+        }
+      `;
+      (document.head || document.documentElement).appendChild(style);
+    }
+
+    function ensureShadowCssInRoot(root: ShadowRoot) {
+      if (!root.getElementById(SHADOW_STYLE_ID)) {
         const style = document.createElement("style");
-        style.id = "no-distractions-shadow-style";
-        style.textContent = `
-          faceplate-tracker[noun="popular"],
-          faceplate-tracker[noun="all"] {
-            display: none !important;
-          }
-        `;
-        host.shadowRoot.appendChild(style);
+        style.id = SHADOW_STYLE_ID;
+        style.textContent = `${HIDE_SELECTOR} { display: none !important; }`;
+        root.prepend(style);
       }
-      clearInterval(interval);
+
+      hideTargetsInRoot(root);
+
+      if (!observedShadowRoots.has(root)) {
+        const observer = new MutationObserver(() => hideTargetsInRoot(root));
+        observer.observe(root, { childList: true, subtree: true });
+        observedShadowRoots.add(root);
+      }
+
+      uncloakSidebar();
     }
 
-    let tries = 0;
-    const interval = setInterval(() => {
-      if (ENABLE_RD) injectCSSIntoShadow(interval);
-      if (++tries > 10) clearInterval(interval);
-    }, 500);
+    function maybeUncloakFromExistingRoot() {
+      const host = document.querySelector(SHADOW_HOST_TAG);
+      if (!host || !host.shadowRoot) return;
+      ensureShadowCssInRoot(host.shadowRoot);
+    }
 
-    // --- Main Feed / Banner Logic ---
-    let enforceRedditRAF: number | null = null;
+    function ensureShadowCss() {
+      const hosts = document.querySelectorAll(SHADOW_HOST_TAG);
+      hosts.forEach((host) => {
+        if (host.shadowRoot) ensureShadowCssInRoot(host.shadowRoot);
+      });
+    }
 
-    function injectBannerAndHideFeed() {
-      const main = document.querySelector(".main-container") as HTMLElement;
-      const feed = document.getElementById("main-content");
+    function patchAttachShadow() {
+      // @ts-ignore - One-time patch marker for dev reloads
+      if (window.__ndRedditPopularShadowPatched) return;
 
-      if (feed) feed.style.display = "none";
+      const originalAttachShadow = Element.prototype.attachShadow;
+      Element.prototype.attachShadow = function (init: ShadowRootInit): ShadowRoot {
+        const root = originalAttachShadow.call(this, init);
 
-      if (main) {
-        main.style.display = "flex";
-        main.style.justifyContent = "center";
-        main.style.alignItems = "center";
-        main.style.minHeight = "100vh";
-
-        if (!document.querySelector(".nd-banner")) {
-          const banner = document.createElement("div");
-          banner.className = "nd-banner";
-          banner.style.display = "block";
-          banner.style.textAlign = "center";
-          banner.style.marginTop = "-100px";
-
-          const img = document.createElement("img");
-          img.src = browser.runtime.getURL("/reddit-icon.png");
-          img.alt = "No Distractions Logo";
-          img.width = 100;
-          img.height = 100;
-          banner.appendChild(img);
-
-          const text = document.createElement("div");
-          text.textContent = "Welcome to Reddit!";
-          Object.assign(text.style, {
-            fontSize: "2rem",
-            fontWeight: "bold",
-            color: "#0F1A1C",
-            textAlign: "center",
-            whiteSpace: "pre-line",
-            marginTop: "-14px",
-          });
-          banner.appendChild(text);
-          main.appendChild(banner);
+        if ((this as Element).tagName.toLowerCase() === SHADOW_HOST_TAG) {
+          ensureShadowCssInRoot(root);
         }
-      }
+
+        return root;
+      };
+
+      // @ts-ignore - One-time patch marker for dev reloads
+      window.__ndRedditPopularShadowPatched = true;
     }
 
-    function restoreFeed() {
-      const main = document.querySelector(".main-container") as HTMLElement;
-      const feed = document.getElementById("main-content");
-      const banner = document.querySelector(".nd-banner");
-
-      if (feed) feed.style.display = "";
-      if (banner) banner.remove();
-
-      if (main) {
-        main.style.display = "";
-        main.style.justifyContent = "";
-        main.style.alignItems = "";
-        main.style.minHeight = "";
-      }
+    function applyInstantHide() {
+      injectDocumentCss();
+      cloakSidebar();
+      hideTargetsInRoot(document);
+      ensureShadowCss();
+      maybeUncloakFromExistingRoot();
     }
 
-    function enforceRedditInjectLoop() {
-      try {
-        // Stop entirely if the context was invalidated by a dev reload
-        if (!browser?.runtime?.id) return;
-        
-        if (!ENABLE_RD) {
-          restoreFeed();
-        } else {
-          const currentUrl = window.location.href;
-          const currentPath = window.location.pathname;
+    patchAttachShadow();
 
-          if (currentPath === "/" || currentUrl === "https://www.reddit.com/?feed=home") {
-            injectBannerAndHideFeed();
-          } else {
-            restoreFeed();
-          }
-        }
-        enforceRedditRAF = requestAnimationFrame(enforceRedditInjectLoop);
-      } catch (e) {
-        // Failsafe exit if HMR severs the connection
-        if (enforceRedditRAF) cancelAnimationFrame(enforceRedditRAF);
-      }
-    }
+    const docObserver = new MutationObserver(applyInstantHide);
+    docObserver.observe(document.documentElement, { childList: true, subtree: true });
 
-    function startRedditBanner() {
-      if (enforceRedditRAF) {
-        cancelAnimationFrame(enforceRedditRAF);
-        enforceRedditRAF = null;
-      }
-      enforceRedditInjectLoop();
-    }
+    applyInstantHide();
 
-    let lastUrl = window.location.href;
-    function checkUrlChange() {
-      const currentUrl = window.location.href;
-      if (currentUrl !== lastUrl) {
-        lastUrl = currentUrl;
-        startRedditBanner();
-      }
-    }
-
-    function initRedditCleaner() {
-      // @ts-ignore - Patching window history for SPA navigation
-      if (!window._noDistractionsRedditPatched) {
-        ["pushState", "replaceState"].forEach((fn) => {
-          // @ts-ignore
-          const orig = history[fn];
-          // @ts-ignore
-          history[fn] = function () {
-            const ret = orig.apply(this, arguments);
-            setTimeout(checkUrlChange, 0);
-            return ret;
-          };
-        });
-        // @ts-ignore
-        window._noDistractionsRedditPatched = true;
-      }
-
-      startRedditBanner();
-      setInterval(checkUrlChange, 1000);
-    }
-
-    // Wait until DOM is ready to start DOM manipulations
-    if (document.readyState === "complete" || document.readyState === "interactive") {
-      initRedditCleaner();
-    } else {
-      window.addEventListener("DOMContentLoaded", initRedditCleaner);
-    }
+    // Safety valve: avoid a permanently hidden sidebar if Reddit changes internals.
+    setTimeout(uncloakSidebar, 2000);
   },
 });

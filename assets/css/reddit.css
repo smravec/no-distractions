@@ -1,37 +1,39 @@
+/* DOES NOT WORK AT ALL */
+
 /* Only apply these styles when the no-distractions-css class is present */
 
 /* Recommendation (home feed) */
-.no-distractions-css shreddit-feed[reload-url*="home-feed"],
+/* .no-distractions-css shreddit-feed[reload-url*="home-feed"],
 .no-distractions-css recent-posts {
   display: none !important;
-}
+} */
 
 /* Recommendation (below post on mobile) */
-.no-distractions-css #right-sidebar-contents {
+/* .no-distractions-css #right-sidebar-contents {
   display: none !important;
-}
+} */
 
 /* r/all page */
-.no-distractions-css shreddit-feed[reload-url*="all-feed"] {
+/* .no-distractions-css shreddit-feed[reload-url*="all-feed"] {
   display: none !important;
-}
+} */
 
 /* r/popular page */
-.no-distractions-css
+/* .no-distractions-css
   search-dynamic-id-cache-controller[search-telemetry-source="popular_carousel"],
 .no-distractions-css shreddit-feed[reload-url*="popular-feed"] {
   display: none !important;
-}
+} */
 
 /* Left side bar - only hide when blocking is enabled */
-.no-distractions-css
+/* .no-distractions-css
   nav:has(left-nav-top-section)
   details:has(summary[aria-controls="RESOURCES"]),
 .no-distractions-css nav:has(left-nav-top-section) reddit-recent-pages {
   display: none !important;
-}
+} */
 
 /* Right side bar - only hide when blocking is enabled */
-.no-distractions-css #right-sidebar-container {
+/* .no-distractions-css #right-sidebar-container {
   display: none !important;
-}
+} */
