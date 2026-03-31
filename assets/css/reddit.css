@@ -3,10 +3,10 @@
 /* Only apply these styles when the no-distractions-css class is present */
 
 /* Recommendation (home feed) */
-/* .no-distractions-css shreddit-feed[reload-url*="home-feed"],
+.no-distractions-css shreddit-feed[reload-url*="home-feed"],
 .no-distractions-css recent-posts {
   display: none !important;
-} */
+}
 
 /* Recommendation (below post on mobile) */
 /* .no-distractions-css #right-sidebar-contents {
@@ -33,7 +33,12 @@
   display: none !important;
 } */
 
-/* Right side bar - only hide when blocking is enabled */
-/* .no-distractions-css #right-sidebar-container {
+/* Right sidebar initial hide (home feed only, before runtime style injection) */
+.nd-home-sidebar-initial-hide #right-sidebar-container {
   display: none !important;
-} */
+}
+
+/* Always hide legal links block */
+.legal-links {
+  display: none !important;
+}
