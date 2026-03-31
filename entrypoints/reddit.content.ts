@@ -1,8 +1,9 @@
 export default defineContentScript({
   matches: ["https://*.reddit.com/*"],
-  runAt: "document_idle",
+  runAt: "document_start",
   allFrames: true,
   main() {
+    const EARLY_CLOAK_STYLE_ID = "nd-reddit-sidebar-early-cloak";
     const DOC_STYLE_ID = "no-distractions-doc-popular-style";
     const SHADOW_STYLE_ID = "no-distractions-shadow-popular-style";
     const READY_CLASS = "nd-reddit-sidebar-ready";
@@ -29,9 +30,44 @@ export default defineContentScript({
       "faceplate-tracker[noun='games_drawer_discover']",
       "a[href='/r/GamesOnReddit']",
       "reddit-sidebar-nav#left-sidebar > nav > hr.w-100.my-sm.border-neutral-border-weak:first-of-type",
+      "faceplate-tracker[noun='rereddit_menu']",
+      "faceplate-tracker[noun='rereddit_translated_pt_br_menu']",
+      "faceplate-tracker[noun='rereddit_translated_de_menu']",
+      "faceplate-tracker[noun='rereddit_translated_de_menu'] + hr.my-sm",
     ].join(", ");
     const SHADOW_HOST_TAG = "left-nav-top-section";
     const observedShadowRoots = new WeakSet<ShadowRoot>();
+    const MIN_CLOAK_MS = 700;
+    const MAX_CLOAK_MS = 2500;
+    const cloakStartedAt = Date.now();
+    let hasUncloaked = false;
+    let hasScheduledUncloak = false;
+
+    function installEarlyCloakStyle() {
+      if (document.getElementById(EARLY_CLOAK_STYLE_ID)) return;
+      const style = document.createElement("style");
+      style.id = EARLY_CLOAK_STYLE_ID;
+      style.textContent = `
+        ${SIDEBAR_SELECTOR} {
+          position: relative !important;
+          isolation: isolate;
+        }
+
+        ${SIDEBAR_SELECTOR}::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: var(--color-neutral-background, #ffffff);
+          z-index: 2147483647;
+          pointer-events: auto;
+        }
+
+        html.${READY_CLASS} ${SIDEBAR_SELECTOR}::after {
+          display: none !important;
+        }
+      `;
+      (document.head || document.documentElement).appendChild(style);
+    }
 
     function hideTargetsInRoot(root: ParentNode) {
       root.querySelectorAll(HIDE_SELECTOR).forEach((el) => {
@@ -40,20 +76,21 @@ export default defineContentScript({
     }
 
     function uncloakSidebar() {
+      if (hasUncloaked) return;
+      hasUncloaked = true;
+
+      const earlyStyle = document.getElementById(EARLY_CLOAK_STYLE_ID);
+      if (earlyStyle) earlyStyle.remove();
+
       document.documentElement.classList.add(READY_CLASS);
-      document.querySelectorAll(SIDEBAR_SELECTOR).forEach((el) => {
-        (el as HTMLElement).style.visibility = "";
-      });
       document.querySelectorAll(DEFER_UNTIL_READY_SELECTOR).forEach((el) => {
         (el as HTMLElement).style.visibility = "";
       });
     }
 
     function cloakSidebar() {
+      if (hasUncloaked) return;
       document.documentElement.classList.remove(READY_CLASS);
-      document.querySelectorAll(SIDEBAR_SELECTOR).forEach((el) => {
-        (el as HTMLElement).style.visibility = "hidden";
-      });
       document.querySelectorAll(DEFER_UNTIL_READY_SELECTOR).forEach((el) => {
         (el as HTMLElement).style.visibility = "hidden";
       });
@@ -64,14 +101,6 @@ export default defineContentScript({
       const style = document.createElement("style");
       style.id = DOC_STYLE_ID;
       style.textContent = `
-        ${SIDEBAR_SELECTOR} {
-          visibility: hidden !important;
-        }
-
-        html.${READY_CLASS} ${SIDEBAR_SELECTOR} {
-          visibility: visible !important;
-        }
-
         ${DEFER_UNTIL_READY_SELECTOR} {
           visibility: hidden !important;
         }
@@ -85,6 +114,14 @@ export default defineContentScript({
         }
       `;
       (document.head || document.documentElement).appendChild(style);
+    }
+
+    function scheduleUncloak() {
+      if (hasUncloaked || hasScheduledUncloak) return;
+      hasScheduledUncloak = true;
+      const elapsed = Date.now() - cloakStartedAt;
+      const delay = Math.max(0, MIN_CLOAK_MS - elapsed);
+      setTimeout(uncloakSidebar, delay);
     }
 
     function ensureShadowCssInRoot(root: ShadowRoot) {
@@ -103,7 +140,7 @@ export default defineContentScript({
         observedShadowRoots.add(root);
       }
 
-      uncloakSidebar();
+      scheduleUncloak();
     }
 
     function maybeUncloakFromExistingRoot() {
@@ -140,13 +177,14 @@ export default defineContentScript({
 
     function applyInstantHide() {
       injectDocumentCss();
-      cloakSidebar();
       hideTargetsInRoot(document);
       ensureShadowCss();
       maybeUncloakFromExistingRoot();
     }
 
     patchAttachShadow();
+    installEarlyCloakStyle();
+    cloakSidebar();
 
     const docObserver = new MutationObserver(applyInstantHide);
     docObserver.observe(document.documentElement, { childList: true, subtree: true });
@@ -154,6 +192,6 @@ export default defineContentScript({
     applyInstantHide();
 
     // Safety valve: avoid a permanently hidden sidebar if Reddit changes internals.
-    setTimeout(uncloakSidebar, 2000);
+    setTimeout(uncloakSidebar, MAX_CLOAK_MS);
   },
 });
