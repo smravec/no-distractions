@@ -3,6 +3,7 @@ export default defineContentScript({
   runAt: "document_start",
   allFrames: true,
   main() {
+    let ENABLE_RD = true as any;
     const EARLY_CLOAK_STYLE_ID = "nd-reddit-sidebar-early-cloak";
     const DOC_STYLE_ID = "no-distractions-doc-popular-style";
     const SHADOW_STYLE_ID = "no-distractions-shadow-popular-style";
@@ -39,9 +40,36 @@ export default defineContentScript({
     const observedShadowRoots = new WeakSet<ShadowRoot>();
     const MIN_CLOAK_MS = 700;
     const MAX_CLOAK_MS = 2500;
-    const cloakStartedAt = Date.now();
+    let cloakStartedAt = Date.now();
     let hasUncloaked = false;
     let hasScheduledUncloak = false;
+
+    function showTargetsInRoot(root: ParentNode) {
+      root.querySelectorAll(HIDE_SELECTOR).forEach((el) => {
+        (el as HTMLElement).style.display = "";
+      });
+    }
+
+    function resetDeferredVisibility() {
+      document.querySelectorAll(DEFER_UNTIL_READY_SELECTOR).forEach((el) => {
+        (el as HTMLElement).style.visibility = "";
+      });
+    }
+
+    function removeDocumentCss() {
+      const style = document.getElementById(DOC_STYLE_ID);
+      if (style) style.remove();
+    }
+
+    function removeShadowCss() {
+      const hosts = document.querySelectorAll(SHADOW_HOST_TAG);
+      hosts.forEach((host) => {
+        if (!host.shadowRoot) return;
+        const style = host.shadowRoot.getElementById(SHADOW_STYLE_ID);
+        if (style) style.remove();
+        showTargetsInRoot(host.shadowRoot);
+      });
+    }
 
     function installEarlyCloakStyle() {
       if (document.getElementById(EARLY_CLOAK_STYLE_ID)) return;
@@ -96,6 +124,12 @@ export default defineContentScript({
       });
     }
 
+    function resetCloakCycle() {
+      cloakStartedAt = Date.now();
+      hasUncloaked = false;
+      hasScheduledUncloak = false;
+    }
+
     function injectDocumentCss() {
       if (document.getElementById(DOC_STYLE_ID)) return;
       const style = document.createElement("style");
@@ -125,22 +159,27 @@ export default defineContentScript({
     }
 
     function ensureShadowCssInRoot(root: ShadowRoot) {
-      if (!root.getElementById(SHADOW_STYLE_ID)) {
-        const style = document.createElement("style");
-        style.id = SHADOW_STYLE_ID;
-        style.textContent = `${HIDE_SELECTOR} { display: none !important; }`;
-        root.prepend(style);
+      if (ENABLE_RD) {
+        if (!root.getElementById(SHADOW_STYLE_ID)) {
+          const style = document.createElement("style");
+          style.id = SHADOW_STYLE_ID;
+          style.textContent = `${HIDE_SELECTOR} { display: none !important; }`;
+          root.prepend(style);
+        }
+        hideTargetsInRoot(root);
+      } else {
+        const style = root.getElementById(SHADOW_STYLE_ID);
+        if (style) style.remove();
+        showTargetsInRoot(root);
       }
 
-      hideTargetsInRoot(root);
-
       if (!observedShadowRoots.has(root)) {
-        const observer = new MutationObserver(() => hideTargetsInRoot(root));
+        const observer = new MutationObserver(() => ensureShadowCssInRoot(root));
         observer.observe(root, { childList: true, subtree: true });
         observedShadowRoots.add(root);
       }
 
-      scheduleUncloak();
+      if (ENABLE_RD) scheduleUncloak();
     }
 
     function maybeUncloakFromExistingRoot() {
@@ -176,22 +215,66 @@ export default defineContentScript({
     }
 
     function applyInstantHide() {
+      if (!ENABLE_RD) {
+        removeDocumentCss();
+        removeShadowCss();
+        showTargetsInRoot(document);
+        resetDeferredVisibility();
+        document.documentElement.classList.remove(READY_CLASS);
+
+        const earlyStyle = document.getElementById(EARLY_CLOAK_STYLE_ID);
+        if (earlyStyle) earlyStyle.remove();
+
+        hasUncloaked = true;
+        return;
+      }
+
       injectDocumentCss();
       hideTargetsInRoot(document);
       ensureShadowCss();
       maybeUncloakFromExistingRoot();
     }
 
+    function syncRedditSidebarState() {
+      if (!ENABLE_RD) {
+        applyInstantHide();
+        return;
+      }
+
+      resetCloakCycle();
+      installEarlyCloakStyle();
+      cloakSidebar();
+      applyInstantHide();
+
+      // Safety valve: avoid a permanently hidden sidebar if Reddit changes internals.
+      setTimeout(uncloakSidebar, MAX_CLOAK_MS);
+    }
+
+    browser.storage.sync.get(["rd", "general_switch"]).then((result) => {
+      const GENERAL_SWITCH =
+        result.general_switch !== undefined ? result.general_switch : true;
+      const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
+      ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
+      syncRedditSidebarState();
+    });
+
+    browser.storage.onChanged.addListener((changes, area) => {
+      if (area === "sync" && (changes.rd || changes.general_switch)) {
+        browser.storage.sync.get(["rd", "general_switch"]).then((result) => {
+          const GENERAL_SWITCH =
+            result.general_switch !== undefined ? result.general_switch : true;
+          const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
+          ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
+          syncRedditSidebarState();
+        });
+      }
+    });
+
     patchAttachShadow();
-    installEarlyCloakStyle();
-    cloakSidebar();
 
     const docObserver = new MutationObserver(applyInstantHide);
     docObserver.observe(document.documentElement, { childList: true, subtree: true });
 
-    applyInstantHide();
-
-    // Safety valve: avoid a permanently hidden sidebar if Reddit changes internals.
-    setTimeout(uncloakSidebar, MAX_CLOAK_MS);
+    syncRedditSidebarState();
   },
 });
