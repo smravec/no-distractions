@@ -1,3 +1,4 @@
+import "@fontsource/reddit-sans/600.css";
 import "../assets/css/reddit.css";
 
 export default defineContentScript({
@@ -88,9 +89,10 @@ export default defineContentScript({
           const text = document.createElement("div");
           text.textContent = "Welcome to Reddit!";
           Object.assign(text.style, {
+            fontFamily: "'Reddit Sans', sans-serif",
             fontSize: "2rem",
-            fontWeight: "bold",
-            color: "#0F1A1C",
+            fontWeight: "700",
+            color: "var(--color-neutral-content-strong, #0F1A1C)",
             textAlign: "center",
             whiteSpace: "pre-line",
             marginTop: "-14px",

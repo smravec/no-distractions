@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@fontsource/reddit-sans':
+        specifier: ^5.2.7
+        version: 5.2.7
     devDependencies:
       typescript:
         specifier: ^5.9.3
@@ -223,6 +227,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@fontsource/reddit-sans@5.2.7':
+    resolution: {integrity: sha512-LCpp9Hx8GRkwHbhhPqKzdIFGKEzeXvE4R+o5NPmsbBwbj4+TP+TysnSiiLFxII56UMH0LEbeGSY51jqeeN+yew==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -1836,6 +1843,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.4':
     optional: true
+
+  '@fontsource/reddit-sans@5.2.7': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
