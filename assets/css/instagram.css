@@ -1,12 +1,12 @@
 /* Explore page (desktop) */
-.ig-explore-page main[role="main"] > * {
+/* .ig-explore-page main[role="main"] > * {
   display: none !important;
-}
+} */
 
 /* Explore page (mobile) */
-.ig-explore-mobile main[role="main"] > *:not(nav) {
+/* .ig-explore-mobile main[role="main"] > *:not(nav) {
   display: none !important;
-}
+} */
 
 /* Reels page */
 .ig-reels-page main[role="main"] > * {

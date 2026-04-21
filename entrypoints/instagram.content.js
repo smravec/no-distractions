@@ -33,92 +33,6 @@ export default defineContentScript({
         );
         return;
       }
-
-      // --- REDIRECT LOGIC respecting switches ---
-      let enforceFollowingRAF = null;
-      function enforceFollowingRedirectLoop() {
-        if (!ENABLE_IG) return; // Respect switches
-
-        const currentUrl = window.location.href;
-        const currentPath = window.location.pathname;
-        const urlObj = new URL(currentUrl);
-        const variant = urlObj.searchParams.get("variant");
-        // Redirect /explore or /explore/ to /explore/search on mobile, to /?variant=following on desktop
-        if (
-          (currentPath === "/explore" || currentPath === "/explore/") &&
-          !currentUrl.includes("/explore/search")
-        ) {
-          if (window.innerWidth > 500) {
-            window.location.replace(
-              "https://www.instagram.com/?variant=following",
-            );
-            return;
-          } else {
-            window.location.replace("https://www.instagram.com/explore/search");
-            return;
-          }
-        }
-        // Redirect to following feed if on main page
-        if (
-          (currentPath === "/" || currentPath === "") &&
-          variant !== "following"
-        ) {
-          window.location.replace("https://www.instagram.com/?variant=following");
-          return;
-        }
-        enforceFollowingRAF = requestAnimationFrame(enforceFollowingRedirectLoop);
-      }
-
-      function redirectToFollowingFeed() {
-        if (enforceFollowingRAF) {
-          cancelAnimationFrame(enforceFollowingRAF);
-          enforceFollowingRAF = null;
-        }
-        enforceFollowingRedirectLoop();
-      }
-
-      // Monitor URL changes more comprehensively, including SPA navigation
-      let lastUrl = window.location.href;
-      function checkUrlChange() {
-        if (!ENABLE_IG) return; // Respect switches
-
-        const currentUrl = window.location.href;
-        const currentPath = window.location.pathname;
-        // If on a /reels/ page, redirect to last non-reels page
-        if (/^\/reels\//.test(currentPath)) {
-          const lastNonReels =
-            sessionStorage.getItem("noDistractionsLastNonReelsUrl") ||
-            "https://www.instagram.com/?variant=following";
-          if (currentUrl !== lastNonReels) {
-            window.location.replace(lastNonReels);
-            return;
-          }
-        } else {
-          // Store last non-reels URL if not on reels
-          sessionStorage.setItem("noDistractionsLastNonReelsUrl", currentUrl);
-        }
-        if (currentUrl !== lastUrl) {
-          lastUrl = currentUrl;
-          redirectToFollowingFeed();
-          blockHorizontalScroll(); // Update horizontal scroll blocking on URL change
-        }
-      }
-
-      // Patch history.pushState and replaceState to catch SPA navigation
-      if (!window._noDistractionsHistoryPatched) {
-        ["pushState", "replaceState"].forEach((fn) => {
-          const orig = history[fn];
-          history[fn] = function () {
-            const ret = orig.apply(this, arguments);
-            setTimeout(checkUrlChange, 0);
-            return ret;
-          };
-        });
-        window._noDistractionsHistoryPatched = true;
-      }
-
-      // Run redirect check immediately
-      redirectToFollowingFeed();
       function blockHorizontalScroll() {
         if (!ENABLE_IG) {
           // If blocking is disabled, remove any existing scroll blocking
@@ -223,18 +137,30 @@ export default defineContentScript({
 
       html.classList.add("no-distractions-css");
 
-      // Hide all <a> elements with href containing '/explore/' and '/reels/'
+      // Hide all <a> elements with href containing '/reels/'
       function hideNavLinks() {
         const body = document.body;
         if (!body) {
           return;
         }
 
-        ["a[href*='/explore/']", "a[href*='/reels/']"].forEach((selector) => {
+        ["a[href*='/reels/']"].forEach((selector) => {
           const elements = body.querySelectorAll(selector);
           elements.forEach((el) =>
             el.style.setProperty("display", "none", "important"),
           );
+        });
+      }
+
+      function updateHomeLinks() {
+        const body = document.body;
+        if (!body) {
+          return;
+        }
+
+        const homeLinks = body.querySelectorAll('a[href="/"]');
+        homeLinks.forEach((el) => {
+          el.setAttribute("href", "/?variant=following");
         });
       }
 
@@ -267,9 +193,53 @@ export default defineContentScript({
         });
       }
 
+      function updateExplorePageHiding() {
+        const currentPath = window.location.pathname;
+        const isExplorePage = currentPath === "/explore" || currentPath === "/explore/";
+        
+        if (isExplorePage) {
+          if (!document.getElementById("no-distractions-explore-hide")) {
+            const injectStyle = () => {
+              if (!document.head) {
+                setTimeout(injectStyle, 10);
+                return;
+              }
+              const style = document.createElement("style");
+              style.id = "no-distractions-explore-hide";
+              style.textContent = `
+                main[role="main"] > div > *:not(:first-child) {
+                  display: none !important;
+                }
+              `;
+              document.head.appendChild(style);
+            };
+            injectStyle();
+          }
+        } else {
+          const style = document.getElementById("no-distractions-explore-hide");
+          if (style) {
+            style.remove();
+          }
+        }
+      }
+
+      function redirectMainPageToFollowing() {
+        const currentUrl = window.location.href;
+        const currentPath = window.location.pathname;
+        const urlObj = new URL(currentUrl);
+        const variant = urlObj.searchParams.get("variant");
+        
+        // If on main page and not already on following variant, redirect
+        if ((currentPath === "/" || currentPath === "") && variant !== "following") {
+          window.location.replace("https://www.instagram.com/?variant=following");
+        }
+      }
+
       function onMutation() {
         hideNavLinks();
         removeForYouTabContainer();
+        updateExplorePageHiding();
+        updateHomeLinks();
       }
 
       onMutation();
@@ -277,9 +247,23 @@ export default defineContentScript({
       const observer = new MutationObserver(onMutation);
       observer.observe(document, { childList: true, subtree: true });
 
-      // Event listeners for robust redirect and scroll blocking
-      window.addEventListener("popstate", redirectToFollowingFeed);
-      setInterval(checkUrlChange, 1000);
+      // Monitor URL changes for explore page
+      let lastUrl = window.location.href;
+      function checkUrlChange() {
+        if (!ENABLE_IG) return;
+        const currentUrl = window.location.href;
+        if (currentUrl !== lastUrl) {
+          lastUrl = currentUrl;
+          updateExplorePageHiding();
+          redirectMainPageToFollowing();
+        }
+      }
+
+      // Run redirect check immediately
+      redirectMainPageToFollowing();
+
+      window.addEventListener("popstate", checkUrlChange);
+      setInterval(checkUrlChange, 500);
     });
   },
 });
