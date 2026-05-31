@@ -144,7 +144,7 @@ export default defineContentScript({
           return;
         }
 
-        ["a[href*='/reels/']"].forEach((selector) => {
+        ["a[href*='/reels/']", "a[href*='/explore/']"].forEach((selector) => {
           const elements = body.querySelectorAll(selector);
           elements.forEach((el) =>
             el.style.setProperty("display", "none", "important"),
@@ -193,32 +193,13 @@ export default defineContentScript({
         });
       }
 
-      function updateExplorePageHiding() {
+      function redirectExplorePage() {
         const currentPath = window.location.pathname;
-        const isExplorePage = currentPath === "/explore" || currentPath === "/explore/";
-        
-        if (isExplorePage) {
-          if (!document.getElementById("no-distractions-explore-hide")) {
-            const injectStyle = () => {
-              if (!document.head) {
-                setTimeout(injectStyle, 10);
-                return;
-              }
-              const style = document.createElement("style");
-              style.id = "no-distractions-explore-hide";
-              style.textContent = `
-                main[role="main"] > div > *:not(:first-child) {
-                  display: none !important;
-                }
-              `;
-              document.head.appendChild(style);
-            };
-            injectStyle();
-          }
-        } else {
-          const style = document.getElementById("no-distractions-explore-hide");
-          if (style) {
-            style.remove();
+        if (currentPath === "/explore" || currentPath === "/explore/") {
+          if (window.innerWidth > 500) {
+            window.location.replace("https://www.instagram.com/?variant=following");
+          } else {
+            window.location.replace("https://www.instagram.com/explore/search");
           }
         }
       }
@@ -238,7 +219,6 @@ export default defineContentScript({
       function onMutation() {
         hideNavLinks();
         removeForYouTabContainer();
-        updateExplorePageHiding();
         updateHomeLinks();
       }
 
@@ -254,12 +234,26 @@ export default defineContentScript({
         const currentUrl = window.location.href;
         if (currentUrl !== lastUrl) {
           lastUrl = currentUrl;
-          updateExplorePageHiding();
+          redirectExplorePage();
           redirectMainPageToFollowing();
         }
       }
 
-      // Run redirect check immediately
+      // Patch history.pushState and replaceState to catch SPA navigation
+      if (!window._noDistractionsHistoryPatched) {
+        ["pushState", "replaceState"].forEach((fn) => {
+          const orig = history[fn];
+          history[fn] = function () {
+            const ret = orig.apply(this, arguments);
+            setTimeout(checkUrlChange, 0);
+            return ret;
+          };
+        });
+        window._noDistractionsHistoryPatched = true;
+      }
+
+      // Run redirect checks immediately
+      redirectExplorePage();
       redirectMainPageToFollowing();
 
       window.addEventListener("popstate", checkUrlChange);
