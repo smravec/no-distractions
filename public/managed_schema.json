@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "allowPause": {
+      "type": "boolean",
+      "title": "Allow pausing",
+      "description": "When false, the 'Turn off blocking' pause button is hidden and any paused state is immediately reverted."
+    }
+  }
+}

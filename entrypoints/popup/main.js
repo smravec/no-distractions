@@ -129,6 +129,33 @@ rd_btn.addEventListener("click", () => {
 // General switch button
 const general_switch_btn = document.getElementById("general_switch")
 
+// ===== ENTERPRISE POLICY (managed storage) =====
+// When the enterprise policy sets allowPause=false, the pause button is
+// hidden entirely. storage.managed is read-only for the user, so this can't
+// be toggled from inside the browser.
+let pauseAllowed = true;
+
+function applyPausePolicy() {
+  general_switch_btn.style.display = pauseAllowed ? "" : "none";
+}
+
+browser.storage.managed
+  .get({ allowPause: true })
+  .then((result) => {
+    pauseAllowed = !result || result.allowPause !== false;
+    applyPausePolicy();
+  })
+  .catch(() => {
+    // storage.managed unavailable (no policy configured) — pausing stays allowed
+  });
+
+browser.storage.onChanged.addListener((changes, area) => {
+  if (area === "managed" && changes.allowPause) {
+    pauseAllowed = changes.allowPause.newValue !== false;
+    applyPausePolicy();
+  }
+});
+
 function updateCountdownDisplay() {
   browser.storage.sync.get(["general_switch", "general_switch_timer"]).then((result) => {
     general_switch = result.general_switch !== undefined ? result.general_switch : true;
@@ -154,6 +181,7 @@ updateCountdownDisplay();
 setInterval(updateCountdownDisplay, 1000);
 
 general_switch_btn.addEventListener("click", () => {
+  if (!pauseAllowed) return; // policy: pausing disabled
   if (general_switch) {
     showConfirmationMenu();
   } else {

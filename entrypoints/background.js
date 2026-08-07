@@ -97,5 +97,48 @@ export default defineBackground({
         }
       });
     }
+
+    // ===== UNINSTALL FEEDBACK =====
+    // Opens the feedback page on the website when the extension is removed.
+    browser.runtime.setUninstallURL("https://nodistractions.app/uninstall");
+
+    // ===== ENTERPRISE POLICY (managed storage) =====
+    // If the policy sets allowPause=false, any paused state is snapped back on
+    // immediately — covers stale synced state and storage tampering, not just
+    // the (hidden) popup button.
+    function enforcePausePolicy() {
+      browser.storage.managed
+        .get({ allowPause: true })
+        .then((result) => {
+          if (!result || result.allowPause !== false) return;
+          browser.storage.sync.get(["general_switch"]).then((res) => {
+            if (res.general_switch === false) {
+              browser.alarms.clear("general_switch_timer");
+              browser.storage.sync.set({ general_switch: true });
+              browser.storage.sync.remove(["general_switch_timer"]);
+            }
+          });
+        })
+        .catch(() => {
+          // storage.managed unavailable (no policy configured) — nothing to enforce
+        });
+    }
+
+    // Runs on every service-worker start, and re-checks whenever the policy
+    // changes or anything tries to flip the switch off.
+    enforcePausePolicy();
+
+    browser.storage.onChanged.addListener((changes, area) => {
+      if (area === "managed" && changes.allowPause) {
+        enforcePausePolicy();
+      }
+      if (
+        area === "sync" &&
+        changes.general_switch &&
+        changes.general_switch.newValue === false
+      ) {
+        enforcePausePolicy();
+      }
+    });
   }
 });

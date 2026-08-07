@@ -34,16 +34,53 @@ A browser extension to block social media distractions - Reels, Shorts, infinite
 ## Building from source
 
 ```bash
-./build-all.sh
+pnpm install
+pnpm wxt build        # build (Chrome MV3, .output/chrome-mv3)
+pnpm wxt zip          # package for the Chrome Web Store (.output/*.zip)
 ```
 
-## Packaging for web stores
+## Enterprise policy (optional)
 
-```bash
-./zip-all.sh
+The extension supports [managed storage](https://developer.chrome.com/docs/extensions/reference/api/storage#property-managed): admins (or self-binding setups) can set `allowPause` to `false` to hide the "Turn off blocking" pause button entirely — any paused state is also auto-reverted. On macOS, place a plist with `allowPause = false` at:
+
 ```
+/Library/Managed Preferences/com.google.Chrome.extensions.<extension-id>.plist
+```
+
+(A ready-made plist for the Web Store extension ID is in `policy/`.) Verify at `chrome://policy`. With no policy configured, nothing changes.
 
 ## Changelog
+
+### Version 0.9
+
+- Enterprise policy support: `allowPause=false` hides the pause button (managed storage)
+- Uninstall feedback: removing the extension opens a feedback page on the website
+
+### Version 0.8
+
+- Bug fixes
+
+### Version 0.7
+
+- Reddit: remove Games section
+- Reddit: remove "Best of Reddit" section
+- Bug fixes
+
+### Version 0.6
+
+- YouTube: fix endscreen suggestions
+- YouTube: center video
+- Bug fixes
+
+### Version 0.5
+
+- Instagram: remove suggested followers section
+- Instagram: hide "For You" section
+- Bug fixes
+
+### Version 0.4
+
+- Bug fixes
 
 ### Version 0.3
 
