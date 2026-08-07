@@ -54,7 +54,6 @@ The extension supports [managed storage](https://developer.chrome.com/docs/exten
 ### Version 0.9
 
 - Enterprise policy support: `allowPause=false` hides the pause button (managed storage)
-- Uninstall feedback: removing the extension opens a feedback page on the website
 
 ### Version 0.8
 
