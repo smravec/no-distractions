@@ -25,6 +25,16 @@
   display: none !important;
 }
 
+.no-distractions-css ytd-watch-flexy[playlist] .ytp-chrome-controls .ytp-next-button,
+.no-distractions-css ytd-watch-flexy[playlist] .ytp-chrome-controls .ytp-prev-button {
+  display: inline-block !important;
+}
+
+.no-distractions-css ytd-watch-flexy[playlist]:has(ytd-playlist-panel-renderer[playlist-type^="RD"]) .ytp-chrome-controls .ytp-next-button,
+.no-distractions-css ytd-watch-flexy[playlist]:has(ytd-playlist-panel-renderer[playlist-type^="RD"]) .ytp-chrome-controls .ytp-prev-button {
+  display: none !important;
+}
+
 /* BAR */
 .no-distractions-css #info > #menu-container,
 .no-distractions-css .slim-video-metadata-actions {
@@ -102,11 +112,17 @@
 }
 
 /* SIDEBAR */
-.no-distractions-css #secondary.ytd-watch-flexy {
+.no-distractions-css ytd-watch-flexy:not([playlist]) #secondary.ytd-watch-flexy,
+.no-distractions-css ytd-watch-flexy[playlist]:has(ytd-playlist-panel-renderer[playlist-type^="RD"]) #secondary.ytd-watch-flexy {
   display: none !important;
 }
 
-.no-distractions-css ytd-watch-flexy[flexy][is-two-columns_]:not([fullscreen]):not([theater]) {
+.no-distractions-css ytd-watch-flexy[playlist] #related.ytd-watch-flexy {
+  display: none !important;
+}
+
+.no-distractions-css ytd-watch-flexy[flexy][is-two-columns_]:not([fullscreen]):not([theater]):not([playlist]),
+.no-distractions-css ytd-watch-flexy[flexy][is-two-columns_]:not([fullscreen]):not([theater])[playlist]:has(ytd-playlist-panel-renderer[playlist-type^="RD"]) {
   --ytd-watch-flexy-max-player-width: calc(
     var(--ytd-watch-flexy-chat-max-height) *
       var(--ytd-watch-flexy-width-ratio) / var(--ytd-watch-flexy-height-ratio)

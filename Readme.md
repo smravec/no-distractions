@@ -53,7 +53,9 @@ The extension supports [managed storage](https://developer.chrome.com/docs/exten
 
 ### Version 0.9
 
-- Enterprise policy support: `allowPause=false` hides the pause button (managed storage)
+- YouTube: playlist panel and player prev/next buttons stay visible when watching a playlist (Mixes stay blocked)
+- YouTube Music is no longer affected by the extension
+- Enterprise policy support: `allowPause=false` locks the extension — pause button and settings disabled (managed storage)
 
 ### Version 0.8
 

@@ -251,6 +251,16 @@ body {
   cursor: pointer;
 }
 
+#general_switch.locked,
+#general_switch.locked:hover {
+  cursor: default;
+}
+
+#rate_link.bottom {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 #rate_link {
   color: greenyellow;
   background-color: transparent;

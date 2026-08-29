@@ -19,7 +19,8 @@ export default defineConfig({
       managed_schema: "managed_schema.json",
     },
     host_permissions: [
-      "*://*.youtube.com/*",
+      "*://www.youtube.com/*",
+      "*://m.youtube.com/*",
       "*://*.facebook.com/*",
       "*://*.instagram.com/*",
       "*://*.reddit.com/*"

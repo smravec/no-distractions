@@ -1,8 +1,18 @@
 export default defineBackground({
   main() {
+    // Match YouTube by exact hostname so music.youtube.com is never touched.
+    function isBlockedYouTubeUrl(url) {
+      if (!url) return false;
+      try {
+        const hostname = new URL(url).hostname;
+        return hostname === "www.youtube.com" || hostname === "m.youtube.com";
+      } catch (e) {
+        return false;
+      }
+    }
+
     // ===== ACTIVE TIME TRACKING FOR RATE BUTTON =====
     const SUPPORTED_SITES = [
-      "youtube.com",
       "instagram.com",
       "facebook.com",
       "reddit.com",
@@ -16,7 +26,10 @@ export default defineBackground({
     // Track active time when user is on supported sites
     function isOnSupportedSite(url) {
       if (!url) return false;
-      return SUPPORTED_SITES.some((site) => url.includes(site));
+      return (
+        isBlockedYouTubeUrl(url) ||
+        SUPPORTED_SITES.some((site) => url.includes(site))
+      );
     }
 
     // Update active time periodically
@@ -58,7 +71,7 @@ export default defineBackground({
                 (tab.url.includes("facebook.com") ||
                   tab.url.includes("instagram.com") ||
                   tab.url.includes("reddit.com") ||
-                  tab.url.includes("youtube.com"))
+                  isBlockedYouTubeUrl(tab.url))
               ) {
                 browser.tabs.reload(tab.id);
               }

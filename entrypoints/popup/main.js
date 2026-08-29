@@ -38,6 +38,17 @@ function updateSettingsButtonText(btn, isOn) {
   btn.textContent = isOn ? "On" : "Off";
 }
 
+// Match YouTube by exact hostname so music.youtube.com is never reloaded.
+function isBlockedYouTubeUrl(url) {
+  if (!url) return false;
+  try {
+    const hostname = new URL(url).hostname;
+    return hostname === "www.youtube.com" || hostname === "m.youtube.com";
+  } catch (e) {
+    return false;
+  }
+}
+
 // Youtube button
 const yt_btn = document.getElementById("youtube")
 browser.storage.sync.get(["yt"]).then((result) => {
@@ -53,7 +64,7 @@ yt_btn.addEventListener("click", () => {
   browser.storage.sync.set({ yt });
   browser.tabs.query({}).then((tabs) => {
     tabs.forEach((tab) => {
-      if (tab.url && tab.url.includes("youtube.com") && tab.id) {
+      if (tab.url && isBlockedYouTubeUrl(tab.url) && tab.id) {
         browser.tabs.reload(tab.id);
       }
     });
@@ -130,13 +141,31 @@ rd_btn.addEventListener("click", () => {
 const general_switch_btn = document.getElementById("general_switch")
 
 // ===== ENTERPRISE POLICY (managed storage) =====
-// When the enterprise policy sets allowPause=false, the pause button is
-// hidden entirely. storage.managed is read-only for the user, so this can't
-// be toggled from inside the browser.
+// When the enterprise policy sets allowPause=false, the popup is locked down:
+// the pause button reads "Extension Locked" and does nothing, the settings
+// page is hidden, and the review prompt takes the settings button's place at
+// the bottom. storage.managed is read-only for the user, so this can't be
+// toggled from inside the browser.
 let pauseAllowed = true;
 
 function applyPausePolicy() {
-  general_switch_btn.style.display = pauseAllowed ? "" : "none";
+  const locked = !pauseAllowed;
+  general_switch_btn.classList.toggle("locked", locked);
+  document.getElementById("toggle_settings").style.display = locked ? "none" : "";
+  if (locked) {
+    // Force the main view; settings and confirmation menus are inaccessible.
+    document.getElementById("settings_menu").style.display = "none";
+    document.getElementById("confirmation_menu").style.display = "none";
+    document.getElementById("main_menu").style.display = "flex";
+    // The review prompt takes the settings button's slot at the bottom.
+    document.getElementById("main_menu").appendChild(rateLink);
+    rateLink.classList.add("bottom");
+  } else {
+    document.querySelector(".main_menu_container").appendChild(rateLink);
+    rateLink.classList.remove("bottom");
+  }
+  updateCountdownDisplay();
+  updateRateButtonVisibility();
 }
 
 browser.storage.managed
@@ -160,10 +189,16 @@ function updateCountdownDisplay() {
   browser.storage.sync.get(["general_switch", "general_switch_timer"]).then((result) => {
     general_switch = result.general_switch !== undefined ? result.general_switch : true;
 
-    general_switch_btn.style.borderColor = general_switch ? "greenyellow" : "red";
-    general_switch_btn.textContent = "Turn off blocking";
+    general_switch_btn.style.borderColor = pauseAllowed
+      ? general_switch
+        ? "greenyellow"
+        : "red"
+      : "rgb(97, 96, 96)";
+    general_switch_btn.textContent = pauseAllowed
+      ? "Turn off blocking"
+      : "Extension Locked";
 
-    if (!general_switch && result.general_switch_timer) {
+    if (pauseAllowed && !general_switch && result.general_switch_timer) {
       const timeRemaining = result.general_switch_timer.expiryTime - Date.now();
       if (timeRemaining > 0) {
         const minutes = Math.floor(timeRemaining / (1000 * 60));
@@ -197,7 +232,7 @@ general_switch_btn.addEventListener("click", () => {
           (tab.url.includes("facebook.com") ||
             tab.url.includes("instagram.com") ||
             tab.url.includes("reddit.com") ||
-            tab.url.includes("youtube.com")) && tab.id
+            isBlockedYouTubeUrl(tab.url)) && tab.id
         ) {
           browser.tabs.reload(tab.id);
         }
@@ -212,6 +247,7 @@ const mainMenu = document.getElementById("main_menu")
 const settingsMenu = document.getElementById("settings_menu")
 
 settingsBtn.addEventListener("click", () => {
+  if (!pauseAllowed) return; // policy: settings disabled
   mainMenu.style.display = "none";
   settingsMenu.style.display = "flex";
 });
@@ -269,7 +305,7 @@ function turnOffBlocking() {
         (tab.url.includes("facebook.com") ||
           tab.url.includes("instagram.com") ||
           tab.url.includes("reddit.com") ||
-          tab.url.includes("youtube.com")) && tab.id
+          isBlockedYouTubeUrl(tab.url)) && tab.id
       ) {
         browser.tabs.reload(tab.id);
       }
@@ -349,7 +385,10 @@ function updateRateButtonVisibility() {
     const activeTime = result.activeTimeOnSites || 0;
     const hasClicked = result.rateButtonClicked || false;
 
-    if (hasClicked) {
+    if (!pauseAllowed) {
+      // Locked popup: the review prompt is the only bottom action.
+      rateLink.style.display = "block";
+    } else if (hasClicked) {
       rateLink.style.display = "none";
     } else if (activeTime >= ACTIVE_TIME_THRESHOLD) {
       rateLink.style.display = "block";
