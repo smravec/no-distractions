@@ -160,3 +160,389 @@
 .no-distractions-css ytm-pivot-bar-renderer > ytm-pivot-bar-item-renderer:has(.pivot-shorts) {
   display: none !important;
 }
+
+/* HOME LANDING */
+.no-distractions-css.nd-yt-home ytd-browse[page-subtype="home"] {
+  display: none !important;
+}
+
+.no-distractions-css.nd-yt-home body {
+  overflow: hidden !important;
+}
+
+.no-distractions-css #nd-yt-home-root {
+  display: flex;
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1999;
+  background: #ffffff;
+  font-family: "Roboto", "Arial", sans-serif;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.18s ease, visibility 0s linear 0.18s;
+}
+
+.no-distractions-css.nd-yt-home #nd-yt-home-root {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.18s ease;
+}
+
+.no-distractions-css #nd-yt-home-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+  margin-top: max(48px, calc(42vh - 120px));
+}
+
+.no-distractions-css #nd-yt-home-search {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.no-distractions-css #nd-yt-home-search:focus-within {
+  border-color: #065fd4;
+}
+
+.no-distractions-css #nd-yt-home-input {
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 16px;
+  color: #0f0f0f;
+}
+
+.no-distractions-css #nd-yt-home-input::placeholder {
+  color: #606060;
+}
+
+.no-distractions-css #nd-yt-home-search-btn {
+  width: 64px;
+  height: 100%;
+  border: none;
+  border-left: 1px solid #ccc;
+  background: #f2f2f2;
+  color: #0f0f0f;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.no-distractions-css #nd-yt-home-search-btn:hover {
+  background: #e5e5e5;
+}
+
+.no-distractions-css #nd-yt-home-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 0 16px;
+}
+
+.no-distractions-css .nd-yt-home-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 20px;
+  background: #f2f2f2;
+  color: #0f0f0f;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 40px;
+  text-decoration: none;
+}
+
+.no-distractions-css .nd-yt-home-chip:hover {
+  background: #e5e5e5;
+}
+
+.no-distractions-css .nd-yt-home-chip svg {
+  flex: none;
+}
+
+.no-distractions-css #nd-yt-home-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f2f2f2;
+  color: #606060;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-decoration: none;
+  flex: none;
+}
+
+.no-distractions-css #nd-yt-home-avatar:hover {
+  background: #e5e5e5;
+}
+
+.no-distractions-css #nd-yt-home-avatar-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.no-distractions-css #nd-yt-home-root img[hidden] {
+  display: none !important;
+}
+
+.no-distractions-css .nd-yt-home-chip:focus-visible,
+.no-distractions-css #nd-yt-home-avatar:focus-visible,
+.no-distractions-css #nd-yt-home-search-btn:focus-visible {
+  outline: 2px solid #065fd4;
+  outline-offset: 2px;
+}
+
+html[dark].no-distractions-css #nd-yt-home-root {
+  background: #0f0f0f;
+}
+
+html[dark].no-distractions-css #nd-yt-home-search {
+  background: #121212;
+  border-color: #303030;
+}
+
+html[dark].no-distractions-css #nd-yt-home-search:focus-within {
+  border-color: #1c62b9;
+}
+
+html[dark].no-distractions-css #nd-yt-home-input {
+  color: #f1f1f1;
+}
+
+html[dark].no-distractions-css #nd-yt-home-input::placeholder {
+  color: #aaaaaa;
+}
+
+html[dark].no-distractions-css #nd-yt-home-search-btn {
+  background: #272727;
+  border-left-color: #303030;
+  color: #f1f1f1;
+}
+
+html[dark].no-distractions-css #nd-yt-home-search-btn:hover {
+  background: #3f3f3f;
+}
+
+html[dark].no-distractions-css .nd-yt-home-chip {
+  background: #272727;
+  color: #f1f1f1;
+}
+
+html[dark].no-distractions-css .nd-yt-home-chip:hover {
+  background: #3f3f3f;
+}
+
+html[dark].no-distractions-css #nd-yt-home-avatar {
+  background: #272727;
+  color: #aaaaaa;
+}
+
+html[dark].no-distractions-css #nd-yt-home-avatar:hover {
+  background: #3f3f3f;
+}
+
+html[dark].no-distractions-css .nd-yt-home-chip:focus-visible,
+html[dark].no-distractions-css #nd-yt-home-avatar:focus-visible,
+html[dark].no-distractions-css #nd-yt-home-search-btn:focus-visible {
+  outline-color: #1c62b9;
+}
+
+/* HOME LANDING MASTHEAD */
+/* Keep the hamburger (#start) and the #end buttons; drop the masthead logo,
+   the search box and the persistent mini guide. The drawer itself stays so
+   the hamburger still opens it. */
+/* Fade (not display) so the masthead keeps its layout — #end never jumps. */
+.no-distractions-css ytd-masthead #center,
+.no-distractions-css ytd-masthead ytd-topbar-logo-renderer {
+  transition: opacity 0.18s ease;
+}
+
+.no-distractions-css.nd-yt-home ytd-masthead #center,
+.no-distractions-css.nd-yt-home ytd-masthead ytd-topbar-logo-renderer {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: opacity 0.18s ease, visibility 0s linear 0.18s;
+}
+
+.no-distractions-css.nd-yt-home ytd-mini-guide-renderer {
+  display: none !important;
+}
+
+/* The persistent guide drawer is position:fixed at z-index 2021 — above the
+   landing overlay (1999) — so it is hidden while the landing is active,
+   EXCEPT when the user deliberately opens it: the content script collapses
+   it on landing activation (syncing YouTube's internal state to "closed")
+   and then mirrors the drawer's real opened-state into nd-yt-guide-open,
+   which lets the hamburger work naturally. */
+.no-distractions-css.nd-yt-home:not(.nd-yt-guide-open) tp-yt-app-drawer#guide {
+  display: none !important;
+}
+
+/* HOME LANDING LOGO */
+.no-distractions-css #nd-yt-home-logo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  color: #0f0f0f;
+}
+
+.no-distractions-css #nd-yt-home-logo svg {
+  height: 50px !important;
+  width: auto !important;
+  display: block;
+}
+
+/* The cloned logo's wordmark paths carry no fill attribute — in the masthead
+   they are filled by YouTube's scoped CSS, which does not travel with the
+   clone. Theme them via the container color; explicit fills (the red play
+   icon) are untouched. */
+.no-distractions-css #nd-yt-home-logo svg path:not([fill]) {
+  fill: currentColor !important;
+}
+
+.no-distractions-css #nd-yt-home-logo .nd-yt-home-country {
+  font-size: 13px;
+  font-weight: 400;
+  margin-left: 6px;
+  color: #606060;
+}
+
+.no-distractions-css .nd-yt-home-logo-text {
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: inherit;
+  align-self: center;
+}
+
+/* The interim fallback's play icon must not take the cloned logo's size. */
+.no-distractions-css #nd-yt-home-logo svg.nd-yt-home-logo-icon {
+  width: 60px !important;
+  height: auto !important;
+  margin-right: 12px;
+  align-self: center;
+}
+
+html[dark].no-distractions-css #nd-yt-home-logo {
+  color: #f1f1f1;
+}
+
+html[dark].no-distractions-css #nd-yt-home-logo .nd-yt-home-country {
+  color: #aaaaaa;
+}
+
+/* HOME LANDING SEARCH SUGGESTIONS */
+.no-distractions-css #nd-yt-home-search-wrap {
+  position: relative;
+  width: min(560px, 85vw);
+  z-index: 2;
+}
+
+.no-distractions-css #nd-yt-home-suggest {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 8px 0;
+  overflow: hidden;
+}
+
+.no-distractions-css #nd-yt-home-suggest[hidden] {
+  display: none !important;
+}
+
+.no-distractions-css .nd-yt-home-suggest-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 36px;
+  padding: 0 16px;
+  font-size: 16px;
+  color: #0f0f0f;
+  cursor: default;
+}
+
+.no-distractions-css .nd-yt-home-suggest-row svg {
+  flex: none;
+  color: #606060;
+}
+
+.no-distractions-css .nd-yt-home-suggest-row span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.no-distractions-css .nd-yt-home-suggest-row:hover,
+.no-distractions-css .nd-yt-home-suggest-row.nd-yt-home-suggest-active {
+  background: #f2f2f2;
+}
+
+html[dark].no-distractions-css #nd-yt-home-suggest {
+  background: #212121;
+  border-color: #3f3f3f;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+html[dark].no-distractions-css .nd-yt-home-suggest-row {
+  color: #f1f1f1;
+}
+
+html[dark].no-distractions-css .nd-yt-home-suggest-row svg {
+  color: #aaaaaa;
+}
+
+html[dark].no-distractions-css .nd-yt-home-suggest-row:hover,
+html[dark].no-distractions-css .nd-yt-home-suggest-row.nd-yt-home-suggest-active {
+  background: #3f3f3f;
+}
+
+/* HOME LANDING TRANSITIONS */
+@keyframes nd-yt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.no-distractions-css #nd-yt-home-logo svg,
+.no-distractions-css #nd-yt-home-avatar-img:not([hidden]) {
+  animation: nd-yt-fade-in 0.25s ease;
+}
