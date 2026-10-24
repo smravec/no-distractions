@@ -1,17 +1,198 @@
-/* Init styles untill the js script gets loaded*/
-/* Hides the main feed */
-.no-distractions-css div[role="main"] {
-  display: none;
+/* Pre-hide the algorithmic home while it is redirected to the Friends feed.
+   Set at document_start by facebook-init, owned by facebook.content after.
+   visibility, not display, so Facebook's feed layout and measuring stay
+   intact. */
+.no-distractions-css.nd-fb-home div[role="main"] {
+  visibility: hidden !important;
 }
 
-/* Pernament styles */
-
-/* Cleans /watch page */
-.no-distractions-css #watch_feed {
+/* Pre-hide a Reels / video-feed / gaming surface while leaving it. */
+.no-distractions-css.nd-fb-redirect div[role="main"] {
   display: none !important;
 }
 
+/* NAV ENTRIES to blocked surfaces. Only nav links carry /reel/?…; a
+   friend's own reel links as /reel/<id>/…, so posts are never matched.
+   Both relative and absolute forms: Facebook rewrites hrefs on hover. */
+.no-distractions-css [role="navigation"] li:has(a[href*="/reel/?"]),
+.no-distractions-css [role="navigation"] li:has(a[href^="/gaming/"]),
+.no-distractions-css [role="navigation"] li:has(a[href*="facebook.com/gaming/"]),
+.no-distractions-css [role="navigation"] li:has(a[href^="/watch"]:not([href*="/watch/saved"])),
+.no-distractions-css [role="navigation"] li:has(a[href*="facebook.com/watch"]:not([href*="/watch/saved"])) {
+  display: none !important;
+}
+
+/* Video sub-nav on /watch/?v= (Home, Live, Reels, Explore, Following all
+   lead to blocked feeds). The whole tab row goes: hiding single tabs makes
+   Facebook's overflow logic re-render the row in a loop. Saved videos stay
+   reachable from the Saved bookmark. */
+.no-distractions-css div:has(> [role="tablist"] a[role="tab"][href*="/watch/saved"]),
+.no-distractions-css a[role="link"][href="/watch/"] {
+  display: none !important;
+}
+
+/* TOP-BAR PLACEHOLDERS. The banner tab nav first renders loading-state
+   placeholder li's, one per tab including the hidden Reels / Gaming ones,
+   so the real tabs land in other slots and the bar jumps. visibility, not
+   display, so the placeholders keep their space until the real tabs
+   replace them. */
+.no-distractions-css [role="banner"] [role="navigation"] li:has([data-visualcompletion="loading-state"]) {
+  visibility: hidden !important;
+}
+
+/* COMPOSER OPENING. While facebook.content clicks banner menu > Create >
+   Post (nd-fb-composing on html, about half a second), the Create menu
+   stays invisible and unclickable. */
+.no-distractions-css.nd-fb-composing [role="dialog"]:has(a[href="/stories/create/"]) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* COMPOSER CARD on the Friends feed, built by facebook-composer. Mimics
+   Facebook's home composer using its own theme variables, so light and
+   dark mode follow the page. */
+.no-distractions-css .nd-fb-composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 16px;
+  margin: 0 0 16px;
+  background: var(--card-background);
+  border-radius: var(--card-corner-radius, 12px);
+  box-shadow: 0 1px 2px var(--shadow-2);
+  font-family: inherit;
+}
+
+.no-distractions-css .nd-fb-composer-avatar {
+  display: block;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.no-distractions-css .nd-fb-composer-avatar-empty {
+  background: var(--secondary-button-background);
+}
+
+.no-distractions-css .nd-fb-composer-pill {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: var(--comment-background);
+  color: var(--secondary-text);
+  font-size: 17px;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.no-distractions-css .nd-fb-composer-pill > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.no-distractions-css .nd-fb-composer-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.no-distractions-css .nd-fb-composer-pill:hover,
+.no-distractions-css .nd-fb-composer-action:hover {
+  background-image: linear-gradient(var(--hover-overlay), var(--hover-overlay));
+}
+
+.no-distractions-css .nd-fb-composer-pill:focus-visible,
+.no-distractions-css .nd-fb-composer-action:focus-visible {
+  outline: 2px solid var(--accent, #0866ff);
+  outline-offset: 2px;
+}
+
+.no-distractions-css .nd-fb-composer-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: center / contain no-repeat;
+}
+
+.no-distractions-css .nd-fb-composer-icon[data-nd-fb-icon="photo"] {
+  background-image: url("https://static.xx.fbcdn.net/rsrc.php/yk/r/5ak_tKfzmQv.webp");
+}
+
+.no-distractions-css .nd-fb-composer-icon[data-nd-fb-icon="feeling"] {
+  background-image: url("https://static.xx.fbcdn.net/rsrc.php/yr/r/t40HYuD0sbT.webp");
+}
+
+/* SHORTCUTS SECTION in the Feeds panel, built by facebook-shortcuts from
+   cloned Feeds rows. Icons come from Facebook's own left-nav sprite. */
+.no-distractions-css .nd-fb-shortcuts-divider {
+  border-top: 1px solid var(--divider);
+  margin: 8px 16px 0;
+}
+
+.no-distractions-css .nd-fb-shortcuts-head {
+  padding: 16px 16px 4px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--secondary-text);
+}
+
+.no-distractions-css .nd-fb-shortcut-icon {
+  display: inline-block;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin-right: 12px;
+  background-image: url("https://static.xx.fbcdn.net/rsrc.php/yG/r/rIjih14LjuO.webp");
+  background-size: 37px 1702px;
+  background-repeat: no-repeat;
+}
+
+.no-distractions-css .nd-fb-shortcut-icon[data-nd-fb-icon="groups"] { background-position: 0 -185px; }
+.no-distractions-css .nd-fb-shortcut-icon[data-nd-fb-icon="marketplace"] { background-position: 0 -999px; }
+.no-distractions-css .nd-fb-shortcut-icon[data-nd-fb-icon="saved"] { background-position: 0 -518px; }
+.no-distractions-css .nd-fb-shortcut-icon[data-nd-fb-icon="events"] { background-position: 0 -666px; }
+.no-distractions-css .nd-fb-shortcut-icon[data-nd-fb-icon="pages"] { background-position: 0 -333px; }
+.no-distractions-css .nd-fb-shortcut-icon[data-nd-fb-icon="ads"] { background-position: 0 -407px; }
+.no-distractions-css .nd-fb-shortcut-icon[data-nd-fb-icon="suite"] { background-position: 0 -37px; }
+
+/* Facebook draws the row hover from JS, which cloned rows don't get. */
+.no-distractions-css [data-nd-fb-shortcut] a:hover {
+  background-color: var(--hover-overlay);
+}
+
 /* Mobile styles */
+
+/* m.facebook.com only (nd-fb-mobile is set by facebook-init there). Early
+   hide of the main column until the legacy mobile code in
+   facebook.content runs: it re-shows main with its own
+   display: block !important override and hides per route, and removes
+   no-distractions-css when Facebook is toggled off or logged out. */
+.no-distractions-css.nd-fb-mobile div[role="main"] {
+  display: none;
+}
+
+/* m.facebook.com watch page: the video feed. */
+.no-distractions-css.nd-fb-mobile #watch_feed {
+  display: none !important;
+}
 
 /* Hides open app button */
 .no-distractions-css #screen-root > div > div.m.fixed-container.bottom {
