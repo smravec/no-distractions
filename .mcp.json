@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "nd-dev-browser": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@0.0.83", "--cdp-endpoint", "http://localhost:9333"]
+    }
+  }
+}

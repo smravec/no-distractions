@@ -26,3 +26,7 @@ web-ext.config.ts
 *.sw?
 
 .DS_Store
+
+# Dev browser profile (logins) and check screenshots
+.dev-profile
+dev-check.png
