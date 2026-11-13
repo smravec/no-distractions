@@ -13,7 +13,7 @@
   --red: #ff5c5c;
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
   --popup-w: 224px;
-  --popup-h: 300px;
+  --popup-h: 312px;
 }
 
 * {
@@ -285,15 +285,15 @@ input:focus-visible {
 }
 
 .strict_caption {
-  /* Use the card's full inner width (the table leaves 26 px on the right for
-     the info icon) and keep it on one line. */
+  /* Two balanced lines, centred across the card's full inner width (the
+     table leaves 26 px on the right for the info icon). */
   margin: 0 -20px 0 -6px;
-  white-space: nowrap;
   margin-top: auto;
   padding-top: 4px;
-  font-size: 10px;
-  line-height: 14px;
+  font-size: 11px;
+  line-height: 15px;
   text-align: center;
+  text-wrap: balance;
   color: var(--text-3);
 }
 

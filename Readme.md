@@ -58,7 +58,7 @@ Set `strictMode` to `true` to force strict mode on for every site.
 
 ### Version 1.2
 
-- Strict mode: hide posts from people you follow too (off by default, turn it on per site in Other settings)
+- Strict mode: hide posts from accounts you follow too (off by default, turn it on per site in Other settings)
 - YouTube strict: Subscriptions feed, subscribed channels in the sidebar and the notifications bell are gone; the Channels list stays
 - Instagram strict: Following feed and stories hidden
 - Facebook strict: Friends, Favorites, Groups and Pages feeds and the Stories entry hidden, the post box and Shortcuts stay

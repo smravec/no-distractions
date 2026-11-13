@@ -218,7 +218,7 @@ function buildStrictNote() {
   title.textContent = "Strict mode is on";
   const text = document.createElement("div");
   text.className = "nd-fb-strict-note-text";
-  text.textContent = "Posts from people you follow are hidden.";
+  text.textContent = "Posts from accounts you follow are hidden.";
   note.append(title, text);
   return note;
 }

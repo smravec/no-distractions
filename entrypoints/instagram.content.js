@@ -229,7 +229,7 @@ export default defineContentScript({
         title.textContent = "Strict mode is on";
         const text = document.createElement("div");
         text.className = "nd-ig-strict-note-text";
-        text.textContent = "Posts from people you follow are hidden.";
+        text.textContent = "Posts from accounts you follow are hidden.";
         note.append(title, text);
         main.appendChild(note);
       }
