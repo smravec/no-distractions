@@ -7,6 +7,7 @@
   --surface: #0d0d0d; /* cards, a step off the black around them */
   --line: rgb(255 255 255 / 0.14); /* card outline, neutral buttons */
   --hair: rgb(255 255 255 / 0.07); /* row dividers */
+  --edge: rgb(255 255 255 / 0.16); /* line around the whole popup, so it never blends into a dark page */
   --text: #fbfbfb;
   --text-2: #a3a3a3;
   --text-3: #676767;
@@ -34,6 +35,7 @@ body {
   gap: 12px;
   padding: 12px 8px;
   background-color: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--edge);
   color: var(--text);
   font-family: var(--font);
   font-size: 13px;
