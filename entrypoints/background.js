@@ -37,7 +37,7 @@ export default defineBackground({
         "paused=" + (sync.general_switch === false ? "1" : "0"),
       ];
       if (typeof local.installedAt === "number") {
-        parts.push("age=" + ageBucket(local.installedAt));
+        parts.push("age=" + encodeURIComponent(ageBucket(local.installedAt)));
         parts.push("pre=" + (local.installedPre === true ? "1" : "0"));
       }
       return UNINSTALL_BASE + "#" + parts.join("&");
@@ -65,9 +65,11 @@ export default defineBackground({
             installType: self && self.installType,
           });
           if (url === lastUninstallUrl) return;
-          lastUninstallUrl = url;
-          globalThis.__ndLastUninstallUrl = url; // debug read-back only
-          return browser.runtime.setUninstallURL(url);
+          // Remember the URL only once it is set, so a failed set is retried.
+          return browser.runtime.setUninstallURL(url).then(() => {
+            lastUninstallUrl = url;
+            globalThis.__ndLastUninstallUrl = url; // debug read-back only
+          });
         })
         .catch(() => {
           // Worst case the plain page still opens.

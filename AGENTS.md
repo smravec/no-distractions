@@ -17,6 +17,7 @@ The user's everyday Google Chrome force-installs the STORE build through managed
 3. Stop the dev browser when done. Only one instance can use `.dev-profile/` and port 9333 at a time.
 
 ### Notes
+- After a relaunch, Chrome keeps the cached background service worker while the manifest version is unchanged. Content scripts and the popup are fresh, `background.js` is not. Test background changes in a throwaway profile (headless Playwright, fresh `launchPersistentContext` dir) or bump the version.
 - `.dev-profile/` is a persistent profile holding the user's logins. Instagram and Facebook feeds need them. If a site shows a login or consent wall, ask the user to run `pnpm dev:browser` headed and log in once. Never delete the profile.
 - There's no managed policy in the dev browser, so `chrome.storage.managed` is empty and `allowPause` defaults to `true`. Pause-lockdown behaviour (`allowPause = false`) can't be tested there.
 - An unpacked extension's ID is a hash of its path (`bfngcldmpflkcknmngcgcbahnnmmmlfg` for this checkout). Never put it in policy; policy uses the store ID.

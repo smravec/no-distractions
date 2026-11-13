@@ -52,7 +52,7 @@ The extension supports [managed storage](https://developer.chrome.com/docs/exten
 
 Set `strictMode` to `true` to force strict mode on for every site.
 
-(A ready-made plist for the Web Store extension ID is in `policy/`.) Verify at `chrome://policy`. With no policy configured, nothing changes.
+(A ready-made plist for the Web Store extension ID is in `policy/`. It sets both keys, so drop `strictMode` if you only want to lock pausing.) Verify at `chrome://policy`. With no policy configured, nothing changes.
 
 ## Changelog
 
@@ -61,7 +61,7 @@ Set `strictMode` to `true` to force strict mode on for every site.
 - Strict mode: hide posts from people you follow too (off by default, turn it on per site in Other settings)
 - YouTube strict: Subscriptions feed, subscribed channels in the sidebar and the notifications bell are gone; the Channels list stays
 - Instagram strict: Following feed and stories hidden
-- Facebook strict: Friends feed hidden, the post box and Shortcuts stay
+- Facebook strict: Friends, Favorites, Groups and Pages feeds and the Stories entry hidden, the post box and Shortcuts stay
 - Reddit strict: Communities and Recent hidden in the sidebar
 - YouTube: a single short opens in the normal player
 - Enterprise policy: `strictMode=true` forces strict mode on
