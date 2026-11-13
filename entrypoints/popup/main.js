@@ -54,14 +54,14 @@ function isBlockedYouTubeUrl(url) {
 const yt_btn = document.getElementById("youtube")
 browser.storage.sync.get(["yt"]).then((result) => {
   yt = result.yt !== undefined ? result.yt : true;
-  yt_btn.style.borderColor = yt ? "greenyellow" : "red";
+  yt_btn.style.borderColor = yt ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(yt_btn, yt);
   renderStrict("yt");
 });
 
 yt_btn.addEventListener("click", () => {
   yt = !yt;
-  yt_btn.style.borderColor = yt ? "greenyellow" : "red";
+  yt_btn.style.borderColor = yt ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(yt_btn, yt);
   renderStrict("yt");
   browser.storage.sync.set({ yt });
@@ -78,14 +78,14 @@ yt_btn.addEventListener("click", () => {
 const fb_btn = document.getElementById("facebook")
 browser.storage.sync.get(["fb"]).then((result) => {
   fb = result.fb !== undefined ? result.fb : true;
-  fb_btn.style.borderColor = fb ? "greenyellow" : "red";
+  fb_btn.style.borderColor = fb ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(fb_btn, fb);
   renderStrict("fb");
 });
 
 fb_btn.addEventListener("click", () => {
   fb = !fb;
-  fb_btn.style.borderColor = fb ? "greenyellow" : "red";
+  fb_btn.style.borderColor = fb ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(fb_btn, fb);
   renderStrict("fb");
   browser.storage.sync.set({ fb });
@@ -102,14 +102,14 @@ fb_btn.addEventListener("click", () => {
 const ig_btn = document.getElementById("instagram")
 browser.storage.sync.get(["ig"]).then((result) => {
   ig = result.ig !== undefined ? result.ig : true;
-  ig_btn.style.borderColor = ig ? "greenyellow" : "red";
+  ig_btn.style.borderColor = ig ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(ig_btn, ig);
   renderStrict("ig");
 });
 
 ig_btn.addEventListener("click", () => {
   ig = !ig;
-  ig_btn.style.borderColor = ig ? "greenyellow" : "red";
+  ig_btn.style.borderColor = ig ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(ig_btn, ig);
   renderStrict("ig");
   browser.storage.sync.set({ ig });
@@ -126,14 +126,14 @@ ig_btn.addEventListener("click", () => {
 const rd_btn = document.getElementById("reddit")
 browser.storage.sync.get(["rd"]).then((result) => {
   rd = result.rd !== undefined ? result.rd : true;
-  rd_btn.style.borderColor = rd ? "greenyellow" : "red";
+  rd_btn.style.borderColor = rd ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(rd_btn, rd);
   renderStrict("rd");
 });
 
 rd_btn.addEventListener("click", () => {
   rd = !rd;
-  rd_btn.style.borderColor = rd ? "greenyellow" : "red";
+  rd_btn.style.borderColor = rd ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(rd_btn, rd);
   renderStrict("rd");
   browser.storage.sync.set({ rd });
@@ -149,7 +149,7 @@ rd_btn.addEventListener("click", () => {
 // ===== STRICT MODE (per site) =====
 // Off by default. Dimmed while the site's blocking is off; locked "On" when
 // the enterprise policy forces strictMode.
-const GRAY = "rgb(97, 96, 96)";
+const GRAY = "var(--line)";
 const strictState = { yt: false, fb: false, ig: false, rd: false };
 let strictForced = false;
 
@@ -183,14 +183,26 @@ function reloadSiteTabs(site) {
   });
 }
 
+const STRICT_HINTS = {
+  yt: "Also hide your Subscriptions feed",
+  fb: "Also hide your Friends feed",
+  ig: "Also hide your Following feed",
+  rd: "Also hide your communities list",
+};
+
 function renderStrict(site) {
   const btn = strictButtons[site];
   if (!btn) return;
   const on = strictForced || strictState[site];
   btn.textContent = on ? "On" : "Off";
-  btn.style.borderColor = !strictForced && on ? "greenyellow" : GRAY;
+  btn.style.borderColor = !strictForced && on ? "var(--green)" : GRAY;
   btn.classList.toggle("locked", strictForced);
   btn.classList.toggle("dimmed", !siteBlockOn(site));
+  btn.title = strictForced
+    ? "Strict mode is set by your organisation"
+    : !siteBlockOn(site)
+      ? "Turn on blocking for this site first"
+      : STRICT_HINTS[site];
 }
 
 function renderAllStrict() {
@@ -233,6 +245,7 @@ function applyPausePolicy() {
     // Force the main view; settings and confirmation menus are inaccessible.
     document.getElementById("settings_menu").style.display = "none";
     document.getElementById("confirmation_menu").style.display = "none";
+    document.getElementById("strict_info_menu").style.display = "none";
     document.getElementById("main_menu").style.display = "flex";
     // The review prompt takes the settings button's slot at the bottom.
     document.getElementById("main_menu").appendChild(rateLink);
@@ -274,9 +287,9 @@ function updateCountdownDisplay() {
 
     general_switch_btn.style.borderColor = pauseAllowed
       ? general_switch
-        ? "greenyellow"
-        : "red"
-      : "rgb(97, 96, 96)";
+        ? "var(--green)"
+        : "var(--red)"
+      : "var(--line)";
     general_switch_btn.textContent = pauseAllowed
       ? "Turn off blocking"
       : "Extension Locked";
@@ -335,6 +348,17 @@ settingsBtn.addEventListener("click", () => {
   settingsMenu.style.display = "flex";
 });
 
+// Strict mode explainer (info button in the settings header)
+const strictInfoMenu = document.getElementById("strict_info_menu")
+document.getElementById("strict_info").addEventListener("click", () => {
+  settingsMenu.style.display = "none";
+  strictInfoMenu.style.display = "flex";
+});
+document.getElementById("strict_info_back").addEventListener("click", () => {
+  strictInfoMenu.style.display = "none";
+  settingsMenu.style.display = "flex";
+});
+
 // Back to main menu logic
 const backBtn = document.getElementById("toggle_main_menu")
 
@@ -344,8 +368,18 @@ backBtn.addEventListener("click", () => {
 });
 
 // Confirmation menu logic
+// A new random code every time, so typing it never becomes muscle memory.
+let expectedCode = "";
+function newConfirmationCode() {
+  const digits = new Uint8Array(4);
+  crypto.getRandomValues(digits);
+  expectedCode = Array.from(digits, (d) => String(d % 10)).join("");
+  document.getElementById("confirmation_code").textContent = expectedCode.split("").join(" ");
+}
+
 function showConfirmationMenu() {
   const confirmationMenu = document.getElementById("confirmation_menu")
+  newConfirmationCode();
   mainMenu.style.display = "none";
   confirmationMenu.style.display = "flex";
   document.getElementById("confirmation_input_1")?.focus();
@@ -360,7 +394,7 @@ function hideConfirmationMenu() {
     const input = document.getElementById(`confirmation_input_${i}`)
     if (input) {
       input.value = "";
-      input.style.borderColor = "greenyellow";
+      input.style.borderColor = "var(--green)";
     }
   }
 }
@@ -410,14 +444,14 @@ for (let i = 1; i <= 4; i++) {
     const value = target.value;
 
     if (value) {
-      target.style.borderColor = "red";
+      target.style.borderColor = "var(--line)";
     } else {
-      target.style.borderColor = "greenyellow";
+      target.style.borderColor = "var(--green)";
     }
 
     if (!/^\d*$/.test(value)) {
       target.value = "";
-      target.style.borderColor = "greenyellow";
+      target.style.borderColor = "var(--green)";
       return;
     }
 
@@ -436,7 +470,7 @@ for (let i = 1; i <= 4; i++) {
     if (e.key === "Backspace") {
       setTimeout(() => {
         if (!target.value) {
-          target.style.borderColor = "greenyellow";
+          target.style.borderColor = "var(--green)";
         }
       }, 0);
     }
@@ -444,7 +478,6 @@ for (let i = 1; i <= 4; i++) {
 }
 
 function checkConfirmationCode() {
-  const expectedCode = "4257";
   let enteredCode = "";
 
   for (let i = 1; i <= 4; i++) {
@@ -452,7 +485,7 @@ function checkConfirmationCode() {
     if (input) enteredCode += input.value;
   }
 
-  if (enteredCode === expectedCode) {
+  if (expectedCode.length === 4 && enteredCode === expectedCode) {
     setTimeout(() => {
       turnOffBlocking();
     }, 200);

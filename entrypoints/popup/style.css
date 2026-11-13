@@ -1,68 +1,148 @@
-@import url("https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap");
+/* No Distractions popup.
+   One card per screen with the action button below it, on a 4 px grid.
+   Colours: black, off-white, three greys and the ND green, which only ever
+   means "on" (or the one main action). */
+
+:root {
+  --bg: #000;
+  --line: rgb(255 255 255 / 0.14); /* card outline, neutral buttons */
+  --hair: rgb(255 255 255 / 0.07); /* row dividers */
+  --text: #fbfbfb;
+  --text-2: #a3a3a3;
+  --text-3: #676767;
+  --green: #44ff10; /* ND brand green (logo, website) */
+  --red: #ff5c5c;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --popup-w: 224px;
+  --popup-h: 300px;
+}
 
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  box-sizing: border-box;
-  border-radius: 20px;
 }
 
 body {
-  width: 200px;
-  height: 270px;
+  width: var(--popup-w);
+  height: var(--popup-h);
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: black;
-  padding: 0;
-  margin: 0;
+  gap: 12px;
+  padding: 12px 8px;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.35;
+  user-select: none;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
 }
 
 #title {
-  margin-bottom: 10px;
-  margin-top: 10px;
-  color: white;
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+/* ---------- screens: card + one button below ---------- */
+
+#main_menu,
+#settings_menu,
+#strict_info_menu,
+#confirmation_menu {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 #main_menu {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-top: 1px solid rgb(97, 96, 96);
-  width: 100%;
-  height: 100%;
 }
 
-.main_menu_container {
+#settings_menu,
+#strict_info_menu,
+#confirmation_menu {
+  display: none;
+}
+
+.main_menu_container,
+.settings_menu_container,
+.strict_info_container,
+.confirmation_menu_container {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  height: 100%;
   justify-content: center;
-  border-bottom: 1px solid rgb(97, 96, 96);
+  gap: 16px;
+  padding: 16px 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
 }
 
+/* The buttons under the card */
+#toggle_settings,
+#toggle_main_menu,
+#strict_info_back,
+#confirmation_back {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+#toggle_settings:hover,
+#toggle_main_menu:hover,
+#strict_info_back:hover,
+#confirmation_back:hover {
+  border-color: rgb(255 255 255 / 0.3);
+}
+
+/* ---------- main ---------- */
+
 .main_menu_title {
-  font-size: 20px;
-  margin-top: 20px;
-  margin-bottom: -24px;
-  background-color: transparent;
-  color: white;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
   text-align: center;
 }
 
 .main_menu_loading {
+  height: 12px;
+  font-size: 32px;
+  line-height: 0;
+  /* The dot glyphs sit on the baseline; lift them to the middle of the gap. */
+  transform: translateY(-8px);
+  font-weight: 700;
+  letter-spacing: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 46px;
-  background-color: transparent;
-  margin-bottom: 14px;
 }
 
 .main_menu_loading::after {
@@ -83,176 +163,14 @@ body {
 }
 
 .btn {
-  font-size: 16px;
-  border: 1px solid transparent;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  margin-bottom: 30px;
-  background-color: transparent;
-  color: white;
-  border-radius: 10px;
-}
-
-.btn:hover {
-  cursor: pointer;
-}
-
-#toggle_settings,
-#toggle_main_menu {
-  display: flex;
-  border: 1px solid rgb(97, 96, 96);
-  background-color: transparent;
-  color: white;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-}
-
-#toggle_settings:hover,
-#toggle_main_menu:hover {
-  cursor: pointer;
-}
-
-#settings_menu {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  border-top: 1px solid rgb(97, 96, 96);
-}
-
-.settings_menu_container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  border-bottom: 1px solid rgb(97, 96, 96);
-}
-
-.setting {
-  width: 90%;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 8px;
-  background-color: transparent;
-  color: white;
-}
-
-.setting > span {
-  font-size: 16px;
-  flex: 1;
-  min-width: 0;
+  height: 32px;
+  padding: 0 16px;
   white-space: nowrap;
-  border-bottom: 1px solid rgb(97, 96, 96);
-  background-color: transparent;
-  border-end-start-radius: 0px;
-  border-end-end-radius: 5px;
-}
-
-.setting > button {
-  color: white;
-  width: 44px;
-  flex: none;
-  text-align: center;
-  padding: 2px 0;
-  border: 1px solid transparent;
-  background-color: black;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--line);
   border-radius: 10px;
-  font-size: 16px;
-}
-
-.setting > button:hover {
-  cursor: pointer;
-}
-
-#confirmation_menu {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  border-top: 1px solid rgb(97, 96, 96);
-}
-
-.confirmation_menu_container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  border-bottom: 1px solid rgb(97, 96, 96);
-}
-
-.confirmation_title {
-  font-size: 20px;
-  margin-top: 20px;
-  margin-bottom: 10px;
-  background-color: transparent;
-  color: white;
-  text-align: center;
-}
-
-.confirmation_subtitle {
-  font-size: 10px;
-  color: white;
-  text-align: center;
-  margin-bottom: 25px;
-  margin-top: 5px;
-  background-color: transparent;
-}
-
-.confirmation_input_container {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-  background-color: transparent;
-}
-
-.confirmation_input {
-  width: 30px;
-  height: 30px;
-  border: 1px solid greenyellow;
-  border-radius: 5px;
-  background-color: transparent;
-  color: white;
-  text-align: center;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.confirmation_input:focus {
-  outline: none;
-  border-color: greenyellow;
-}
-
-#confirmation_back {
-  display: flex;
-  border: 1px solid rgb(97, 96, 96);
-  background-color: transparent;
-  color: white;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-}
-
-#confirmation_back:hover {
-  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 #general_switch.locked,
@@ -260,48 +178,188 @@ body {
   cursor: default;
 }
 
-#rate_link.bottom {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
 #rate_link {
-  color: greenyellow;
-  background-color: transparent;
   border: none;
-  margin-bottom: 8px;
-  font-size: 14px;
-  margin-left: 5px;
-  margin-right: 5px;
+  font-size: 12px;
+  color: var(--green);
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-#rate_link:hover {
-  cursor: pointer;
+#rate_link.bottom {
+  height: 28px;
 }
 
-/* Settings header: column labels aligned over the two button columns */
-.setting_header {
-  margin-bottom: 4px;
+/* ---------- settings ---------- */
+
+.settings_menu_container {
+  gap: 0;
+  justify-content: flex-start;
+  padding-top: 12px;
 }
-.setting_header > span {
-  border-bottom: none;
+
+.setting {
+  width: 100%;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid var(--hair);
 }
-.setting_col {
-  width: 44px;
+
+.setting > span {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.setting > button {
+  width: 40px;
+  height: 24px;
   flex: none;
-  text-align: center;
-  font-size: 11px;
-  color: rgb(97, 96, 96);
-  background-color: transparent;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
-/* Strict buttons: off by default (gray, not red) */
+/* Strict is an add-on to Block: a step quieter. */
+.setting > button.strict_btn {
+  height: 22px;
+  font-size: 12px;
+}
+
 .setting > button.strict_btn.dimmed {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: default;
 }
+
 .setting > button.strict_btn.locked,
 .setting > button.strict_btn.locked:hover {
   cursor: default;
+}
+
+.setting_header {
+  height: 20px;
+  border-top: none;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.setting_col {
+  width: 40px;
+  flex: none;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* "Strict" + info icon. The icon hangs off the right of the 40 px column so
+   the word stays centred over the strict buttons. */
+.setting_col_strict {
+  position: relative;
+}
+
+.info_btn {
+  position: absolute;
+  top: 50%;
+  right: -12px;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: none;
+  display: grid;
+  place-items: center;
+  color: var(--text-3);
+}
+
+.info_btn:hover {
+  color: var(--text);
+}
+
+.strict_caption {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 11px;
+  line-height: 15px;
+  text-align: center;
+  color: var(--text-3);
+}
+
+/* ---------- strict mode explainer ---------- */
+
+.strict_info_container {
+  gap: 0;
+}
+
+.strict_info_title {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.strict_info_subtitle {
+  margin: 4px 0 12px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.strict_info_row {
+  width: 100%;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--hair);
+  font-size: 12px;
+}
+
+.strict_info_row > span:last-child {
+  color: var(--text-2);
+}
+
+/* ---------- turn-off confirmation ---------- */
+
+.confirmation_title {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.code_digits {
+  font-variant-numeric: tabular-nums;
+}
+
+.confirmation_subtitle {
+  margin-top: -8px;
+  font-size: 11px;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.confirmation_input_container {
+  display: flex;
+  gap: 8px;
+}
+
+.confirmation_input {
+  width: 32px;
+  height: 36px;
+  border: 1px solid var(--green);
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--text);
+  text-align: center;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.confirmation_input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(68 255 16 / 0.25);
 }

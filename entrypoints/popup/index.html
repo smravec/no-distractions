@@ -31,10 +31,10 @@
         <div class="setting setting_header">
           <span></span>
           <div class="setting_col">Block</div>
-          <div class="setting_col">Strict</div>
+          <div class="setting_col setting_col_strict">Strict<button id="strict_info" class="info_btn" aria-label="What is strict mode?" title="What is strict mode?"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></button></div>
         </div>
         <div class="setting">
-          <span>Youtube</span>
+          <span>YouTube</span>
           <button id="youtube">On</button>
           <button id="yt_strict" class="strict_btn">Off</button>
         </div>
@@ -53,18 +53,31 @@
           <button id="reddit">On</button>
           <button id="rd_strict" class="strict_btn">Off</button>
         </div>
+        <div class="strict_caption">Strict also hides people you follow</div>
       </div>
       <button id="toggle_main_menu">Back</button>
+    </div>
+
+    <div id="strict_info_menu">
+      <div class="strict_info_container">
+        <div class="strict_info_title">Strict mode</div>
+        <div class="strict_info_subtitle">Also hides people you follow</div>
+        <div class="strict_info_row"><span>YouTube</span><span>Subscriptions</span></div>
+        <div class="strict_info_row"><span>Facebook</span><span>Friends feed</span></div>
+        <div class="strict_info_row"><span>Instagram</span><span>Following feed</span></div>
+        <div class="strict_info_row"><span>Reddit</span><span>Your communities</span></div>
+      </div>
+      <button id="strict_info_back">Got it</button>
     </div>
 
     <div id="confirmation_menu" style="display: none">
       <div class="confirmation_menu_container">
         <div class="confirmation_title">
-          Type 4 2 5 7<br />
+          Type <span id="confirmation_code" class="code_digits"></span><br />
           to continue
         </div>
         <div class="confirmation_subtitle">
-          *Quick friction to stop autopilot.
+          Quick friction to stop autopilot.
         </div>
         <div class="confirmation_input_container">
           <input

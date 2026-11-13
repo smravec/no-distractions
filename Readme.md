@@ -65,6 +65,8 @@ Set `strictMode` to `true` to force strict mode on for every site.
 - Reddit strict: Communities and Recent hidden in the sidebar
 - YouTube: a single short opens in the normal player
 - Enterprise policy: `strictMode=true` forces strict mode on
+- Cleaner popup: a bit wider, clearer settings, and a short explainer of what strict mode hides
+- Turning off blocking now asks for a new random code every time
 - The uninstall page gets a few anonymous settings (version, sites, strict mode, roughly how long it was installed)
 
 ### Version 1.1
