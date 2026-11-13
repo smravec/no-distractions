@@ -195,6 +195,9 @@ input:focus-visible {
   gap: 0;
   justify-content: flex-start;
   padding-top: 12px;
+  /* Extra room on the right so the info icon after "Strict" isn't pressed
+     against the card edge. */
+  padding-right: 26px;
 }
 
 .setting {
@@ -282,10 +285,14 @@ input:focus-visible {
 }
 
 .strict_caption {
+  /* Use the card's full inner width (the table leaves 26 px on the right for
+     the info icon) and keep it on one line. */
+  margin: 0 -20px 0 -6px;
+  white-space: nowrap;
   margin-top: auto;
   padding-top: 4px;
-  font-size: 11px;
-  line-height: 15px;
+  font-size: 10px;
+  line-height: 14px;
   text-align: center;
   color: var(--text-3);
 }
@@ -304,7 +311,9 @@ input:focus-visible {
 
 .strict_info_subtitle {
   margin: 4px 0 12px;
-  font-size: 12px;
+  font-size: 11px;
+  white-space: nowrap;
+  text-align: center;
   color: var(--text-2);
 }
 
