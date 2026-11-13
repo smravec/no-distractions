@@ -56,6 +56,10 @@ Set `strictMode` to `true` to force strict mode on for every site.
 
 ## Changelog
 
+### Version 1.3
+
+- Bug fixes
+
 ### Version 1.2
 
 - Strict mode: hide posts from accounts you follow too (off by default, turn it on per site in Other settings)
