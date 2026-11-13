@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Screenshot 2 — YouTube</title>
+<link rel="stylesheet" href="common.css" />
+<script src="lib.js"></script>
+<style>
+  :root { --w: 1280px; --h: 800px; }
+  .copy { position: absolute; left: 72px; top: 84px; width: 470px; }
+  .copy .h1 { font-size: 62px; margin-top: 26px; }
+  .copy .sub { font-size: 21px; margin-top: 22px; }
+  .stack { position: absolute; left: 56px; top: 418px; width: 486px; display: grid; gap: 12px; }
+  .win { left: 590px; top: 84px; width: 760px; height: 780px; }
+  .watch { padding: 14px 30px 0; }
+  .player { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; }
+  .player > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ctrl { position: absolute; left: 0; right: 0; bottom: 0; height: 54px; background: linear-gradient(transparent, rgba(0,0,0,.75)); }
+  .prog { position: absolute; left: 14px; right: 14px; bottom: 40px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.3); }
+  .prog i { position: absolute; left: 0; top: 0; bottom: 0; width: 38%; background: #ff0033; border-radius: 2px; }
+  .prog i::after { content: ""; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; border-radius: 50%; background: #ff0033; }
+  .cbtn { position: absolute; left: 16px; bottom: 11px; display: flex; gap: 18px; align-items: center; color: #fff; font: 13px Roboto, sans-serif; }
+  .wt { font: 700 20px/1.3 Roboto, sans-serif; margin-top: 14px; color: #f1f1f1; }
+  .chrow { display: flex; align-items: center; gap: 12px; margin-top: 12px; font-family: Roboto, sans-serif; }
+  .chrow .av { width: 40px; height: 40px; }
+  .chrow b { display: block; font-size: 15px; font-weight: 500; color: #f1f1f1; }
+  .chrow small { font-size: 12.5px; color: #aaa; }
+  .subbtn { margin-left: 14px; background: #f1f1f1; color: #0f0f0f; font-weight: 500; font-size: 14px; padding: 9px 16px; border-radius: 18px; }
+  .desc { margin-top: 14px; background: #272727; border-radius: 12px; padding: 12px 14px; font: 13.5px/1.5 Roboto, sans-serif; color: #e8e8e8; }
+  .desc b { font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="glow" style="width:620px;height:520px;left:700px;top:200px;background:rgba(184,255,60,.12)"></div>
+  <div class="glow" style="width:420px;height:360px;left:-120px;top:420px;background:rgba(255,40,70,.10)"></div>
+
+  <div class="copy">
+    <div class="eyebrow" id="eb"></div>
+    <div class="h1">No Shorts.<br /><span class="hl">No rabbit holes.</span></div>
+    <div class="sub">YouTube opens on your subscriptions. Watch the video you came for — then leave.</div>
+  </div>
+
+  <div class="win">
+    <div id="bar"></div>
+    <div class="ytm" style="top:40px">
+      <div id="top"></div>
+      <div class="watch">
+        <div class="player" id="player">
+          <div class="ctrl"></div>
+          <div class="prog"><i></i></div>
+          <div class="cbtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M3 9v6h4l5 5V4L7 9zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z"/></svg>19:48 / 52:10</div>
+        </div>
+        <div class="wt">Lecture 7: Dynamic Programming, Explained Slowly</div>
+        <div class="chrow"><i class="av" style="background:#e8604c"></i><div><b>Chris Codes</b><small>182K subscribers</small></div><span class="subbtn">Subscribed</span></div>
+        <div class="desc"><b>41K views · 1 day ago</b><br />Part 7 of the algorithms series. We start from the recursive solution and work toward the bottom-up table, one step at a time…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stack" id="stack"></div>
+  <div class="grain"></div>
+<script>
+  inject(YT_CSS + RM_CSS);
+  document.getElementById("eb").innerHTML = tile("yt", 30) + "YouTube";
+  document.getElementById("bar").innerHTML = winBar("<b>youtube.com</b>/watch");
+  document.getElementById("top").innerHTML = ytTop();
+  document.getElementById("player").insertAdjacentHTML("afterbegin", SCENES.desk("#2b3240", "#3a3027"));
+  document.getElementById("stack").innerHTML = [
+    rmCard("Home recommendations", "Opens Subscriptions instead", "Redirected"),
+    rmCard("Shorts", "Shelf, sidebar tab and player"),
+    rmCard("“Up next” suggestions", "No sidebar pulling you onward"),
+    rmCard("End-screen videos", "Nothing waiting when it ends"),
+  ].join("");
+</script>
+</body>
+</html>

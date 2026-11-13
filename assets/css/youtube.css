@@ -142,18 +142,21 @@
 
 /* SHORTS */
 .no-distractions-css .yt-simple-endpoint[title="Shorts"],
-.no-distractions-css .ytd-search grid-shelf-view-model,
+/* Only the "Shorts" shelf mixed into results has a header; the results of the
+   Shorts filter chip are headerless shelves and must stay visible. */
+.no-distractions-css .ytd-search grid-shelf-view-model:has(> yt-section-header-view-model),
 .no-distractions-css #player-shorts-container,
 .no-distractions-css .ytd-shorts,
 .no-distractions-css yt-chip-cloud-chip-renderer:has(yt-formatted-string[title="Shorts"]),
-.no-distractions-css yt-tab-shape[tab-title="Shorts"],
 .no-distractions-css ytd-compact-video-renderer:has(a[href*="/shorts/"]),
 .no-distractions-css ytd-notification-renderer:has(> a[href^="/shorts/"]),
 .no-distractions-css ytd-reel-shelf-renderer,
-.no-distractions-css ytd-rich-grid-renderer[is-shorts-grid],
-.no-distractions-css ytd-rich-item-renderer:has(a[href*="/shorts/"]),
+/* A channel's own Shorts stay visible (a Shorts-only channel would be blank),
+   and so do individual search results: both are sought out, not fed. */
+.no-distractions-css ytd-rich-grid-renderer[is-shorts-grid]:not(ytd-browse[page-subtype="channels"] *),
+.no-distractions-css ytd-rich-item-renderer:has(a[href*="/shorts/"]):not(ytd-browse[page-subtype="channels"] *),
 .no-distractions-css ytd-rich-shelf-renderer[is-shorts],
-.no-distractions-css ytd-video-renderer:has(a[href*="/shorts/"]),
+.no-distractions-css ytd-video-renderer:has(a[href*="/shorts/"]):not(ytd-search *, ytd-browse[page-subtype="channels"] *),
 .no-distractions-css ytm-reel-shelf-renderer,
 .no-distractions-css ytm-rich-grid-renderer.is_shorts,
 .no-distractions-css ytm-video-with-context-renderer:has(a[href*="/shorts/"]),

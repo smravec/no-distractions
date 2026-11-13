@@ -1,3 +1,5 @@
+import { copyFileSync, mkdirSync, rmSync } from 'node:fs';
+import { basename, resolve } from 'node:path';
 import { defineConfig } from 'wxt';
 
 export default defineConfig({
@@ -34,5 +36,14 @@ export default defineConfig({
   },
   runner: {
     disabled: true
-  }
+  },
+  hooks: {
+    // Keep only the newest zip in latest-build/, so it's easy to find for upload.
+    'zip:extension:done': (wxt, zipPath) => {
+      const dir = resolve(wxt.config.root, 'latest-build');
+      rmSync(dir, { recursive: true, force: true });
+      mkdirSync(dir);
+      copyFileSync(zipPath, resolve(dir, basename(zipPath)));
+    },
+  },
 });

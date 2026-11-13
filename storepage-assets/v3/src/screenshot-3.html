@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>3 — Reddit</title>
+<link rel="stylesheet" href="frame.css" />
+<script src="lib.js"></script>
+<script src="kit.js"></script>
+<style>:root { --w: 1280px; --h: 800px; }</style>
+</head>
+<body>
+  <div class="page">
+    <div class="cap">
+      <h1>Reddit without the<br />home feed</h1>
+      <p>r/popular, r/all, Explore and News are hidden too.</p>
+    </div>
+    <div class="stage" id="stage"></div>
+  </div>
+<script>
+  document.body.insertAdjacentHTML("afterbegin", mark());
+  document.getElementById("stage").innerHTML = pair("reddit-before.png", "reddit-after.png");
+</script>
+</body>
+</html>

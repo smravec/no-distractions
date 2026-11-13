@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Screenshot 5 — Every platform</title>
+<link rel="stylesheet" href="common.css" />
+<script src="lib.js"></script>
+<style>
+  :root { --w: 1280px; --h: 800px; }
+  .copy { position: absolute; left: 80px; top: 70px; }
+  .copy .h1 { font-size: 62px; }
+  .side { position: absolute; left: 760px; top: 98px; width: 440px; font-size: 20px; }
+  .cards { position: absolute; left: 80px; right: 80px; top: 282px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .c { border-radius: 22px; padding: 24px 22px 22px; background: linear-gradient(180deg, rgba(30,30,32,.9), rgba(14,14,15,.9));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 0 0 1px rgba(255,255,255,.08), 0 30px 60px -24px rgba(0,0,0,.9); position: relative; overflow: hidden; }
+  .c::before { content: ""; position: absolute; left: -40px; top: -60px; width: 220px; height: 160px; border-radius: 50%; filter: blur(50px); opacity: .22; background: var(--tint); }
+  .ch { display: flex; align-items: center; gap: 14px; position: relative; }
+  .ch b { font-size: 23px; font-weight: 650; letter-spacing: -.02em; }
+  .lbl { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin: 22px 0 12px; }
+  .c ul { list-style: none; display: grid; gap: 11px; }
+  .c li { display: flex; align-items: center; gap: 10px; font-size: 16.5px; color: #dcdcd9; letter-spacing: -.01em; }
+  .c li::before { content: ""; flex: none; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,77,90,.14) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff5a66' stroke-width='3.5' stroke-linecap='round'><path d='M7 7l10 10M17 7 7 17'/></svg>") center/10px no-repeat; }
+  .keep { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 15.5px; color: var(--lime); display: flex; gap: 9px; align-items: flex-start; line-height: 1.35; }
+  .keep svg { flex: none; margin-top: 1px; }
+  .trust { position: absolute; left: 80px; right: 80px; top: 700px; height: 60px; border-radius: 16px; display: flex; justify-content: center; align-items: center; gap: 44px;
+    background: rgba(255,255,255,.03); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07); font-size: 17px; color: #d8d8d5; font-weight: 500; }
+  .trust span { display: inline-flex; align-items: center; gap: 10px; }
+  .trust svg { width: 20px; height: 20px; }
+  .trust i { width: 4px; height: 4px; border-radius: 50%; background: #3a3a3a; }
+</style>
+</head>
+<body>
+  <div class="glow" style="width:900px;height:360px;left:190px;top:320px;background:rgba(184,255,60,.08)"></div>
+  <div class="grid-bg"></div>
+
+  <div class="copy">
+    <div class="h1">One extension.<br /><span class="hl">Every feed.</span></div>
+  </div>
+  <div class="side sub">Keep what you came for. Lose the endless scroll. Switch any site on or off in one click.</div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="trust" id="trust"></div>
+  <div class="grain"></div>
+<script>
+  const check = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b8ff3c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const P = [
+    ["yt", "#ff2a4a", ["Home recommendations", "Shorts", "Trending & Explore", "End-screen suggestions"], "Your subscriptions"],
+    ["ig", "#f0306f", ["Reels", "Explore page", "Suggested posts", "Suggested accounts"], "Posts from people you follow"],
+    ["fb", "#2b8cff", ["News Feed", "Reels", "Watch & video tab", "Live videos"], "Messages, groups & profiles"],
+    ["rd", "#ff5a1f", ["Home feed", "r/popular & r/all", "Explore & News", "Games & Best of Reddit"], "The subreddits you open"],
+  ];
+  document.getElementById("cards").innerHTML = P.map(([id, tint, rm, keep]) => `
+    <div class="c" style="--tint:${tint}">
+      <div class="ch">${tile(id, 46)}<b>${NAME[id]}</b></div>
+      <div class="lbl">Removes</div>
+      <ul>${rm.map((r) => `<li>${r}</li>`).join("")}</ul>
+      <div class="keep">${check}<span>Keeps ${keep.charAt(0).toLowerCase() + keep.slice(1)}</span></div>
+    </div>`).join("");
+  document.getElementById("trust").innerHTML = [
+    `<span><svg viewBox="0 0 24 24" fill="#d8d8d5">${ICON.gh}</svg>Free &amp; open source</span>`,
+    `<span><svg viewBox="0 0 24 24" fill="none" stroke="#d8d8d5" stroke-width="2" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5" stroke-linecap="round"/></svg>Zero data collected</span>`,
+    `<span><svg viewBox="0 0 24 24" fill="none" stroke="#d8d8d5" stroke-width="2" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Works instantly, no setup</span>`,
+  ].join("<i></i>");
+</script>
+</body>
+</html>

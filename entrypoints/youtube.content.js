@@ -29,6 +29,21 @@ export default defineContentScript({
         return;
       }
 
+      // A single short opens in the normal player, which has no swipe to the
+      // next one. Without an ID, /shorts is the endless feed: no way in.
+      function redirectShorts(currentPath) {
+        if (!/^\/shorts(\/.*)?$/.test(currentPath)) {
+          return false;
+        }
+        const shortId = currentPath.match(/^\/shorts\/([\w-]+)\/?$/);
+        window.location.replace(
+          shortId
+            ? window.location.origin + "/watch?v=" + shortId[1]
+            : "https://www.youtube.com/feed/subscriptions",
+        );
+        return true;
+      }
+
       // --- REDIRECT LOGIC respecting switches ---
       function redirectToSubscriptionsFeed() {
         const currentUrl = window.location.href;
@@ -43,11 +58,7 @@ export default defineContentScript({
           window.location.replace("https://www.youtube.com/feed/subscriptions");
           return;
         }
-        // Redirect if on /shorts or /shorts/anything
-        if (/^\/shorts(\/.*)?$/.test(currentPath)) {
-          window.location.replace("https://www.youtube.com/feed/subscriptions");
-          return;
-        }
+        redirectShorts(currentPath);
       }
 
       // Monitor URL changes for SPA navigation
@@ -64,8 +75,7 @@ export default defineContentScript({
           window.location.replace("https://www.youtube.com/feed/subscriptions");
           return;
         }
-        if (/^\/shorts(\/.*)?$/.test(currentPath)) {
-          window.location.replace("https://www.youtube.com/feed/subscriptions");
+        if (redirectShorts(currentPath)) {
           return;
         }
         updateHomeLandingState();
@@ -319,6 +329,38 @@ export default defineContentScript({
         }
       }
 
+      // Catch clicks on a short before YouTube's router starts its player, so
+      // it never plays there first. A full load on purpose: yt-navigate to a
+      // watch page leaves the player cued instead of playing. Modified clicks
+      // (new tab) keep their default and are redirected when the page loads.
+      function wireShortsLinks() {
+        document.addEventListener(
+          "click",
+          (e) => {
+            if (
+              e.button !== 0 ||
+              e.metaKey ||
+              e.ctrlKey ||
+              e.shiftKey ||
+              e.altKey
+            ) {
+              return;
+            }
+            const link = e.target.closest?.('a[href^="/shorts/"]');
+            const shortId = link
+              ?.getAttribute("href")
+              .match(/^\/shorts\/([\w-]+)/);
+            if (!shortId) {
+              return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.assign("/watch?v=" + shortId[1]);
+          },
+          true,
+        );
+      }
+
       function isHomeLandingPath() {
         const p = window.location.pathname;
         return IS_DESKTOP && (p === "/" || p === "");
@@ -491,6 +533,8 @@ export default defineContentScript({
         });
         window._noDistractionsYT_HistoryPatched = true;
       }
+
+      wireShortsLinks();
 
       // Run redirect check immediately
       redirectToSubscriptionsFeed();

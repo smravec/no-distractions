@@ -30,3 +30,6 @@ web-ext.config.ts
 # Dev browser profile (logins) and check screenshots
 .dev-profile
 dev-check.png
+
+# Newest zip only, written by pnpm zip
+latest-build

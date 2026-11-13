@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Marquee promo</title>
+<link rel="stylesheet" href="frame.css" />
+<script src="lib.js"></script>
+<script src="kit.js"></script>
+<style>
+  :root { --w: 1400px; --h: 560px; }
+  .mark { left: 80px; top: 72px; right: auto; width: 52px; height: 52px; }
+  .name { position: absolute; left: 148px; top: 87px; font-size: 22px; font-weight: 500; }
+  h1 { position: absolute; left: 80px; top: 176px; width: 560px; font-size: 58px; line-height: 1.04; letter-spacing: -.025em; font-weight: 700; }
+  .ic { position: absolute; left: 80px; top: 412px; display: flex; align-items: center; gap: 16px; font-size: 20px; color: var(--grey); }
+  .side { position: absolute; left: 676px; right: 56px; top: 132px; }
+  .side .lbl { font-size: 15px; }
+  .side .pair { gap: 16px; }
+</style>
+</head>
+<body>
+  <div class="name">No Distractions</div>
+  <h1>Remove Shorts, Reels and recommended feeds</h1>
+  <div class="ic" id="ic"></div>
+  <div class="side" id="side"></div>
+<script>
+  document.body.insertAdjacentHTML("afterbegin", mark());
+  document.getElementById("ic").innerHTML = flatTiles(36, 10) + "<span>Free and open source</span>";
+  document.getElementById("side").innerHTML = pair("yt-watch-before.png", "yt-watch-after.png");
+</script>
+</body>
+</html>

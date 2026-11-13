@@ -1,0 +1,28 @@
+/* v3: real captures, plain captions. Black, white, and the popup's greenyellow — nothing else. */
+:root { --g: #adff2f; --grey: #9a9a9a; --rule: #2a2a2a; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: var(--w); height: var(--h); overflow: hidden; }
+body { background: #000; color: #fff; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; position: relative; }
+
+.page { position: absolute; inset: 52px 48px 40px; display: flex; flex-direction: column; }
+.cap { padding: 0 16px; padding-right: 90px; }
+.cap h1 { font-weight: 700; font-size: 54px; line-height: 1.05; letter-spacing: -.025em; }
+.cap p { font-size: 22px; color: var(--grey); margin-top: 14px; line-height: 1.35; }
+.stage { margin-top: auto; }
+
+.mark { position: absolute; right: 64px; top: 56px; width: 48px; height: 48px; border-radius: 11px; background: #000; box-shadow: inset 0 0 0 1px #3a3a3a; }
+.mark svg { width: 100%; height: 100%; display: block; }
+
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.shot { border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 1px var(--rule); background: #fff; }
+.shot img { display: block; width: 100%; }
+.lbl { display: flex; align-items: center; gap: 9px; font-size: 16px; font-weight: 500; color: var(--grey); margin: 0 0 12px 2px; }
+.lbl::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #4a4a4a; }
+.lbl.on { color: var(--g); }
+.lbl.on::before { background: var(--g); }
+
+.tiles { display: inline-flex; gap: 8px; vertical-align: middle; }
+.t { display: grid; place-items: center; border-radius: 24%; }
+.t svg { width: 58%; height: 58%; fill: #fff; }
+.t.yt { background: #ff0033; } .t.ig { background: linear-gradient(45deg, #f9a83b, #e1306c 50%, #8a3ab9); }
+.t.fb { background: #0866ff; } .t.rd { background: #ff4500; }

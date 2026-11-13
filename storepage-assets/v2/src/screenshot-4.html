@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Screenshot 4 — Friction</title>
+<link rel="stylesheet" href="common.css" />
+<script src="lib.js"></script>
+<style>
+  :root { --w: 1280px; --h: 800px; }
+  .head { position: absolute; left: 0; right: 0; top: 62px; text-align: center; }
+  .head .h1 { font-size: 60px; }
+  .head .sub { font-size: 21px; margin-top: 18px; }
+  .row { position: absolute; left: 0; right: 0; top: 282px; display: flex; justify-content: center; gap: 96px; }
+  .step { width: 300px; position: relative; }
+  .frame { width: 300px; height: 405px; border-radius: 14px; overflow: hidden; background: #000;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.16), 0 40px 80px -20px rgba(0,0,0,.95); }
+  .frame .pop { transform: scale(1.5); transform-origin: 0 0; }
+  .step.mid .frame { box-shadow: 0 0 0 1px rgba(184,255,60,.55), 0 0 60px -10px rgba(184,255,60,.45), 0 40px 80px -20px rgba(0,0,0,.95); }
+  .cap { display: flex; gap: 12px; align-items: flex-start; margin-top: 22px; }
+  .num { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; font-weight: 700; color: #0b1200; background: var(--lime); }
+  .cap div b { display: block; font-size: 19px; font-weight: 600; letter-spacing: -.015em; }
+  .cap div span { display: block; font-size: 15.5px; color: var(--muted); margin-top: 3px; }
+  .arrow { position: absolute; top: 186px; right: -82px; width: 68px; }
+</style>
+</head>
+<body>
+  <div class="glow" style="width:760px;height:460px;left:260px;top:300px;background:rgba(184,255,60,.12)"></div>
+  <div class="grid-bg"></div>
+
+  <div class="head">
+    <div class="h1">Pausing takes intent,<br /><span class="hl">not impulse.</span></div>
+    <div class="sub">A quick code breaks the autopilot — and blocking turns itself back on after an hour.</div>
+  </div>
+
+  <div class="row" id="row"></div>
+  <div class="grain"></div>
+<script>
+  const arrow = '<svg class="arrow" viewBox="0 0 68 24" fill="none" stroke="#b8ff3c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h60" stroke-dasharray="2 7" opacity=".7"/><path d="M54 4l9 8-9 8"/></svg>';
+  const steps = [
+    ["on", "Always on", "Feeds are blocked by default."],
+    ["code", "Type a random code", "Four digits. Every single time."],
+    ["paused", "Back on in an hour", "Blocking re-enables automatically."],
+  ];
+  inject(POP_CSS);
+  document.getElementById("row").innerHTML = steps.map(([s, t, d], i) => `
+    <div class="step ${i === 1 ? "mid" : ""}">
+      <div class="frame">${popup(s)}</div>
+      <div class="cap"><span class="num">${i + 1}</span><div><b>${t}</b><span>${d}</span></div></div>
+      ${i < 2 ? arrow : ""}
+    </div>`).join("");
+</script>
+</body>
+</html>

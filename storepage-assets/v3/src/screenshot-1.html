@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>1 — Recommendations</title>
+<link rel="stylesheet" href="frame.css" />
+<script src="lib.js"></script>
+<script src="kit.js"></script>
+<style>:root { --w: 1280px; --h: 800px; }</style>
+</head>
+<body>
+  <div class="page">
+    <div class="cap">
+      <h1>Remove Shorts, Reels and<br />recommended feeds</h1>
+      <p id="sub"></p>
+    </div>
+    <div class="stage" id="stage"></div>
+  </div>
+<script>
+  document.body.insertAdjacentHTML("afterbegin", mark());
+  document.getElementById("sub").innerHTML = flatTiles(26) + "&nbsp;&nbsp;YouTube, Instagram, Facebook and Reddit";
+  document.getElementById("stage").innerHTML = pair("yt-watch-before.png", "yt-watch-after.png");
+</script>
+</body>
+</html>

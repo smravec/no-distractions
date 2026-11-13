@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Small promo</title>
+<link rel="stylesheet" href="frame.css" />
+<script src="lib.js"></script>
+<script src="kit.js"></script>
+<style>
+  :root { --w: 440px; --h: 280px; }
+  .mark { left: 26px; top: 26px; right: auto; width: 46px; height: 46px; }
+  .name { position: absolute; left: 86px; top: 39px; font-size: 19px; font-weight: 500; }
+  h1 { position: absolute; left: 26px; top: 102px; font-size: 34px; line-height: 1.05; letter-spacing: -.025em; font-weight: 700; }
+  .ic { position: absolute; left: 26px; bottom: 26px; }
+</style>
+</head>
+<body>
+  <div class="name">No Distractions</div>
+  <h1>Block Shorts, Reels<br />and feeds</h1>
+  <div class="ic" id="ic"></div>
+<script>
+  document.body.insertAdjacentHTML("afterbegin", mark());
+  document.getElementById("ic").innerHTML = flatTiles(32, 10);
+</script>
+</body>
+</html>

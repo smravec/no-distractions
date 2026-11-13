@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Marquee promo tile</title>
+<link rel="stylesheet" href="common.css" />
+<script src="lib.js"></script>
+<style>
+  :root { --w: 1400px; --h: 560px; }
+  .copy { position: absolute; left: 96px; top: 74px; width: 600px; }
+  .copy .h1 { font-size: 74px; margin-top: 46px; }
+  .copy .sub { font-size: 21px; margin-top: 22px; width: 520px; }
+  .icons { margin-top: 34px; }
+  .scene { position: absolute; left: 740px; top: 64px; width: 900px; height: 600px; perspective: 1800px; }
+  .win { position: absolute; inset: 0; transform: rotateY(-16deg) rotateX(5deg); transform-origin: 0 50%; }
+  .cmp { position: absolute; top: 40px; left: 0; right: 0; bottom: 0; }
+  .cmp > div { position: absolute; inset: 0; }
+  .cmp .after .yt-h { visibility: hidden; }
+  .cmp .after { clip-path: inset(0 0 0 423px); }
+  .divider { position: absolute; top: 40px; bottom: 0; left: 423px; width: 2px; margin-left: -1px; background: var(--lime); box-shadow: 0 0 24px rgba(184,255,60,.7); }
+  .handle { position: absolute; left: 423px; top: 200px; width: 42px; height: 42px; margin-left: -21px; border-radius: 50%; background: var(--lime); display: grid; place-items: center; box-shadow: 0 0 0 6px rgba(184,255,60,.18), 0 10px 30px rgba(0,0,0,.6); }
+</style>
+</head>
+<body>
+  <div class="glow" style="width:760px;height:460px;left:700px;top:120px;background:rgba(184,255,60,.15)"></div>
+  <div class="grid-bg" style="-webkit-mask-image:radial-gradient(ellipse 60% 70% at 30% 40%,#000 10%,transparent 70%)"></div>
+
+  <div class="copy">
+    <div class="brand" id="brand"></div>
+    <div class="h1">Social media,<br /><span class="hl">minus the feed.</span></div>
+    <div class="sub">Block Reels, Shorts &amp; suggested posts on YouTube, Instagram, Facebook &amp; Reddit.</div>
+    <div class="icons" id="icons"></div>
+  </div>
+
+  <div class="scene">
+    <div class="win">
+      <div id="bar"></div>
+      <div class="cmp"><div id="before"></div><div class="after" id="after"></div></div>
+      <div class="divider"></div>
+      <div class="handle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0b1200" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-5 6 5 6M15 6l5 6-5 6"/></svg></div>
+    </div>
+  </div>
+  <div class="grain"></div>
+<script>
+  inject(YT_CSS);
+  document.getElementById("brand").innerHTML = logo(52) + '<span class="brand-name" style="font-size:24px">No Distractions</span>';
+  document.getElementById("icons").innerHTML = tiles(46, 12);
+  document.getElementById("bar").innerHTML = winBar("<b>youtube.com</b>");
+  document.getElementById("before").innerHTML = ytBefore({ cols: 3, scols: 5 });
+  document.getElementById("after").innerHTML = ytAfter({ cols: 3 });
+</script>
+</body>
+</html>

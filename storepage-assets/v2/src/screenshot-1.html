@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Screenshot 1 — Hero</title>
+<link rel="stylesheet" href="common.css" />
+<script src="lib.js"></script>
+<style>
+  :root { --w: 1280px; --h: 800px; }
+  .top { position: absolute; left: 56px; right: 56px; top: 40px; display: flex; justify-content: space-between; align-items: center; }
+  .head { position: absolute; left: 0; right: 0; top: 104px; text-align: center; }
+  .head .h1 { font-size: 70px; }
+  .head .sub { font-size: 23px; margin-top: 20px; }
+  .win { left: 80px; width: 1120px; top: 352px; height: 520px; }
+  .cmp { position: absolute; top: 40px; left: 0; right: 0; bottom: 0; }
+  /* split sits in the gutter between card columns 2 and 3 so no text gets sliced */
+  .cmp .after { position: absolute; inset: 0; clip-path: inset(0 0 0 650px); }
+  .cmp .before { position: absolute; inset: 0; }
+  .divider { position: absolute; top: 40px; bottom: 0; left: 650px; width: 2px; margin-left: -1px; background: var(--lime); box-shadow: 0 0 24px rgba(184,255,60,.7); }
+  .handle { position: absolute; left: 650px; top: 214px; width: 46px; height: 46px; margin-left: -23px; border-radius: 50%; background: var(--lime); display: grid; place-items: center; box-shadow: 0 0 0 6px rgba(184,255,60,.18), 0 10px 30px rgba(0,0,0,.6); }
+  .tag { position: absolute; top: 732px; z-index: 5; box-shadow: 0 10px 30px rgba(0,0,0,.6); font-size: 15px; padding: 9px 16px; }
+</style>
+</head>
+<body>
+  <div class="glow" style="width:900px;height:420px;left:190px;top:280px;background:rgba(184,255,60,.16)"></div>
+  <div class="grid-bg"></div>
+
+  <div class="top">
+    <div class="brand" id="brand"></div>
+    <div id="tiles"></div>
+  </div>
+
+  <div class="head">
+    <div class="h1">Social media,<br /><span class="hl">minus the feed.</span></div>
+    <div class="sub">Blocks Reels, Shorts and suggested posts. Keeps the people you actually follow.</div>
+  </div>
+
+  <div class="win">
+    <div id="bar"></div>
+    <div class="cmp">
+      <div class="before" id="before"></div>
+      <div class="after" id="after"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="handle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0b1200" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l-5 6 5 6M15 6l5 6-5 6"/></svg></div>
+  </div>
+  <span class="tag pill pill-dark" style="left:500px">Before</span>
+  <span class="tag pill pill-lime" style="left:752px">After · No Distractions</span>
+
+  <div class="grain"></div>
+<script>
+  inject(YT_CSS);
+  document.getElementById("brand").innerHTML = logo(46) + '<span class="brand-name">No Distractions</span>';
+  document.getElementById("tiles").innerHTML = tiles(40, 10);
+  document.getElementById("bar").innerHTML = winBar("<b>youtube.com</b>");
+  document.getElementById("before").innerHTML = ytBefore({ cols: 4, scols: 6 });
+  document.getElementById("after").innerHTML = ytAfter({ cols: 4 });
+</script>
+</body>
+</html>

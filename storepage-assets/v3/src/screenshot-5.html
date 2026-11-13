@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>5 — Sites</title>
+<link rel="stylesheet" href="frame.css" />
+<script src="lib.js"></script>
+<script src="kit.js"></script>
+<style>
+  :root { --w: 1280px; --h: 800px; }
+  .wrap { display: flex; gap: 64px; align-items: flex-start; padding: 0 16px; }
+  .wrap > img { width: 320px; height: 432px; border-radius: 10px; box-shadow: 0 0 0 1px #3a3a3a; flex: none; }
+  table { border-collapse: collapse; flex: 1; }
+  td { padding: 17px 0; border-top: 1px solid var(--rule); vertical-align: top; }
+  tr:first-child td { border-top: none; padding-top: 4px; }
+  td.s { width: 210px; font-size: 24px; font-weight: 700; }
+  td.s span { display: inline-flex; align-items: center; gap: 12px; }
+  td.r { font-size: 19px; color: var(--grey); line-height: 1.4; }
+  .foot { margin-top: 26px; padding: 18px 16px 0; border-top: 1px solid var(--rule); font-size: 18px; color: var(--grey); }
+  .foot b { color: #fff; font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="cap">
+      <h1>One switch per site</h1>
+      <p>All four are on by default. Turn any of them off in the popup.</p>
+    </div>
+    <div class="stage">
+      <div class="wrap">
+        <img src="captures/popup-settings.png" />
+        <table id="t"></table>
+      </div>
+      <div class="foot"><b>Free</b> &nbsp;·&nbsp; <b>Open source</b> (MIT) &nbsp;·&nbsp; <b>Collects no data</b></div>
+    </div>
+  </div>
+<script>
+  document.body.insertAdjacentHTML("afterbegin", mark());
+  const rows = [
+    ["yt", "Home feed, Shorts, Trending, Up next sidebar, end-screen videos"],
+    ["ig", "Reels, Explore, suggested posts and accounts"],
+    ["fb", "News Feed, Reels, Watch, Live"],
+    ["rd", "Home feed, r/popular, r/all, Explore, News, Games"],
+  ];
+  document.getElementById("t").innerHTML = rows.map(([id, r]) => `<tr><td class="s"><span><span class="t ${id}" style="width:30px;height:30px"><svg viewBox="0 0 24 24">${ICON[id]}</svg></span>${NAME[id]}</span></td><td class="r">${r}</td></tr>`).join("");
+</script>
+</body>
+</html>
