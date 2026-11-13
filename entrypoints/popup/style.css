@@ -1,9 +1,10 @@
 /* No Distractions popup.
    One card per screen with the action button below it, on a 4 px grid.
-   Colours: black, off-white, three greys, greenyellow and red. */
+   Colours: black, a near-black card, off-white, three greys, greenyellow and red. */
 
 :root {
   --bg: #000;
+  --surface: #0d0d0d; /* cards, a step off the black around them */
   --line: rgb(255 255 255 / 0.14); /* card outline, neutral buttons */
   --hair: rgb(255 255 255 / 0.07); /* row dividers */
   --text: #fbfbfb;
@@ -99,6 +100,7 @@ input:focus-visible {
   padding: 16px 12px;
   border: 1px solid var(--line);
   border-radius: 16px;
+  background-color: var(--surface);
 }
 
 /* The buttons under the card */
