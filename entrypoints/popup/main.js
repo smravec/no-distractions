@@ -1,4 +1,5 @@
 import './style.css';
+import { STRICT_KEYS, STRICT_SITES } from "../../utils/strict.js";
 
 let general_switch = true;
 let yt = true;
@@ -55,12 +56,14 @@ browser.storage.sync.get(["yt"]).then((result) => {
   yt = result.yt !== undefined ? result.yt : true;
   yt_btn.style.borderColor = yt ? "greenyellow" : "red";
   updateSettingsButtonText(yt_btn, yt);
+  renderStrict("yt");
 });
 
 yt_btn.addEventListener("click", () => {
   yt = !yt;
   yt_btn.style.borderColor = yt ? "greenyellow" : "red";
   updateSettingsButtonText(yt_btn, yt);
+  renderStrict("yt");
   browser.storage.sync.set({ yt });
   browser.tabs.query({}).then((tabs) => {
     tabs.forEach((tab) => {
@@ -77,12 +80,14 @@ browser.storage.sync.get(["fb"]).then((result) => {
   fb = result.fb !== undefined ? result.fb : true;
   fb_btn.style.borderColor = fb ? "greenyellow" : "red";
   updateSettingsButtonText(fb_btn, fb);
+  renderStrict("fb");
 });
 
 fb_btn.addEventListener("click", () => {
   fb = !fb;
   fb_btn.style.borderColor = fb ? "greenyellow" : "red";
   updateSettingsButtonText(fb_btn, fb);
+  renderStrict("fb");
   browser.storage.sync.set({ fb });
   browser.tabs.query({}).then((tabs) => {
     tabs.forEach((tab) => {
@@ -99,12 +104,14 @@ browser.storage.sync.get(["ig"]).then((result) => {
   ig = result.ig !== undefined ? result.ig : true;
   ig_btn.style.borderColor = ig ? "greenyellow" : "red";
   updateSettingsButtonText(ig_btn, ig);
+  renderStrict("ig");
 });
 
 ig_btn.addEventListener("click", () => {
   ig = !ig;
   ig_btn.style.borderColor = ig ? "greenyellow" : "red";
   updateSettingsButtonText(ig_btn, ig);
+  renderStrict("ig");
   browser.storage.sync.set({ ig });
   browser.tabs.query({}).then((tabs) => {
     tabs.forEach((tab) => {
@@ -121,12 +128,14 @@ browser.storage.sync.get(["rd"]).then((result) => {
   rd = result.rd !== undefined ? result.rd : true;
   rd_btn.style.borderColor = rd ? "greenyellow" : "red";
   updateSettingsButtonText(rd_btn, rd);
+  renderStrict("rd");
 });
 
 rd_btn.addEventListener("click", () => {
   rd = !rd;
   rd_btn.style.borderColor = rd ? "greenyellow" : "red";
   updateSettingsButtonText(rd_btn, rd);
+  renderStrict("rd");
   browser.storage.sync.set({ rd });
   browser.tabs.query({}).then((tabs) => {
     tabs.forEach((tab) => {
@@ -134,6 +143,74 @@ rd_btn.addEventListener("click", () => {
         browser.tabs.reload(tab.id);
       }
     });
+  });
+});
+
+// ===== STRICT MODE (per site) =====
+// Off by default. Dimmed while the site's blocking is off; locked "On" when
+// the enterprise policy forces strictMode.
+const GRAY = "rgb(97, 96, 96)";
+const strictState = { yt: false, fb: false, ig: false, rd: false };
+let strictForced = false;
+
+const strictButtons = {
+  yt: document.getElementById("yt_strict"),
+  fb: document.getElementById("fb_strict"),
+  ig: document.getElementById("ig_strict"),
+  rd: document.getElementById("rd_strict"),
+};
+
+function siteBlockOn(site) {
+  return { yt, fb, ig, rd }[site];
+}
+
+function siteTabMatches(site, url) {
+  if (!url) return false;
+  if (site === "yt") return isBlockedYouTubeUrl(url);
+  if (site === "fb") return url.includes("facebook.com");
+  if (site === "ig") return url.includes("instagram.com");
+  if (site === "rd") return url.includes("reddit.com");
+  return false;
+}
+
+function reloadSiteTabs(site) {
+  browser.tabs.query({}).then((tabs) => {
+    tabs.forEach((tab) => {
+      if (tab.id && siteTabMatches(site, tab.url)) {
+        browser.tabs.reload(tab.id);
+      }
+    });
+  });
+}
+
+function renderStrict(site) {
+  const btn = strictButtons[site];
+  if (!btn) return;
+  const on = strictForced || strictState[site];
+  btn.textContent = on ? "On" : "Off";
+  btn.style.borderColor = !strictForced && on ? "greenyellow" : GRAY;
+  btn.classList.toggle("locked", strictForced);
+  btn.classList.toggle("dimmed", !siteBlockOn(site));
+}
+
+function renderAllStrict() {
+  STRICT_SITES.forEach(renderStrict);
+}
+
+browser.storage.sync.get(Object.values(STRICT_KEYS)).then((result) => {
+  STRICT_SITES.forEach((site) => {
+    strictState[site] = result[STRICT_KEYS[site]] === true;
+  });
+  renderAllStrict();
+});
+
+STRICT_SITES.forEach((site) => {
+  strictButtons[site]?.addEventListener("click", () => {
+    if (strictForced || !siteBlockOn(site)) return; // locked / dimmed
+    strictState[site] = !strictState[site];
+    renderStrict(site);
+    browser.storage.sync.set({ [STRICT_KEYS[site]]: strictState[site] });
+    reloadSiteTabs(site);
   });
 });
 
@@ -169,10 +246,12 @@ function applyPausePolicy() {
 }
 
 browser.storage.managed
-  .get({ allowPause: true })
+  .get({ allowPause: true, strictMode: false })
   .then((result) => {
     pauseAllowed = !result || result.allowPause !== false;
+    strictForced = !!result && result.strictMode === true;
     applyPausePolicy();
+    renderAllStrict();
   })
   .catch(() => {
     // storage.managed unavailable (no policy configured) — pausing stays allowed
@@ -182,6 +261,10 @@ browser.storage.onChanged.addListener((changes, area) => {
   if (area === "managed" && changes.allowPause) {
     pauseAllowed = changes.allowPause.newValue !== false;
     applyPausePolicy();
+  }
+  if (area === "managed" && changes.strictMode) {
+    strictForced = changes.strictMode.newValue === true;
+    renderAllStrict();
   }
 });
 

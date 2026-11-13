@@ -9,6 +9,7 @@ const COMPOSER_FILTERS = ["friends", "favorites", "groups", "pages"];
 const FEEDS_PANEL_LINK = "[role=navigation] a[href='/?filter=favorites&sk=h_chr']";
 const CARD_SELECTOR = "[data-nd-fb-composer]";
 const COMPOSING_CLASS = "nd-fb-composing";
+const NOTE_SELECTOR = ".nd-fb-strict-note";
 
 // One open flow at a time; a double click must not toggle the menu twice.
 let busy = false;
@@ -201,6 +202,45 @@ export function fbRemoveComposer() {
   const root = document.documentElement;
   if (root.classList.contains(COMPOSING_CLASS)) {
     root.classList.remove(COMPOSING_CLASS);
+  }
+}
+
+// STRICT MODE note, right after the card. facebook.css hides every sibling
+// after the card except this note, so the feed list goes while the card
+// stays. fbSyncComposer keeps the card only while it directly follows the
+// anchor, so a note after it never disturbs that check.
+function buildStrictNote() {
+  const note = document.createElement("div");
+  note.className = "nd-fb-strict-note";
+  note.setAttribute("data-nd-fb-strict-note", "1");
+  const title = document.createElement("div");
+  title.className = "nd-fb-strict-note-title";
+  title.textContent = "Strict mode is on";
+  const text = document.createElement("div");
+  text.className = "nd-fb-strict-note-text";
+  text.textContent = "Posts from people you follow are hidden.";
+  note.append(title, text);
+  return note;
+}
+
+// Runs on every observer pass: no DOM write when already right.
+export function fbSyncStrictNote(strict) {
+  const card = strict ? document.querySelector(CARD_SELECTOR) : null;
+  const next = card ? card.nextElementSibling : null;
+  const keep = next && next.matches(NOTE_SELECTOR) ? next : null;
+  for (const n of document.querySelectorAll(NOTE_SELECTOR)) {
+    if (n !== keep) {
+      n.remove();
+    }
+  }
+  if (card && !keep) {
+    card.after(buildStrictNote());
+  }
+}
+
+export function fbRemoveStrictNote() {
+  for (const n of document.querySelectorAll(NOTE_SELECTOR)) {
+    n.remove();
   }
 }
 

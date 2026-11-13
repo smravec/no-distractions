@@ -139,6 +139,40 @@
   background-image: url("https://static.xx.fbcdn.net/rsrc.php/yr/r/t40HYuD0sbT.webp");
 }
 
+/* STRICT MODE: on Feeds views with our composer card, everything after the
+   card (the feed list) is hidden except the strict note. No card (other
+   route, layout change) means nothing is hidden. display:none also stops
+   the feed's load-more sentinel from firing. */
+.no-distractions-css.nd-fb-strict div[role="main"] [data-nd-fb-composer] ~ :not(.nd-fb-strict-note) {
+  display: none !important;
+}
+
+.no-distractions-css .nd-fb-strict-note {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 20px 16px;
+  margin: 0 0 16px;
+  background: var(--card-background);
+  border-radius: var(--card-corner-radius, 12px);
+  box-shadow: 0 1px 2px var(--shadow-2);
+  text-align: center;
+  font-family: inherit;
+}
+
+.no-distractions-css .nd-fb-strict-note-title {
+  color: var(--primary-text);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.no-distractions-css .nd-fb-strict-note-text {
+  margin-top: 4px;
+  color: var(--secondary-text);
+  font-size: 15px;
+  line-height: 20px;
+}
+
 /* SHORTCUTS SECTION in the Feeds panel, built by facebook-shortcuts from
    cloned Feeds rows. Icons come from Facebook's own left-nav sprite. */
 .no-distractions-css .nd-fb-shortcuts-divider {

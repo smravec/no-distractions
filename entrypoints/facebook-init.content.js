@@ -29,6 +29,19 @@ export default defineContentScript({
       return;
     }
 
+    // Strict mode from last session's cache, so the Feeds list is hidden
+    // before it paints. facebook.content.js owns the class afterwards.
+    try {
+      if (
+        localStorage.getItem("nd-fb-enabled") === "1" &&
+        localStorage.getItem("nd-fb-strict") === "1"
+      ) {
+        html.classList.add("nd-fb-strict");
+      }
+    } catch (e) {
+      // localStorage may be unavailable; facebook.content.js sets the class.
+    }
+
     // Hard-load fast path: bounce a blocked route (the algorithmic home,
     // reels, watch, gaming) before Facebook boots. storage.sync is async, so
     // this trusts last session's cached toggle state; facebook.content.js

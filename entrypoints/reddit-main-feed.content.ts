@@ -1,11 +1,18 @@
 import "@fontsource/reddit-sans/600.css";
 import "../assets/css/reddit.css";
+// @ts-ignore -- plain JS helper, the project has no allowJs
+import { readStrict } from "../utils/strict.js";
 
 export default defineContentScript({
   matches: ["*://*.reddit.com/*"],
   runAt: "document_start",
   main() {
     let ENABLE_RD = true as any;
+    // Strict mode: also hide the joined-communities and recent sections of the left nav.
+    let STRICT_RD = false;
+    // False until the first strict read lands, so the early class update keeps the
+    // class the init script set from the localStorage cache.
+    let strictResolved = false;
     const INITIAL_HOME_SIDEBAR_CLASS = "nd-home-sidebar-initial-hide";
 
     function isHomeFeedPage() {
@@ -24,34 +31,48 @@ export default defineContentScript({
       }
     }
 
-    // 1. Initial State Fetch
-    browser.storage.sync.get(["rd", "general_switch"]).then((result) => {
-      const GENERAL_SWITCH = result.general_switch !== undefined ? result.general_switch : true;
-      const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
-      ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
-      updateRedditClasses();
-      syncInitialSidebarHideClass();
-    });
-
-    // 2. Listen for switch changes instead of polling the database 60 times a second
-    browser.storage.onChanged.addListener((changes, area) => {
-      if (area === "sync" && (changes.rd || changes.general_switch)) {
-        browser.storage.sync.get(["rd", "general_switch"]).then((result) => {
+    // 1. State fetch: on/off first (same timing as before), then strict mode
+    function refreshState() {
+      browser.storage.sync
+        .get(["rd", "general_switch"])
+        .then((result) => {
           const GENERAL_SWITCH = result.general_switch !== undefined ? result.general_switch : true;
           const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
           ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
           updateRedditClasses();
           syncInitialSidebarHideClass();
+          return (ENABLE_RD ? (readStrict("rd") as Promise<boolean>) : Promise.resolve(false)).catch(() => false);
+        })
+        .then((strict) => {
+          STRICT_RD = ENABLE_RD && strict === true;
+          strictResolved = true;
+          updateRedditClasses();
+          syncInitialSidebarHideClass();
         });
-      }
+    }
+    refreshState();
+
+    // 2. Listen for switch changes instead of polling the database 60 times a second
+    browser.storage.onChanged.addListener((changes, area) => {
+      if (area === "sync" && (changes.rd || changes.general_switch || changes.rd_strict)) refreshState();
+      if (area === "managed" && changes.strictMode) refreshState();
     });
 
     function updateRedditClasses() {
       const html = document.documentElement;
       if (!ENABLE_RD) {
         html.classList.remove("no-distractions-css");
+        html.classList.remove("nd-rd-strict");
       } else {
         html.classList.add("no-distractions-css");
+      }
+      if (!strictResolved) return;
+      const strictOn = !!ENABLE_RD && STRICT_RD;
+      html.classList.toggle("nd-rd-strict", strictOn);
+      try {
+        localStorage.setItem("nd-rd-strict", strictOn ? "1" : "0");
+      } catch (e) {
+        // localStorage may be unavailable; the class above still applies.
       }
     }
 

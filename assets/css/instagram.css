@@ -12,3 +12,41 @@
 .ig-reels-page main[role="main"] > * {
   display: none !important;
 }
+
+/* STRICT MODE (home only): the whole home column (stories tray, Following
+   tab, posts, right rail) is hidden; only our note shows. display:none keeps
+   the feed's load-more sentinel from ever intersecting. Pre-hidden from
+   init's cache classes so nothing paints first. */
+.no-distractions-css.nd-ig-strict.ig-main-feed main[role="main"] > :not(#nd-ig-strict-note) {
+  display: none !important;
+}
+
+.no-distractions-css #nd-ig-strict-note {
+  display: none;
+}
+
+.no-distractions-css.nd-ig-strict.ig-main-feed #nd-ig-strict-note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  width: 100%;
+  padding: 0 16px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.no-distractions-css .nd-ig-strict-note-title {
+  color: rgb(var(--ig-primary-text));
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 25px;
+}
+
+.no-distractions-css .nd-ig-strict-note-text {
+  margin-top: 6px;
+  color: rgb(var(--ig-secondary-text));
+  font-size: 14px;
+  line-height: 18px;
+}

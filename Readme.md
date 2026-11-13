@@ -6,6 +6,7 @@ A browser extension to block social media distractions - Reels, Shorts, infinite
 ## What it does
 
 - Keep posts from accounts you follow  
+- Strict mode (optional, per site): hide posts from accounts you follow too  
 - Hide "suggested for you" algorithmic feeds  
 - Block endless scrolling traps and recommendations  
 - Remove explore pages, reels, and trending content
@@ -23,7 +24,7 @@ A browser extension to block social media distractions - Reels, Shorts, infinite
 
 - **Multi-platform** — One extension for all major social media sites
 - **100% Open Source** — Transparent code you can verify
-- **Zero data collection** — Completely privacy-friendly
+- **No personal data** — Only a few anonymous settings go to the uninstall page, nothing that identifies you
 - **Works out-of-the-box** — No complex configuration needed
 
 ## Install
@@ -39,6 +40,8 @@ pnpm wxt build        # build (Chrome MV3, .output/chrome-mv3)
 pnpm wxt zip          # package for the Chrome Web Store (.output/*.zip)
 ```
 
+Testing the unpacked build in its own browser: see [docs/development.md](docs/development.md).
+
 ## Enterprise policy (optional)
 
 The extension supports [managed storage](https://developer.chrome.com/docs/extensions/reference/api/storage#property-managed): admins (or self-binding setups) can set `allowPause` to `false` to hide the "Turn off blocking" pause button entirely — any paused state is also auto-reverted. On macOS, place a plist with `allowPause = false` at:
@@ -47,9 +50,22 @@ The extension supports [managed storage](https://developer.chrome.com/docs/exten
 /Library/Managed Preferences/com.google.Chrome.extensions.<extension-id>.plist
 ```
 
+Set `strictMode` to `true` to force strict mode on for every site.
+
 (A ready-made plist for the Web Store extension ID is in `policy/`.) Verify at `chrome://policy`. With no policy configured, nothing changes.
 
 ## Changelog
+
+### Version 1.2
+
+- Strict mode: hide posts from people you follow too (off by default, turn it on per site in Other settings)
+- YouTube strict: Subscriptions feed, subscribed channels in the sidebar and the notifications bell are gone; the Channels list stays
+- Instagram strict: Following feed and stories hidden
+- Facebook strict: Friends feed hidden, the post box and Shortcuts stay
+- Reddit strict: Communities and Recent hidden in the sidebar
+- YouTube: a single short opens in the normal player
+- Enterprise policy: `strictMode=true` forces strict mode on
+- The uninstall page gets a few anonymous settings (version, sites, strict mode, roughly how long it was installed)
 
 ### Version 1.1
 
@@ -112,17 +128,3 @@ The extension supports [managed storage](https://developer.chrome.com/docs/exten
 ## License
 
 MIT
-
-## Dev browser
-
-Your everyday Chrome force-installs the store build through managed policy, so the dev build runs in Playwright's Chrome for Testing instead. That browser has a separate bundle ID, so the policy doesn't apply and only the dev build is loaded.
-
-```bash
-pnpm dev:browser              # build, open browser with .output/chrome-mv3 loaded, rebuild + relaunch on changes
-pnpm dev:browser --headless   # same, no window
-pnpm dev:check <url> [out.png] [--wait=ms]   # screenshot + console of a page in the running dev browser
-```
-
-- The profile is kept in `.dev-profile/` (gitignored), so you only log in to YouTube/Instagram/Facebook/Reddit once.
-- CDP is on `http://localhost:9333`. The `nd-dev-browser` Playwright MCP server in `.mcp.json` attaches to it.
-- There's no managed policy here, so `chrome.storage.managed` is empty and `allowPause` defaults to `true`.

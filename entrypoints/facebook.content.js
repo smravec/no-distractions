@@ -5,8 +5,14 @@ import {
   fbIsHomeRedirect,
   fbIsLoggedIn,
 } from "../utils/facebook-routes.js";
-import { fbSyncComposer, fbRemoveComposer } from "../utils/facebook-composer.js";
+import {
+  fbSyncComposer,
+  fbRemoveComposer,
+  fbSyncStrictNote,
+  fbRemoveStrictNote,
+} from "../utils/facebook-composer.js";
 import { fbSyncShortcuts, fbRemoveShortcuts } from "../utils/facebook-shortcuts.js";
+import { readStrict } from "../utils/strict.js";
 
 export default defineContentScript({
   matches: ["https://www.facebook.com/*", "https://m.facebook.com/*"],
@@ -326,10 +332,12 @@ export default defineContentScript({
           "nd-fb-home",
           "nd-fb-redirect",
           "nd-fb-composing",
+          "nd-fb-strict",
         );
         // Disarm the MAIN-world history rewriter.
         html.removeAttribute("data-nd-fb");
         fbRemoveComposer();
+        fbRemoveStrictNote();
         fbRemoveShortcuts();
       }
 
@@ -346,6 +354,7 @@ export default defineContentScript({
         disarm();
         try {
           localStorage.setItem("nd-fb-enabled", "0");
+          localStorage.setItem("nd-fb-strict", "0");
         } catch (e) {
           // Ignore: without the cache the fast path simply stays off.
         }
@@ -364,6 +373,27 @@ export default defineContentScript({
       } catch (e) {
         // Ignore: without the cache the fast path simply stays off.
       }
+
+      // Strict mode: the Feeds lists go, only the composer card, a note and
+      // the Feeds panel stay. Starts from the early class facebook-init set
+      // from the localStorage cache, then follows the stored setting.
+      let STRICT = html.classList.contains("nd-fb-strict");
+      readStrict("fb")
+        .then((s) => {
+          STRICT = !!s;
+          html.classList.toggle("nd-fb-strict", STRICT);
+          try {
+            localStorage.setItem("nd-fb-strict", STRICT ? "1" : "0");
+          } catch (e) {
+            // Ignore: without the cache strict applies once storage answers.
+          }
+          schedulePass();
+        })
+        .catch(() => {
+          STRICT = false;
+          html.classList.remove("nd-fb-strict");
+          schedulePass();
+        });
 
       // --- hide helpers -------------------------------------------------
       function hideAs(el, kind) {
@@ -447,6 +477,9 @@ export default defineContentScript({
             keep = isReelsShelf(el) || !hasLiveContent(el);
           } else if (kind === "feeds-all") {
             keep = !!el.querySelector("a[href='/?filter=all&sk=h_chr']");
+          } else if (kind === "strict-stories") {
+            keep =
+              STRICT && !!el.querySelector("a[href^='/stories/?source=feed_tab']");
           } else if (kind === "watch-feed") {
             const fork = el.parentElement;
             keep =
@@ -496,6 +529,34 @@ export default defineContentScript({
             }
             if (!node.hasAttribute("data-nd-fb-hidden")) {
               hideAs(node, "feeds-all");
+            }
+          });
+      }
+
+      // Strict mode: the Feeds panel's Stories entry opens friends' stories.
+      // Same single-child walk as hideFeedsAllItem. Our Shortcuts clones
+      // are never touched.
+      function hideStoriesFeedItem() {
+        if (!STRICT) {
+          return;
+        }
+        document
+          .querySelectorAll("[role='navigation'] a[href^='/stories/?source=feed_tab']")
+          .forEach((a) => {
+            if (a.closest("[data-nd-fb-shortcuts]")) {
+              return;
+            }
+            const nav = a.closest("[role='navigation']");
+            let node = a;
+            while (
+              node.parentElement &&
+              node.parentElement !== nav &&
+              node.parentElement.children.length === 1
+            ) {
+              node = node.parentElement;
+            }
+            if (!node.hasAttribute("data-nd-fb-hidden")) {
+              hideAs(node, "strict-stories");
             }
           });
       }
@@ -740,6 +801,8 @@ export default defineContentScript({
         hideFeedsAllItem();
         fbSyncShortcuts();
         fbSyncComposer();
+        fbSyncStrictNote(STRICT);
+        hideStoriesFeedItem();
         hideFeedUnits();
         hideWatchSuggestions();
       }

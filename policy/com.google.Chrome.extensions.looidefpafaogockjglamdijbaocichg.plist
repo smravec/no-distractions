@@ -4,5 +4,7 @@
 <dict>
 	<key>allowPause</key>
 	<false/>
+	<key>strictMode</key>
+	<true/>
 </dict>
 </plist>

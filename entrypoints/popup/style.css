@@ -140,16 +140,20 @@ body {
 }
 
 .setting {
-  width: 80%;
+  width: 90%;
   display: flex;
-  margin-bottom: 10px;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
   background-color: transparent;
   color: white;
 }
 
 .setting > span {
   font-size: 16px;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
   border-bottom: 1px solid rgb(97, 96, 96);
   background-color: transparent;
   border-end-start-radius: 0px;
@@ -158,10 +162,10 @@ body {
 
 .setting > button {
   color: white;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  width: 44px;
+  flex: none;
+  text-align: center;
+  padding: 2px 0;
   border: 1px solid transparent;
   background-color: black;
   border-radius: 10px;
@@ -274,4 +278,30 @@ body {
 
 #rate_link:hover {
   cursor: pointer;
+}
+
+/* Settings header: column labels aligned over the two button columns */
+.setting_header {
+  margin-bottom: 4px;
+}
+.setting_header > span {
+  border-bottom: none;
+}
+.setting_col {
+  width: 44px;
+  flex: none;
+  text-align: center;
+  font-size: 11px;
+  color: rgb(97, 96, 96);
+  background-color: transparent;
+}
+
+/* Strict buttons: off by default (gray, not red) */
+.setting > button.strict_btn.dimmed {
+  opacity: 0.4;
+  cursor: default;
+}
+.setting > button.strict_btn.locked,
+.setting > button.strict_btn.locked:hover {
+  cursor: default;
 }

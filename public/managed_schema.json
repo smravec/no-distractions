@@ -5,6 +5,11 @@
       "type": "boolean",
       "title": "Allow pausing",
       "description": "When false, the 'Turn off blocking' pause button is hidden and any paused state is immediately reverted."
+    },
+    "strictMode": {
+      "type": "boolean",
+      "title": "Force strict mode",
+      "description": "When true, strict mode is on for every site: posts from accounts you follow are hidden too, and the strict toggles can't be turned off."
     }
   }
 }

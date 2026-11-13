@@ -1,4 +1,5 @@
 import "../assets/css/instagram.css";
+import { readStrict } from "../utils/strict.js";
 
 export default defineContentScript({
   matches: ["https://www.instagram.com/*"],
@@ -50,14 +51,17 @@ export default defineContentScript({
           "ig-explore-page",
           "ig-explore-mobile",
           "ig-reels-page",
+          "nd-ig-strict",
         );
         // Disarm the MAIN-world history rewriter and the hard-load fast path.
         html.removeAttribute("data-nd-ig");
         try {
           localStorage.setItem("nd-ig-enabled", "0");
+          localStorage.setItem("nd-ig-strict", "0");
         } catch (e) {
           // Ignore: without the cache the fast path simply stays off.
         }
+        document.getElementById("nd-ig-strict-note")?.remove();
         return;
       }
       function blockHorizontalScroll() {
@@ -169,6 +173,65 @@ export default defineContentScript({
         localStorage.setItem("nd-ig-enabled", "1");
       } catch (e) {
         // Ignore: without the cache the fast path simply stays off.
+      }
+
+      // Strict mode (home only): the whole home column goes and a note takes
+      // its place. Starts from the early class instagram-init set from the
+      // localStorage cache, then follows the stored setting.
+      let STRICT = html.classList.contains("nd-ig-strict");
+      readStrict("ig")
+        .then((s) => {
+          STRICT = !!s;
+          html.classList.toggle("nd-ig-strict", STRICT);
+          try {
+            localStorage.setItem("nd-ig-strict", STRICT ? "1" : "0");
+          } catch (e) {
+            // Ignore: without the cache strict applies once storage answers.
+          }
+          syncStrictNote();
+        })
+        .catch(() => {
+          STRICT = false;
+          html.classList.remove("nd-ig-strict");
+          syncStrictNote();
+        });
+
+      function isHomePath() {
+        const p = window.location.pathname;
+        return p === "/" || p === "";
+      }
+
+      // Keeps the home route class and the note in step with the URL.
+      // Idempotent: no DOM write when already right (onMutation calls it).
+      function syncStrictNote() {
+        const home = isHomePath();
+        if (html.classList.contains("ig-main-feed") !== home) {
+          html.classList.toggle("ig-main-feed", home);
+        }
+        const main = document.querySelector("main[role='main']");
+        const existing = document.getElementById("nd-ig-strict-note");
+        if (!(STRICT && home && main)) {
+          if (existing) {
+            existing.remove();
+          }
+          return;
+        }
+        if (existing && existing.parentElement === main && existing === main.lastElementChild) {
+          return;
+        }
+        if (existing) {
+          existing.remove();
+        }
+        const note = document.createElement("div");
+        note.id = "nd-ig-strict-note";
+        const title = document.createElement("div");
+        title.className = "nd-ig-strict-note-title";
+        title.textContent = "Strict mode is on";
+        const text = document.createElement("div");
+        text.className = "nd-ig-strict-note-text";
+        text.textContent = "Posts from people you follow are hidden.";
+        note.append(title, text);
+        main.appendChild(note);
       }
 
       // Instagram A/B-tests the Search nav entry: depending on the variant its
@@ -529,6 +592,7 @@ export default defineContentScript({
         hideExploreGrid();
         hideSearchPageHeader();
         selectFollowingFeedTab();
+        syncStrictNote();
       }
 
       onMutation();
@@ -544,6 +608,7 @@ export default defineContentScript({
         if (currentUrl !== lastUrl) {
           lastUrl = currentUrl;
           redirectMainPageToFollowing();
+          syncStrictNote();
         }
       }
 

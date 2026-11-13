@@ -164,6 +164,30 @@
   display: none !important;
 }
 
+/* STRICT MODE: channels you follow are off too */
+/* Pre-hide the subscriptions feed on a hard load until the redirect lands. */
+.no-distractions-css.nd-yt-strict.nd-yt-subs-page ytd-browse[page-subtype="subscriptions"],
+.no-distractions-css.nd-yt-strict.nd-yt-subs-page ytm-browse,
+/* Guide + mini guide Subscriptions entries. */
+.no-distractions-css.nd-yt-strict ytd-guide-entry-renderer:has(> a#endpoint[href="/feed/subscriptions"]),
+.no-distractions-css.nd-yt-strict ytd-mini-guide-entry-renderer:has(> a#endpoint[href="/feed/subscriptions"]),
+/* The guide section listing subscribed channels (logged in only). Never the
+   You section, which can also link to your own /@handle. */
+.no-distractions-css.nd-yt-strict ytd-guide-section-renderer:has(a#endpoint[href^="/@"]):not(:has(a#endpoint[href="/feed/you"], a#endpoint[href="/feed/history"])),
+.no-distractions-css.nd-yt-strict ytd-guide-section-renderer:has(a#endpoint[href="/feed/channels"]):not(:has(a#endpoint[href="/feed/you"], a#endpoint[href="/feed/history"])),
+/* New uploads bell. */
+.no-distractions-css.nd-yt-strict ytd-masthead ytd-notification-topbar-button-renderer,
+/* Mobile Subscriptions tab (unverified). */
+.no-distractions-css.nd-yt-strict ytm-pivot-bar-renderer > ytm-pivot-bar-item-renderer:has(.pivot-subs) {
+  display: none !important;
+}
+
+/* Landing chip swap: Subscriptions normally, Channels in strict mode. */
+.no-distractions-css:not(.nd-yt-strict) .nd-yt-home-chip[data-nd-chip="channels"],
+.no-distractions-css.nd-yt-strict .nd-yt-home-chip[data-nd-chip="subs"] {
+  display: none !important;
+}
+
 /* HOME LANDING */
 .no-distractions-css.nd-yt-home ytd-browse[page-subtype="home"] {
   display: none !important;

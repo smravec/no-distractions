@@ -21,6 +21,18 @@ The user's everyday Google Chrome force-installs the STORE build through managed
 - There's no managed policy in the dev browser, so `chrome.storage.managed` is empty and `allowPause` defaults to `true`. Pause-lockdown behaviour (`allowPause = false`) can't be tested there.
 - An unpacked extension's ID is a hash of its path (`bfngcldmpflkcknmngcgcbahnnmmmlfg` for this checkout). Never put it in policy; policy uses the store ID.
 
+## Strict mode
+- Per-site sync keys `yt_strict`, `fb_strict`, `ig_strict`, `rd_strict` (default `false`). Managed key `strictMode: true` forces it on for every site. `utils/strict.js` reads both.
+- Each site gets an `nd-<site>-strict` class on `<html>` (only while that site is on), with a localStorage cache `nd-<site>-strict` so init scripts can set it before first paint. All strict CSS is gated by that class, so a missing class or anchor hides nothing.
+- Forced `strictMode` (like `allowPause = false`) can't be tested in the dev browser, because it has no managed policy.
+
+## Uninstall link
+- `background.js` keeps `setUninstallURL` up to date: `https://nodistractions.app/uninstall#v=…&on=yt,fb,ig,rd&strict=…&admin=0|1&lock=pause,strict&paused=0|1&age=<bucket>&pre=0|1`.
+- The data sits after `#`, so it never reaches server logs. The website's uninstall form adds it to the feedback email.
+- Only those fields. Never add time on sites (`activeTimeOnSites`), URLs or IDs: Chrome Web Store counts browsing activity as user data.
+- `installedAt` / `installedPre` live in `storage.local`. `pre=1` means the user installed before 1.2, so the age is only "at least".
+- Never add permissions or host permissions for this: a new warning-level permission disables the extension for every user until they accept it.
+
 ## Commands
 - `pnpm build` builds to `.output/chrome-mv3`. `pnpm zip` packages for the Web Store.
 - `pnpm compile` runs the typecheck (`tsc --noEmit`).

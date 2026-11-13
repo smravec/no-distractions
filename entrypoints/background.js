@@ -1,5 +1,123 @@
 export default defineBackground({
   main() {
+    // ===== UNINSTALL LINK =====
+    // The uninstall page gets a few anonymous settings after "#" (never sent
+    // to the server's logs; the page forwards them only with feedback the user
+    // chooses to send). No IDs, no URLs, no time on sites.
+    const UNINSTALL_BASE = "https://nodistractions.app/uninstall";
+    const UN_SITES = ["yt", "fb", "ig", "rd"];
+    const UN_STRICT_KEYS = { yt: "yt_strict", fb: "fb_strict", ig: "ig_strict", rd: "rd_strict" };
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    let lastUninstallUrl = null;
+
+    function ageBucket(installedAt) {
+      const days = Math.floor((Date.now() - installedAt) / DAY_MS);
+      if (!(days >= 1)) return "0d"; // also clock skew / NaN
+      if (days === 1) return "1d";
+      if (days <= 7) return "2-7d";
+      if (days <= 30) return "8-30d";
+      if (days <= 90) return "31-90d";
+      if (days <= 365) return "91-365d";
+      return "1y+";
+    }
+
+    function buildUninstallUrl({ version, sync, managed, local, installType }) {
+      const on = UN_SITES.filter((s) => sync[s] !== false);
+      const forced = managed.strictMode === true;
+      const strict = on.filter((s) => forced || sync[UN_STRICT_KEYS[s]] === true);
+      const lock = [];
+      if (managed.allowPause === false) lock.push("pause");
+      if (forced) lock.push("strict");
+      const parts = [
+        "v=" + encodeURIComponent(version || ""),
+        "on=" + on.join(","),
+        "strict=" + strict.join(","),
+        "admin=" + (installType === "admin" ? "1" : "0"),
+        "lock=" + lock.join(","),
+        "paused=" + (sync.general_switch === false ? "1" : "0"),
+      ];
+      if (typeof local.installedAt === "number") {
+        parts.push("age=" + ageBucket(local.installedAt));
+        parts.push("pre=" + (local.installedPre === true ? "1" : "0"));
+      }
+      return UNINSTALL_BASE + "#" + parts.join("&");
+    }
+
+    function refreshUninstallUrl() {
+      return Promise.all([
+        browser.storage.sync
+          .get(["yt", "fb", "ig", "rd", "general_switch", ...Object.values(UN_STRICT_KEYS)])
+          .catch(() => ({})),
+        Promise.resolve()
+          .then(() => browser.storage.managed.get({ allowPause: true, strictMode: false }))
+          .catch(() => ({})),
+        browser.storage.local.get(["installedAt", "installedPre"]).catch(() => ({})),
+        Promise.resolve()
+          .then(() => browser.management.getSelf())
+          .catch(() => null),
+      ])
+        .then(([sync, managed, local, self]) => {
+          const url = buildUninstallUrl({
+            version: browser.runtime.getManifest().version,
+            sync: sync || {},
+            managed: managed || {},
+            local: local || {},
+            installType: self && self.installType,
+          });
+          if (url === lastUninstallUrl) return;
+          lastUninstallUrl = url;
+          globalThis.__ndLastUninstallUrl = url; // debug read-back only
+          return browser.runtime.setUninstallURL(url);
+        })
+        .catch(() => {
+          // Worst case the plain page still opens.
+          browser.runtime.setUninstallURL(UNINSTALL_BASE).catch(() => {});
+        });
+    }
+
+    // installedAt is set ONLY here, never by refresh (a refresh racing the first
+    // onInstalled must not mark a fresh install as "pre").
+    function recordInstall(details) {
+      if (details && details.reason === "install") {
+        return browser.storage.local
+          .set({ installedAt: Date.now(), installedPre: false })
+          .catch(() => {});
+      }
+      return browser.storage.local
+        .get(["installedAt"])
+        .then((r) => {
+          if (typeof r.installedAt !== "number") {
+            return browser.storage.local.set({ installedAt: Date.now(), installedPre: true });
+          }
+        })
+        .catch(() => {});
+    }
+
+    refreshUninstallUrl(); // every service-worker start
+
+    browser.runtime.onInstalled.addListener((details) => {
+      recordInstall(details).then(refreshUninstallUrl);
+    });
+    browser.runtime.onStartup.addListener(() => {
+      refreshUninstallUrl();
+    });
+
+    // Daily, so the age bucket stays current. alarms.create resets an existing
+    // alarm's schedule, so only create it when missing.
+    browser.alarms
+      .get("uninstallUrlRefresh")
+      .then((a) => {
+        if (!a) browser.alarms.create("uninstallUrlRefresh", { periodInMinutes: 1440 });
+      })
+      .catch(() => {});
+
+    const UN_WATCH = ["yt", "fb", "ig", "rd", "general_switch", ...Object.values(UN_STRICT_KEYS)];
+    browser.storage.onChanged.addListener((changes, area) => {
+      if (area === "managed" || (area === "sync" && UN_WATCH.some((k) => k in changes))) {
+        refreshUninstallUrl();
+      }
+    });
+
     // Match YouTube by exact hostname so music.youtube.com is never touched.
     function isBlockedYouTubeUrl(url) {
       if (!url) return false;
@@ -56,6 +174,10 @@ export default defineBackground({
 
     // Handle alarm when timer expires
     browser.alarms.onAlarm.addListener((alarm) => {
+      if (alarm.name === "uninstallUrlRefresh") {
+        refreshUninstallUrl();
+        return;
+      }
       if (alarm.name === "activeTimeTracker") {
         updateActiveTime();
         return;
@@ -110,10 +232,6 @@ export default defineBackground({
         }
       });
     }
-
-    // ===== UNINSTALL FEEDBACK =====
-    // Opens the feedback page on the website when the extension is removed.
-    browser.runtime.setUninstallURL("https://nodistractions.app/uninstall");
 
     // ===== ENTERPRISE POLICY (managed storage) =====
     // If the policy sets allowPause=false, any paused state is snapped back on

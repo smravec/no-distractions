@@ -42,3 +42,17 @@
 .legal-links {
   display: none !important;
 }
+
+/* STRICT MODE: also hide the communities you joined and recently visited ones
+   (left nav: Recent, Communities incl. Manage Communities, and "Start a community") */
+.no-distractions-css.nd-rd-strict reddit-sidebar-nav#left-sidebar #recent-communities-section,
+.no-distractions-css.nd-rd-strict reddit-sidebar-nav#left-sidebar faceplate-expandable-section-helper:has(summary[aria-controls="communities_section"]),
+.no-distractions-css.nd-rd-strict reddit-sidebar-nav#left-sidebar li.left-nav-create-community-button {
+  display: none !important;
+}
+
+/* Strict mode: with Recent and Communities gone, the separator after Communities would
+   double up with the one above Recent (loaders sit between them, so hr + hr can't match) */
+.no-distractions-css.nd-rd-strict reddit-sidebar-nav#left-sidebar faceplate-expandable-section-helper:has(summary[aria-controls="communities_section"]) ~ hr {
+  display: none !important;
+}

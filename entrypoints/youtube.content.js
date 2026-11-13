@@ -1,3 +1,5 @@
+import { readStrict } from "../utils/strict.js";
+
 export default defineContentScript({
   matches: ["https://www.youtube.com/*", "https://m.youtube.com/*"],
   runAt: "document_idle",
@@ -26,7 +28,43 @@ export default defineContentScript({
       if (!ENABLE_YOUTUBE_CSS) {
         html.classList.remove("no-distractions-css");
         html.classList.remove("nd-yt-home");
+        html.classList.remove("nd-yt-strict");
+        html.classList.remove("nd-yt-subs-page");
+        try {
+          localStorage.setItem("nd-yt-strict", "0");
+        } catch (e) {
+          // localStorage unavailable; nothing cached to clear.
+        }
         return;
+      }
+
+      let YT_STRICT = false; // real value only after readStrict resolves
+      // Redirects whose target depends on strict mode wait for this, so a
+      // strict load never hops through the subscriptions feed on its way.
+      let YT_STRICT_KNOWN = false;
+      const SUBS_PATH_RE = /^\/feed\/subscriptions\/?$/;
+
+      // Where strict mode sends you instead of the subscriptions feed.
+      function strictHomeUrl() {
+        return IS_DESKTOP
+          ? window.location.origin + "/"
+          : window.location.origin + "/feed/library";
+      }
+      function feedFallbackUrl() {
+        return YT_STRICT
+          ? strictHomeUrl()
+          : "https://www.youtube.com/feed/subscriptions";
+      }
+      // location.replace (never push): back from "/" skips the subscriptions
+      // entry, so there's no back-button trap and no loop ("/" and
+      // /feed/library never redirect).
+      function redirectStrictSubscriptions(currentPath) {
+        if (!YT_STRICT || !SUBS_PATH_RE.test(currentPath)) return false;
+        // Keep the feed hidden while the replacement page loads (SPA hops
+        // into the feed never went through the init script's pre-hide).
+        html.classList.add("nd-yt-subs-page");
+        window.location.replace(strictHomeUrl());
+        return true;
       }
 
       // A single short opens in the normal player, which has no swipe to the
@@ -36,10 +74,13 @@ export default defineContentScript({
           return false;
         }
         const shortId = currentPath.match(/^\/shorts\/([\w-]+)\/?$/);
+        if (!shortId && !YT_STRICT_KNOWN) {
+          return false; // applyStrictState re-runs this once storage answers.
+        }
         window.location.replace(
           shortId
             ? window.location.origin + "/watch?v=" + shortId[1]
-            : "https://www.youtube.com/feed/subscriptions",
+            : feedFallbackUrl(),
         );
         return true;
       }
@@ -52,12 +93,14 @@ export default defineContentScript({
         // Mobile keeps the old root redirect; desktop root shows the landing.
         if (
           !IS_DESKTOP &&
+          YT_STRICT_KNOWN &&
           (currentPath === "/" || currentPath === "") &&
           !currentUrl.includes("/feed/subscriptions")
         ) {
-          window.location.replace("https://www.youtube.com/feed/subscriptions");
+          window.location.replace(feedFallbackUrl());
           return;
         }
+        if (redirectStrictSubscriptions(currentPath)) return;
         redirectShorts(currentPath);
       }
 
@@ -69,15 +112,18 @@ export default defineContentScript({
         if (!ENABLE_YOUTUBE_CSS) return; // Respect switches
         if (
           !IS_DESKTOP &&
+          YT_STRICT_KNOWN &&
           (currentPath === "/" || currentPath === "") &&
           !currentUrl.includes("/feed/subscriptions")
         ) {
-          window.location.replace("https://www.youtube.com/feed/subscriptions");
+          window.location.replace(feedFallbackUrl());
           return;
         }
+        if (redirectStrictSubscriptions(currentPath)) return;
         if (redirectShorts(currentPath)) {
           return;
         }
+        html.classList.toggle("nd-yt-subs-page", SUBS_PATH_RE.test(currentPath));
         updateHomeLandingState();
         if (currentUrl !== lastUrl) {
           lastUrl = currentUrl;
@@ -274,6 +320,7 @@ export default defineContentScript({
         "/feed/subscriptions": "FEsubscriptions",
         "/feed/playlists": "FEplaylist_aggregation",
         "/feed/history": "FEhistory",
+        "/feed/channels": "FEchannels",
       };
 
       function spaNavigate(payload, fallback) {
@@ -391,9 +438,13 @@ export default defineContentScript({
               <div id="nd-yt-home-suggest" role="listbox" hidden></div>
             </div>
             <div id="nd-yt-home-links">
-              <a class="nd-yt-home-chip" href="/feed/subscriptions">
+              <a class="nd-yt-home-chip" data-nd-chip="subs" href="/feed/subscriptions">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M4 6h16v1H4V6zM2 9h20v1H2V9zm17 3H5c-.55 0-1 .45-1 1v7c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-7c0-.55-.45-1-1-1zm-9 7v-5l4.5 2.5L10 19z"/></svg>
                 <span>Subscriptions</span>
+              </a>
+              <a class="nd-yt-home-chip" data-nd-chip="channels" href="/feed/channels">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                <span>Channels</span>
               </a>
               <a class="nd-yt-home-chip" href="/feed/playlists">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M3 6h12v2H3V6zm0 4h12v2H3v-2zm0 4h8v2H3v-2zm13 0v6l5-3-5-3z"/></svg>
@@ -536,9 +587,27 @@ export default defineContentScript({
 
       wireShortsLinks();
 
+      function applyStrictState(on) {
+        YT_STRICT = on;
+        YT_STRICT_KNOWN = true;
+        html.classList.toggle("nd-yt-strict", on);
+        if (!on) html.classList.remove("nd-yt-subs-page");
+        try {
+          localStorage.setItem("nd-yt-strict", on ? "1" : "0");
+        } catch (e) {
+          // localStorage unavailable; the next load just skips the pre-hide.
+        }
+        // Now every redirect knows its target (strict subscriptions, the
+        // mobile root, a /shorts feed without an ID).
+        redirectToSubscriptionsFeed();
+      }
+
       // Run redirect check immediately
       redirectToSubscriptionsFeed();
       updateHomeLandingState();
+      readStrict("yt")
+        .then((v) => applyStrictState(v === true))
+        .catch(() => applyStrictState(false));
       window.addEventListener("popstate", redirectToSubscriptionsFeed);
       window.addEventListener("popstate", updateHomeLandingState);
       // YouTube announces SPA navigations as DOM events; reacting to them
