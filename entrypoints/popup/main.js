@@ -380,6 +380,15 @@ function newConfirmationCode() {
 function showConfirmationMenu() {
   const confirmationMenu = document.getElementById("confirmation_menu")
   newConfirmationCode();
+  // Start empty: digits left from an earlier open (e.g. before a policy lock)
+  // would sit next to the new code and block typing.
+  for (let i = 1; i <= 4; i++) {
+    const input = document.getElementById(`confirmation_input_${i}`)
+    if (input) {
+      input.value = "";
+      input.style.borderColor = "var(--green)";
+    }
+  }
   mainMenu.style.display = "none";
   confirmationMenu.style.display = "flex";
   document.getElementById("confirmation_input_1")?.focus();
