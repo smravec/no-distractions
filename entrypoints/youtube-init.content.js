@@ -1,11 +1,13 @@
 import "../assets/css/youtube.css";
-import { cachedSiteOff } from "../utils/site-cache.js";
+import { cachedSiteOff, listenSiteState } from "../utils/site-cache.js";
 
 export default defineContentScript({
   matches: ["https://www.youtube.com/*", "https://m.youtube.com/*"],
   runAt: "document_start",
   allFrames: true,
   main() {
+    // From document_start, so a tab that is still loading hears the popup.
+    listenSiteState("yt");
     // YouTube's blocking was off last visit: leave the page alone. The idle
     // script adds the class itself if it has been turned back on.
     if (cachedSiteOff("yt")) {

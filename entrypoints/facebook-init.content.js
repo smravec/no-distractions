@@ -19,8 +19,7 @@ export default defineContentScript({
     }
     // Facebook's blocking was off last visit: leave the page alone.
     // facebook.content.js adds the classes if it has been turned back on.
-    // m.facebook.com never writes the cache, so it always starts armed.
-    if (window.location.hostname !== "m.facebook.com" && cachedSiteOff("fb")) {
+    if (cachedSiteOff("fb")) {
       return;
     }
     const html = document.documentElement;

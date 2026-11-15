@@ -14,6 +14,7 @@ import {
 import { fbSyncShortcuts, fbRemoveShortcuts } from "../utils/facebook-shortcuts.js";
 import { readStrict } from "../utils/strict.js";
 import {
+  cacheSiteEnabled,
   clearFastPath,
   listenSiteState,
   undoFastPath,
@@ -41,9 +42,7 @@ export default defineContentScript({
       return;
     }
 
-    if (window.location.hostname === "www.facebook.com") {
-      listenSiteState("fb");
-    }
+    listenSiteState("fb");
 
     // The old mobile-site logic, kept verbatim. It was written for
     // document_idle, so it waits for the DOM.
@@ -58,11 +57,17 @@ export default defineContentScript({
       // Check if user is logged out (don't block on login/signup pages)
       const isLoggedOut = document.body?.classList.contains("UIPage_LoggedOut");
 
+      // m.facebook.com is its own origin with its own off-flag cache.
+      // Logged-out pages leave it alone.
+      if (!isLoggedOut) {
+        cacheSiteEnabled("fb", ENABLE_FB);
+      }
       if (!ENABLE_FB || isLoggedOut) {
-        html.classList.remove("no-distractions-css");
+        html.classList.remove("no-distractions-css", "nd-fb-mobile");
         return;
       }
-      html.classList.add("no-distractions-css");
+      // The init script skips both when the cache said off last visit.
+      html.classList.add("no-distractions-css", "nd-fb-mobile");
 
       // Stops from running on other sites which just use facebook.com in a iframe (like instagram)
       let isTopFrame = false;

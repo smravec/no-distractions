@@ -136,12 +136,21 @@ function siteBlockOn(site) {
   return { yt, fb, ig, rd }[site];
 }
 
+// By hostname, so a URL that merely mentions another site never matches it.
+function onDomain(url, domain) {
+  try {
+    const host = new URL(url).hostname;
+    return host === domain || host.endsWith("." + domain);
+  } catch (e) {
+    return false;
+  }
+}
 function siteTabMatches(site, url) {
   if (!url) return false;
   if (site === "yt") return isBlockedYouTubeUrl(url);
-  if (site === "fb") return url.includes("facebook.com");
-  if (site === "ig") return url.includes("instagram.com");
-  if (site === "rd") return url.includes("reddit.com");
+  if (site === "fb") return onDomain(url, "facebook.com");
+  if (site === "ig") return onDomain(url, "instagram.com");
+  if (site === "rd") return onDomain(url, "reddit.com");
   return false;
 }
 

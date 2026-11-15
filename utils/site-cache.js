@@ -41,8 +41,9 @@ export function listenSiteState(site) {
 // storage answers. They leave a note, so a redirect made from a stale "on"
 // cache can be undone once storage says the site is off.
 const FAST_PATH_MAX_AGE_MS = 15000;
+// Not "nd-fb-fastpath": that key is Facebook's redirect loop guard.
 function fastPathKey(site) {
-  return "nd-" + site + "-fastpath";
+  return "nd-" + site + "-fastpath-undo";
 }
 export function markFastPath(site) {
   try {
@@ -64,6 +65,9 @@ export function clearFastPath(site) {
 // Call only when storage says the site is off, after caching "0" (so the
 // page it goes back to doesn't redirect again). True when it navigates.
 export function undoFastPath(site) {
+  // Only once the off flag is cached, so the page it goes back to can't
+  // redirect again.
+  if (!cachedSiteOff(site)) return false;
   try {
     const raw = sessionStorage.getItem(fastPathKey(site));
     if (!raw) return false;

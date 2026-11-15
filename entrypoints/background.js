@@ -195,13 +195,20 @@ export default defineBackground({
             browser.tabs.query({}).then((tabs) => {
               tabs.forEach((tab) => {
                 const url = tab.url || "";
+                let host = "";
+                try {
+                  host = new URL(url).hostname;
+                } catch (e) {
+                  // Not a URL: no site.
+                }
+                const onDomain = (d) => host === d || host.endsWith("." + d);
                 const site = isBlockedYouTubeUrl(url)
                   ? "yt"
-                  : url.includes("facebook.com")
+                  : onDomain("facebook.com")
                     ? "fb"
-                    : url.includes("instagram.com")
+                    : onDomain("instagram.com")
                       ? "ig"
-                      : url.includes("reddit.com")
+                      : onDomain("reddit.com")
                         ? "rd"
                         : null;
                 if (!site || !tab.id) return;

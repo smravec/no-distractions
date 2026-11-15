@@ -1,5 +1,5 @@
 import { readStrict } from "../utils/strict.js";
-import { cacheSiteEnabled, listenSiteState } from "../utils/site-cache.js";
+import { cacheSiteEnabled } from "../utils/site-cache.js";
 
 export default defineContentScript({
   matches: ["https://www.youtube.com/*", "https://m.youtube.com/*"],
@@ -16,8 +16,6 @@ export default defineContentScript({
     if (!extensionApi?.storage?.sync) {
       return;
     }
-
-    listenSiteState("yt");
 
     extensionApi.storage.sync.get(["yt", "general_switch"], (result) => {
       const GENERAL_SWITCH =

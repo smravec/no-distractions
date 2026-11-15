@@ -27,6 +27,11 @@ The user's everyday Google Chrome force-installs the STORE build through managed
 - Each site gets an `nd-<site>-strict` class on `<html>` (only while that site is on), with a localStorage cache `nd-<site>-strict` so init scripts can set it before first paint. All strict CSS is gated by that class, so a missing class or anchor hides nothing.
 - Forced `strictMode` (like `allowPause = false`) can't be tested in the dev browser, because it has no managed policy.
 
+## Sites switched off
+- A site that is off must stay untouched. Each site's localStorage has `nd-<site>-enabled` ("1"/"0"), written by its content script. Every document_start init script returns early on "0" (`utils/site-cache.js`).
+- Before reloading a site's tabs, the popup and the pause-expiry alarm send `{ type: "nd-site-state", site, enabled }` so the reload already starts from the new state.
+- The Facebook/Instagram hard-load fast paths leave a sessionStorage note (`nd-<site>-fastpath-undo`); if storage then says the site is off, the redirect is undone. `nd-fb-fastpath` is a different key: Facebook's redirect loop guard.
+
 ## Uninstall link
 - `background.js` keeps `setUninstallURL` up to date: `https://nodistractions.app/uninstall#v=…&on=yt,fb,ig,rd&strict=…&admin=0|1&lock=pause,strict&paused=0|1&age=<bucket>&pre=0|1`.
 - The data sits after `#`, so it never reaches server logs. The website's uninstall form adds it to the feedback email.
