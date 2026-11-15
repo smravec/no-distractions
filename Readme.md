@@ -56,6 +56,10 @@ Set `strictMode` to `true` to force strict mode on for every site.
 
 ## Changelog
 
+### Version 1.4
+
+- Bug fixes
+
 ### Version 1.3
 
 - Bug fixes
