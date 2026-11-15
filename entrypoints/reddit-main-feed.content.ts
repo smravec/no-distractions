@@ -2,12 +2,15 @@ import "@fontsource/reddit-sans/600.css";
 import "../assets/css/reddit.css";
 // @ts-ignore -- plain JS helper, the project has no allowJs
 import { readStrict } from "../utils/strict.js";
+// @ts-ignore -- plain JS helper, the project has no allowJs
+import { cacheSiteEnabled, cachedSiteOff, listenSiteState } from "../utils/site-cache.js";
 
 export default defineContentScript({
   matches: ["*://*.reddit.com/*"],
   runAt: "document_start",
   main() {
-    let ENABLE_RD = true as any;
+    // Start from last visit's cache so an off Reddit is never touched.
+    let ENABLE_RD = !cachedSiteOff("rd") as any;
     // Strict mode: also hide the joined-communities and recent sections of the left nav.
     let STRICT_RD = false;
     // False until the first strict read lands, so the early class update keeps the
@@ -39,6 +42,7 @@ export default defineContentScript({
           const GENERAL_SWITCH = result.general_switch !== undefined ? result.general_switch : true;
           const REDDIT_TOGGLE = result.rd !== undefined ? result.rd : true;
           ENABLE_RD = GENERAL_SWITCH && REDDIT_TOGGLE;
+          cacheSiteEnabled("rd", !!ENABLE_RD);
           updateRedditClasses();
           syncInitialSidebarHideClass();
           return (ENABLE_RD ? (readStrict("rd") as Promise<boolean>) : Promise.resolve(false)).catch(() => false);
@@ -51,6 +55,9 @@ export default defineContentScript({
         });
     }
     refreshState();
+    if (window.top === window.self) {
+      listenSiteState("rd");
+    }
 
     // 2. Listen for switch changes instead of polling the database 60 times a second
     browser.storage.onChanged.addListener((changes, area) => {

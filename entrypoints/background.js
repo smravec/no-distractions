@@ -186,22 +186,39 @@ export default defineBackground({
       }
       if (alarm.name === "general_switch_timer") {
         // Set general switch back to true
-        browser.storage.sync.set({ general_switch: true }).then(() => {
-          // Refresh all tabs with supported sites
-          browser.tabs.query({}).then((tabs) => {
-            tabs.forEach((tab) => {
-              if (
-                tab.url &&
-                (tab.url.includes("facebook.com") ||
-                  tab.url.includes("instagram.com") ||
-                  tab.url.includes("reddit.com") ||
-                  isBlockedYouTubeUrl(tab.url))
-              ) {
-                browser.tabs.reload(tab.id);
-              }
+        browser.storage.sync
+          .set({ general_switch: true })
+          .then(() => browser.storage.sync.get(["yt", "fb", "ig", "rd"]))
+          .then((state) => {
+            // Refresh all tabs with supported sites. Each tab first hears its
+            // site's new on/off state, so the reload starts from it.
+            browser.tabs.query({}).then((tabs) => {
+              tabs.forEach((tab) => {
+                const url = tab.url || "";
+                const site = isBlockedYouTubeUrl(url)
+                  ? "yt"
+                  : url.includes("facebook.com")
+                    ? "fb"
+                    : url.includes("instagram.com")
+                      ? "ig"
+                      : url.includes("reddit.com")
+                        ? "rd"
+                        : null;
+                if (!site || !tab.id) return;
+                const told = browser.tabs
+                  .sendMessage(tab.id, {
+                    type: "nd-site-state",
+                    site,
+                    enabled: state[site] !== false,
+                  })
+                  .catch(() => {});
+                const waited = new Promise((r) => setTimeout(r, 300));
+                Promise.race([told, waited])
+                  .then(() => browser.tabs.reload(tab.id))
+                  .catch(() => {});
+              });
             });
           });
-        });
       }
     });
 

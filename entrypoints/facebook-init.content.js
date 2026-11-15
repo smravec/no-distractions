@@ -4,6 +4,7 @@ import {
   fbIsHomeRedirect,
   fbIsLoggedIn,
 } from "../utils/facebook-routes.js";
+import { cachedSiteOff, markFastPath } from "../utils/site-cache.js";
 
 export default defineContentScript({
   matches: ["https://www.facebook.com/*", "https://m.facebook.com/*"],
@@ -14,6 +15,12 @@ export default defineContentScript({
     // inert: facebook.content.js never manages them, so the gate class (and
     // the CSS behind it) must not go on there either.
     if (window.top !== window.self) {
+      return;
+    }
+    // Facebook's blocking was off last visit: leave the page alone.
+    // facebook.content.js adds the classes if it has been turned back on.
+    // m.facebook.com never writes the cache, so it always starts armed.
+    if (window.location.hostname !== "m.facebook.com" && cachedSiteOff("fb")) {
       return;
     }
     const html = document.documentElement;
@@ -64,6 +71,7 @@ export default defineContentScript({
       // stops it from starting a second one, which would count this load
       // twice in the loop guard and override its choice.
       window.__ndFbRedirecting = Date.now();
+      markFastPath("fb");
       window.location.replace(target);
     } catch (e) {
       // localStorage may be unavailable; the async redirect still runs.

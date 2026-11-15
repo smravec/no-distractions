@@ -64,14 +64,7 @@ yt_btn.addEventListener("click", () => {
   yt_btn.style.borderColor = yt ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(yt_btn, yt);
   renderStrict("yt");
-  browser.storage.sync.set({ yt });
-  browser.tabs.query({}).then((tabs) => {
-    tabs.forEach((tab) => {
-      if (tab.url && isBlockedYouTubeUrl(tab.url) && tab.id) {
-        browser.tabs.reload(tab.id);
-      }
-    });
-  });
+  refreshSiteTabs(["yt"], browser.storage.sync.set({ yt }));
 });
 
 // Facebook button
@@ -88,14 +81,7 @@ fb_btn.addEventListener("click", () => {
   fb_btn.style.borderColor = fb ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(fb_btn, fb);
   renderStrict("fb");
-  browser.storage.sync.set({ fb });
-  browser.tabs.query({}).then((tabs) => {
-    tabs.forEach((tab) => {
-      if (tab.url && tab.url.includes("facebook.com") && tab.id) {
-        browser.tabs.reload(tab.id);
-      }
-    });
-  });
+  refreshSiteTabs(["fb"], browser.storage.sync.set({ fb }));
 });
 
 // Instagram button
@@ -112,14 +98,7 @@ ig_btn.addEventListener("click", () => {
   ig_btn.style.borderColor = ig ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(ig_btn, ig);
   renderStrict("ig");
-  browser.storage.sync.set({ ig });
-  browser.tabs.query({}).then((tabs) => {
-    tabs.forEach((tab) => {
-      if (tab.url && tab.url.includes("instagram.com") && tab.id) {
-        browser.tabs.reload(tab.id);
-      }
-    });
-  });
+  refreshSiteTabs(["ig"], browser.storage.sync.set({ ig }));
 });
 
 // Reddit button
@@ -136,14 +115,7 @@ rd_btn.addEventListener("click", () => {
   rd_btn.style.borderColor = rd ? "var(--green)" : "var(--red)";
   updateSettingsButtonText(rd_btn, rd);
   renderStrict("rd");
-  browser.storage.sync.set({ rd });
-  browser.tabs.query({}).then((tabs) => {
-    tabs.forEach((tab) => {
-      if (tab.url && tab.url.includes("reddit.com") && tab.id) {
-        browser.tabs.reload(tab.id);
-      }
-    });
-  });
+  refreshSiteTabs(["rd"], browser.storage.sync.set({ rd }));
 });
 
 // ===== STRICT MODE (per site) =====
@@ -171,6 +143,36 @@ function siteTabMatches(site, url) {
   if (site === "ig") return url.includes("instagram.com");
   if (site === "rd") return url.includes("reddit.com");
   return false;
+}
+
+// Tell each open tab of these sites its new on/off state, so the reload
+// starts from it instead of the page's cache from its last load, then reload
+// it. A tab that doesn't answer within 300 ms is reloaded anyway.
+const ALL_SITES = ["yt", "fb", "ig", "rd"];
+function refreshSiteTabs(sites, pendingWrite) {
+  Promise.resolve(pendingWrite)
+    .catch(() => {})
+    .then(() => browser.storage.sync.get(["general_switch", ...sites]))
+    .then((state) =>
+      browser.tabs.query({}).then((tabs) =>
+        Promise.all(
+          tabs.map((tab) => {
+            const site = sites.find((s) => siteTabMatches(s, tab.url));
+            if (!site || !tab.id) return null;
+            const enabled =
+              state.general_switch !== false && state[site] !== false;
+            const told = browser.tabs
+              .sendMessage(tab.id, { type: "nd-site-state", site, enabled })
+              .catch(() => {});
+            const waited = new Promise((r) => setTimeout(r, 300));
+            return Promise.race([told, waited])
+              .then(() => browser.tabs.reload(tab.id))
+              .catch(() => {});
+          }),
+        ),
+      ),
+    )
+    .catch(() => {});
 }
 
 function reloadSiteTabs(site) {
@@ -317,23 +319,11 @@ general_switch_btn.addEventListener("click", () => {
     showConfirmationMenu();
   } else {
     browser.alarms.clear("general_switch_timer");
-    browser.storage.sync.set({ general_switch: true });
+    const resumed = browser.storage.sync.set({ general_switch: true });
     browser.storage.sync.remove(["general_switch_timer"]);
     setPausedState(false);
 
-    browser.tabs.query({}).then((tabs) => {
-      tabs.forEach((tab) => {
-        if (
-          tab.url &&
-          (tab.url.includes("facebook.com") ||
-            tab.url.includes("instagram.com") ||
-            tab.url.includes("reddit.com") ||
-            isBlockedYouTubeUrl(tab.url)) && tab.id
-        ) {
-          browser.tabs.reload(tab.id);
-        }
-      });
-    });
+    refreshSiteTabs(ALL_SITES, resumed);
   }
 });
 
@@ -413,7 +403,7 @@ function turnOffBlocking() {
   const ONE_HOUR_MS = 1 * 60 * 60 * 1000;
   const expiryTime = Date.now() + ONE_HOUR_MS;
 
-  browser.storage.sync.set({
+  const paused = browser.storage.sync.set({
     general_switch: false,
     general_switch_timer: {
       expiryTime: expiryTime,
@@ -424,19 +414,7 @@ function turnOffBlocking() {
   browser.alarms.create("general_switch_timer", { delayInMinutes: 60 });
   setPausedState(true);
 
-  browser.tabs.query({}).then((tabs) => {
-    tabs.forEach((tab) => {
-      if (
-        tab.url &&
-        (tab.url.includes("facebook.com") ||
-          tab.url.includes("instagram.com") ||
-          tab.url.includes("reddit.com") ||
-          isBlockedYouTubeUrl(tab.url)) && tab.id
-      ) {
-        browser.tabs.reload(tab.id);
-      }
-    });
-  });
+  refreshSiteTabs(ALL_SITES, paused);
 
   hideConfirmationMenu();
 }

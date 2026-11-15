@@ -13,6 +13,11 @@ import {
 } from "../utils/facebook-composer.js";
 import { fbSyncShortcuts, fbRemoveShortcuts } from "../utils/facebook-shortcuts.js";
 import { readStrict } from "../utils/strict.js";
+import {
+  clearFastPath,
+  listenSiteState,
+  undoFastPath,
+} from "../utils/site-cache.js";
 
 export default defineContentScript({
   matches: ["https://www.facebook.com/*", "https://m.facebook.com/*"],
@@ -34,6 +39,10 @@ export default defineContentScript({
     // those frames must stay untouched.
     if (window.top !== window.self) {
       return;
+    }
+
+    if (window.location.hostname === "www.facebook.com") {
+      listenSiteState("fb");
     }
 
     // The old mobile-site logic, kept verbatim. It was written for
@@ -358,6 +367,9 @@ export default defineContentScript({
         } catch (e) {
           // Ignore: without the cache the fast path simply stays off.
         }
+        // The fast path redirected from last visit's "on" cache: go back to
+        // the page that was asked for.
+        undoFastPath("fb");
         return;
       }
       if (isLoggedOut()) {
@@ -373,6 +385,7 @@ export default defineContentScript({
       } catch (e) {
         // Ignore: without the cache the fast path simply stays off.
       }
+      clearFastPath("fb");
 
       // Strict mode: the Feeds lists go, only the composer card, a note and
       // the Feeds panel stay. Starts from the early class facebook-init set

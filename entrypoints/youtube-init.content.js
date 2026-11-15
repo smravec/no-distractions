@@ -1,10 +1,16 @@
 import "../assets/css/youtube.css";
+import { cachedSiteOff } from "../utils/site-cache.js";
 
 export default defineContentScript({
   matches: ["https://www.youtube.com/*", "https://m.youtube.com/*"],
   runAt: "document_start",
   allFrames: true,
   main() {
+    // YouTube's blocking was off last visit: leave the page alone. The idle
+    // script adds the class itself if it has been turned back on.
+    if (cachedSiteOff("yt")) {
+      return;
+    }
     document.documentElement.classList.add('no-distractions-css');
     // Synchronous gate for the desktop home landing page: pre-hides the home
     // feed before it can paint. The idle script owns the class afterwards

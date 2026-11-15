@@ -1,4 +1,5 @@
 import { readStrict } from "../utils/strict.js";
+import { cacheSiteEnabled, listenSiteState } from "../utils/site-cache.js";
 
 export default defineContentScript({
   matches: ["https://www.youtube.com/*", "https://m.youtube.com/*"],
@@ -16,6 +17,8 @@ export default defineContentScript({
       return;
     }
 
+    listenSiteState("yt");
+
     extensionApi.storage.sync.get(["yt", "general_switch"], (result) => {
       const GENERAL_SWITCH =
         result.general_switch !== undefined ? result.general_switch : true;
@@ -25,6 +28,7 @@ export default defineContentScript({
       const html = document.documentElement;
       const IS_DESKTOP = window.location.hostname === "www.youtube.com";
 
+      cacheSiteEnabled("yt", ENABLE_YOUTUBE_CSS);
       if (!ENABLE_YOUTUBE_CSS) {
         html.classList.remove("no-distractions-css");
         html.classList.remove("nd-yt-home");

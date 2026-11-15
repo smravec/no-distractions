@@ -1,5 +1,11 @@
 import "../assets/css/instagram.css";
 import { readStrict } from "../utils/strict.js";
+import {
+  clearFastPath,
+  listenSiteState,
+  markFastPath,
+  undoFastPath,
+} from "../utils/site-cache.js";
 
 export default defineContentScript({
   matches: ["https://www.instagram.com/*"],
@@ -18,6 +24,7 @@ export default defineContentScript({
         new URL(window.location.href).searchParams.get("variant") !==
           "following"
       ) {
+        markFastPath("ig");
         window.location.replace(
           "https://www.instagram.com/?variant=following",
         );
@@ -35,6 +42,10 @@ export default defineContentScript({
 
     if (!extensionApi?.storage?.sync) {
       return;
+    }
+
+    if (window.top === window.self) {
+      listenSiteState("ig");
     }
 
     extensionApi.storage.sync.get(["ig", "general_switch"], (result) => {
@@ -62,6 +73,11 @@ export default defineContentScript({
           // Ignore: without the cache the fast path simply stays off.
         }
         document.getElementById("nd-ig-strict-note")?.remove();
+        // The fast path redirected from last visit's "on" cache: go back to
+        // the page that was asked for.
+        if (window.top === window.self) {
+          undoFastPath("ig");
+        }
         return;
       }
       function blockHorizontalScroll() {
@@ -174,6 +190,7 @@ export default defineContentScript({
       } catch (e) {
         // Ignore: without the cache the fast path simply stays off.
       }
+      clearFastPath("ig");
 
       // Strict mode (home only): the whole home column goes and a note takes
       // its place. Starts from the early class instagram-init set from the

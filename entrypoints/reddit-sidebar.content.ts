@@ -1,9 +1,13 @@
+// @ts-ignore -- plain JS helper, the project has no allowJs
+import { cachedSiteOff } from "../utils/site-cache.js";
+
 export default defineContentScript({
   matches: ["https://*.reddit.com/*"],
   runAt: "document_start",
   allFrames: true,
   main() {
-    let ENABLE_RD = true as any;
+    // Start from last visit's cache so an off Reddit is never touched.
+    let ENABLE_RD = !cachedSiteOff("rd") as any;
     const EARLY_CLOAK_STYLE_ID = "nd-reddit-sidebar-early-cloak";
     const DOC_STYLE_ID = "no-distractions-doc-popular-style";
     const SHADOW_STYLE_ID = "no-distractions-shadow-popular-style";
